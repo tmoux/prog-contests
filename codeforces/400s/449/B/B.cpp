@@ -5,35 +5,13 @@ typedef long long ll;
 const int maxn = 1e5+5;
 const ll INF = 1e18;
 int n, m, k;
-struct Edge { int to, w; bool isTrain; };
+struct Edge { int to, w; };
 vector<Edge> adj[maxn];
 vector<int> train[maxn];
-bool used[maxn];
 int ans = 0;
 
-int main()
-{
-    ios_base::sync_with_stdio(false); cin.tie(NULL);
-    cin >> n >> m >> k;
-    for (int i = 0; i < m; i++) {
-        int u, v, w; cin >> u >> v >> w;
-        adj[u].push_back({v,w,0});
-        adj[v].push_back({u,w,0});
-    }
-    for (int i = 0; i < k; i++) {
-        int s, y; cin >> s >> y;
-        train[s].push_back(y);
-        adj[1].push_back({s,y,1});
-        adj[s].push_back({1,y,1});
-    }
-    for (int i = 1; i <= n; i++) sort(train[i].begin(),train[i].end());
-    for (int i = 1; i <= n; i++) {
-        if (train[i].empty()) continue;
-        ans += train[i].size() - 1;
-    }
-
-    //dijkstra
-    set<pair<ll,int>,int>> setds;
+vector<ll> dijkstra() {
+    set<pair<ll,int>> setds;
     vector<ll> dist(n+1,INF);
     setds.insert({0,1});
     dist[1] = 0;
@@ -41,16 +19,6 @@ int main()
         auto tmp = *(setds.begin());
         setds.erase(setds.begin());
         int u = tmp.second;
-        if (!train[u].empty()) {
-            int tr = *train[u].begin();
-            if (dist[u] <= tr) {
-                if (!used[u]) ans++;
-                used[u] = true;
-            }
-            else {
-                dist[u] = tr;
-            }
-        }
         for (Edge& e: adj[u]) {
             int v = e.to;
             ll weight = e.w;
@@ -65,10 +33,50 @@ int main()
             }
         }
     }
+    return dist;
+}
+
+int indegree[maxn];
+
+int main()
+{
+    ios_base::sync_with_stdio(false); cin.tie(NULL);
+    cin >> n >> m >> k;
+    for (int i = 0; i < m; i++) {
+        int u, v, w; cin >> u >> v >> w;
+        adj[u].push_back({v,w});
+        adj[v].push_back({u,w});
+    }
+    for (int i = 0; i < k; i++) {
+        int s, y; cin >> s >> y;
+        train[s].push_back(y);
+    }
+    for (int i = 1; i <= n; i++) sort(train[i].begin(),train[i].end());
+
+    for (int i = 1; i <= n; i++) {
+        if (train[i].empty()) continue;
+        ans += train[i].size() - 1;
+        adj[1].push_back({i,train[i].front()});
+    }
+
+    vector<ll> dist = dijkstra();
+    for (int u = 1; u <= n; u++) {
+        for (Edge& e: adj[u]) {
+            int v = e.to;
+            ll w = e.w;
+            if (dist[u] + w == dist[v]) {
+                indegree[v]++;
+            }
+        }
+    }
+    for (int i = 1; i <= n; i++) {
+        if (train[i].empty()) continue;
+        ll w = train[i].front();
+        if (w > dist[i]) ans++;
+        else if (indegree[i] > 1) ans++;
+    }
     cout << ans << '\n';
     
-
-
 
         
     return 0;

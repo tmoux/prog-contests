@@ -38,7 +38,7 @@ int main()
 	#endif
 	
 	int max = 0, maxans;
-	for (int i = 1; i <= 1000000; i++) {
+	for (int i = 1; i <= 300000; i++) {
 		map<int,int> primes;
 		vector<pair<int,int>> ps;
 		primeFactor(i,primes);
