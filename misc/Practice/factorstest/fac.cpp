@@ -38,7 +38,8 @@ int main()
 	#endif
 	
 	int max = 0, maxans;
-	for (int i = 1; i <= 300000; i++) {
+    ll sum = 0;
+	for (int i = 1; i <= 1000000; i++) {
 		map<int,int> primes;
 		vector<pair<int,int>> ps;
 		primeFactor(i,primes);
@@ -46,14 +47,15 @@ int main()
 			ps.push_back({p.first,p.second});
 		}
 		int ans = getFactors(ps);
+        sum += ans;
 
 		if (ans > max) {
 			max = ans;
 			maxans = i;
 		}
 	}
+    cout << max << '\n';
 
-	printf("Maximum ans: %d with %d factors", maxans, max);
 	
 	return 0;
 }

@@ -7,6 +7,6 @@ ll modexp(ll x, ll n, int M) {
 
 //assume M is prime
 ll modInverse(ll x, int M) {
-	return modexp(x,M-2);
+	return modexp(x,M-2,M);
 }
 
