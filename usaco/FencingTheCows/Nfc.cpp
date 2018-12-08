@@ -71,13 +71,11 @@ double Distance(Vertex A, Vertex B)
 int N;
 
 int main() {
-	t1 = gettime();
-	ofstream fout("fc.out");
-	ifstream fin("fc.in");
+    //freopen("fc.in","r",stdin); freopen("fc.out","w",stdout);
 
-	fin >> N;
+	cin >> N;
 	for (int i = 0; i < N; i++) {
-		double x, y; fin >> x >> y;
+		double x, y; cin >> x >> y;
 		v[i].x = x;
 		v[i].y = y;
 	}
@@ -104,9 +102,9 @@ int main() {
     for (int i = 0; i < m - 1; ++i)
         ans += Distance(ch[i], ch[i + 1]);
     cout << fixed << setprecision(2) << ans << endl;
-    fout << fixed << setprecision(2) << ans << endl;
 	
-	
-	endProgram(t1);
+    for (int i = 0; i < m - 1; i++) {
+        cout << ch[i].x << ' ' << ch[i].y << '\n';
+    }
 	return 0;
 }

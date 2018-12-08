@@ -1,51 +1,108 @@
 #include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
 using namespace std;
 
+#define all(x) begin(x),end(x)
 typedef long long ll;
 
-template <class K, class V = __gnu_pbds::null_type>
-using ordered_set = __gnu_pbds::tree<K, V, std::less<K>, __gnu_pbds::rb_tree_tag, __gnu_pbds::tree_order_statistics_node_update>;
-// order_of_key(k), how many elements < k
-// find_by_order(k), k'th element (from 0)
-// both logn
-
 const int M = 1e9+7;
-namespace fen {
-    void add(int bit[], int i, int x) {
-        for (; i <= n; i += i & (-i))
+const int maxn = 755;
+
+struct Fen {
+    int* bit;
+    int s;
+    vector<int> cols;
+    map<int,int> colToIdx;
+    void init(int _s) {
+        s = _s;
+        bit = new int[s+1];
+        for (int i = 0; i <= s; i++) bit[i] = 0;
+    }
+    void init(const vector<int>& _c) {
+        s = _c.size();
+        cols = _c;
+        sort(all(cols));
+        cols.erase(unique(all(cols)),cols.end());
+        bit = new int[s+1];
+        for (int i = 0; i <= s; i++) bit[i] = 0;
+
+        //indexing
+        colToIdx[0] = 0;
+        for (int i = 0; i < cols.size(); i++) {
+            colToIdx[cols[i]] = i+1;
+        }
+    }
+
+    void add(int i, int x) {
+        for (; i <= s; i += i & (-i))
             bit[i] = (bit[i]+x) % M;
     }
 
-    int sum(int bit[], int i) {
+    int sum(int i) {
+        if (i == 0) return 0;
         int r = 0;
         for (; i; i -= i & (-i)) {
             r = (r+bit[i]) % M;
         }
         return r;
     }
-}
+
+    int idxForQuery(int i) {
+        auto it = upper_bound(all(cols),i);
+        if (it == cols.begin()) return 0;
+        --it;
+        return colToIdx[*it];
+    }
+
+    void insertValue(int col, int x) {
+        int i = colToIdx[col];
+        add(i,x);
+    }
+
+    int getValue(int col) {
+        int i = idxForQuery(col);
+        return sum(i);
+    }
+};
   
-const int maxn = 755;
-int R, C, K, a[maxn][maxn]; //a is one-indexed
-int cols[maxn]; //each column is a BIT
-map<int,ordered_set<int>> numCounts; //pbds for each number
-    
+
+int R, C, K, a[maxn][maxn]; //a[i][j] is one-indexed
+Fen cols;
+Fen nums[maxn*maxn];
+
 int main()
 {
-    cin >> R >> C >> K;
-    for (int i = 1; i <= n; i++) {
-        for (int j = 1; j <= n; j++) {
-            cin >> a[i][j];
+    freopen("hopscotch.in","r",stdin); freopen("hopscotch.out","w",stdout);
+    scanf("%d %d %d",&R,&C,&K);
+    map<int,vector<int>> mp;
+    for (int i = 1; i <= R; i++) {
+        for (int j = 1; j <= C; j++) {
+            scanf("%d",&a[i][j]);
+            mp[a[i][j]].push_back(j);
         }
     }
-    for (int i = n; i >= 1; i--) {
-        for (int j = n; j >= 1; j--) {
-            int adding = (fen::sum(cols,n) - fen::sum(cols,j) + M) % M;
+    //init fenwick trees
+    cols.init(C);
+    for (auto& p: mp) {
+        nums[p.first].init(p.second);
+    }
+    cols.add(1,1);
+    nums[a[1][1]].insertValue(1,1);
+    //dp down rows, right-to-left cols 
+    int ans;
+    for (int i = 2; i <= R; i++) {
+        for (int j = C; j >= 2; j--) {
+            int se = cols.sum(j-1);
+            int subtract = nums[a[i][j]].getValue(j-1);
+            se = (se - subtract + M) % M;
+            //update bits
+            cols.add(j,se);
+            nums[a[i][j]].insertValue(j,se);
+
+            if (i == R && j == C) {
+                ans = se;
+                break;
+            }
         }
     }
+    printf("%d\n",ans);
 }
-
-
-
