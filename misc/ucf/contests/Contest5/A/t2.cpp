@@ -53,24 +53,25 @@ ll solveTree(int centroid) {
         paths[i] = 1;
         adding[i] = 0;
     }
+    paths[0] = 1;
     for (int j: adj[centroid]) {
         if (blocked[j]) continue;
         //memset(adding,0,sizeof(ll)*depth);
         int maxd = 0;
         fillPaths(j,centroid,1,adding,maxd);    
+        /*
         cout << "centroid= " << centroid << ", " << j << '\n';
         for (int j = 1; j <= maxd; j++) {
             cout << j << ": " << adding[j] << '\n';
         }
         cout << '\n';
-        for (int a = 1; a <= min(maxd,k); a++) {
-            res += 1LL*adding[a]*paths[k-a];                        
-        }
-        for (int a = 1; a <= maxd; a++) {
+        */
+        for (int a = 1; a <= min(k,maxd); a++) {
+            res += 1LL * adding[a] * paths[max(0,k-a)];    
             adding[a] += adding[a-1];
-            paths[a] += adding[a];
         }
         for (int a = 1; a <= maxd; a++) {
+            paths[a] += adding[a];
             adding[a] = 0;
         }
     }
@@ -88,6 +89,7 @@ ll decomp(int i) {
         if (blocked[j]) continue;
         ans += decomp(j);
     }
+    cout << centroid << ": " << ans << '\n';
     return ans;
 }
 
