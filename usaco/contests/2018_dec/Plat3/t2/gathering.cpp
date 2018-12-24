@@ -109,6 +109,43 @@ struct Node {
 	}
 };
 
+int indegree[maxn], requires[maxn];
+vector<int> req[maxn];
+bool used[maxn];
+bool poss() {
+    queue<int> q; //list of valid nodes
+    int taken = 0;
+    for (int i = 1; i <= N; i++) {
+        if (indegree[i] <= 1 && requires[i] == 0) {
+            q.push(i);
+            used[i] = true;
+        }
+    }
+    while (!q.empty()) {
+        taken++;
+        int f = q.front(); q.pop();
+        for (int j: adj[f]) {
+            indegree[j]--;
+        }
+        for (int j: req[f]) {
+            requires[j]--;
+        }
+        for (int j: adj[f]) {
+            if (requires[j] == 0 && indegree[j] <= 1 && !used[j]) {
+                q.push(j);
+                used[j] = true;
+            }
+        }
+        for (int j: req[f]) {
+            if (requires[j] == 0 && indegree[j] <= 1 && !used[j]) {
+                q.push(j);
+                used[j] = true;
+            }
+        }
+    }
+    return taken == N;
+}
+
 int main()
 {
     ios_base::sync_with_stdio(false); cin.tie(NULL);
@@ -118,11 +155,22 @@ int main()
         int a, b; cin >> a >> b;
         adj[a].push_back(b);
         adj[b].push_back(a);
+        indegree[a]++;
+        indegree[b]++;
     }
     for (int i = 0; i < M; i++) {
         int a, b; cin >> a >> b;
         dirs.push_back({a,b});
+        requires[b]++;
+        req[a].push_back(b);
     }
+    if (!poss()) {
+        for (int i = 0; i < N; i++) {
+            cout << 0 << '\n';
+        }
+        return 0;
+    }
+    //now we know it is possible
     memset(parent,-1,sizeof parent);
     root(1,-1,0);
     for (int k = 1; k < maxk; k++) {
