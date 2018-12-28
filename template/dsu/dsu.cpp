@@ -1,6 +1,6 @@
 int parent[maxn]; //memset to -1
 int Find(int x) {
-    return x < 0 ? x : parent[x] = Find(parent[x]);
+    return parent[x] < 0 ? x : parent[x] = Find(parent[x]);
 }
 
 void Union(int x, int y) {
