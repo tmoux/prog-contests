@@ -1,0 +1,5 @@
+x = 1
+10 MOO {
+  x = ( x ) + ( x )
+}
+RETURN x

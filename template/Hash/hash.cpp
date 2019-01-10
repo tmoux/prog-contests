@@ -25,6 +25,7 @@ struct Hash
         len = s.size();
         str = s;
         prefix = new ll[maxn];
+        prefix[0] = 0; //important!
         ll mult = 1;
         for (int i = 0; i < s.size(); i++) {
             prefix[i+1] = (prefix[i] + (ctoi(s[i])*mult)%M)%M;  

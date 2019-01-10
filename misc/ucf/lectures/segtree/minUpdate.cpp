@@ -6,7 +6,7 @@ using namespace std;
 class Node {
 public:
 	int s, e, m;
-	//coverse s,e;
+	//covers s,e;
 	int sum;
 	int mini = 0;
 	Node *l, *r;

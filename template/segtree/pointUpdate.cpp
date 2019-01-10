@@ -18,8 +18,8 @@ struct Seg
 			return;
 		}
 		int m = (l+r)/2;
-		build(1,l,m,a);
-		build(1,m+1,r,a);
+		build(i*2,l,m,a);
+		build(i*2+1,m+1,r,a);
 		sum[i] = sum[i*2] + sum[i*2+1];
 	}
 	void update(int i, int idx, int x) {
