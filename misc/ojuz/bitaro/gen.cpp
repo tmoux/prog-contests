@@ -2,24 +2,31 @@
 using namespace std;
 typedef long long ll;
 
-const int maxn = 1e5+5;
-int N, M, Q;
-vector<int> ancestors[maxn];
-int SZ;
-vector<pair<int,int>> bests[maxn];
+
 
 int main()
 {
-    ios_base::sync_with_stdio(false); cin.tie(NULL);
-    cin >> N >> M >> Q;
+    int N, M, Q; cin >> N >> M >> Q;
+    printf("%d %d %d\n",N,M,Q);
     for (int i = 0; i < M; i++) {
-    	int s, e; cin >> s >> e;
-    	ancestors[e].push_back(s);
+        int l = rand() % N + 1;
+        int r = rand() % N + 1;
+        if (l > r) swap(l,r);
+        printf("%d %d\n",l,r);
     }
-    SZ = 500;
-
-
-
+    int tot = 100000;
+    while (Q--) {
+        int t = rand() % N + 1;
+        int y = rand() % (tot);
+        tot -= y;    
+        cout << t << ' ' << y << ' ';
+        for (int i = 0; i < y; i++) {
+            int j = rand() % N + 1;
+            cout << j << ' ';
+        }
+        cout << '\n';
+    }
 
     return 0;
 }
+
