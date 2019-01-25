@@ -5,12 +5,86 @@ typedef long long ll;
 const int maxn = 5e5+5;
 const ll NEG = -1e18;
 int n, q;
+
+struct Node {
+	int s, e, m;
+	//covers s,e;
+	ll sum;
+	ll lazy;
+	Node *l, *r;
+	
+	Node(int a, int b) {
+		s = a;
+		e = b;
+		sum = 0;
+		lazy = -1;
+		if (s != e) {
+			m = (s+e)/2;
+			l = new Node(s,m);
+			r = new Node(m+1,e);
+		}
+		else {
+			l = NULL;
+			r = NULL;
+		}
+	}
+
+	void push() {
+		if (lazy == -1) return;
+		if (s != e) {
+			l->lazy = lazy;
+			l->sum = (l->e - l->s + 1) * lazy;
+
+			r->lazy = lazy;
+			r->sum = (r->e - r->s + 1) * lazy;
+		}
+		lazy = -1;
+	}
+
+	void pull() {
+		sum = l->sum + r->sum;
+	}
+
+	void add(int st, int en, ll x) {
+		//lazy: already accounted for in your own node, not the childs nodes
+		if (st <= s && e <= en) {
+			lazy = x;
+			sum = (e - s + 1) * x;
+			return;
+		}
+		push();
+		if (st <= m) {
+			l->add(st,en,x);
+		}
+		if (en > m) {
+			r->add(st,en,x);
+		}
+		pull();
+	}
+
+	ll getsum(int st, int en) {
+		push();
+		//if completely included
+		if (st <= s && e <= en) {
+			return sum;
+		}
+		ll ret = 0;
+		if (st <= m) {
+			ret += l->getsum(st,en);
+		}
+		if (en > m) {
+			ret += r->getsum(st,en);
+		}
+		return ret;
+	}
+};
+
 namespace HLD
 {
 	int preorder[maxn], postorder[maxn], sub_size[maxn], weight[maxn], real_to_hld[maxn];
 	int pre = 0, hld_id = 1;
 	vector<int> adj[maxn];
-	struct Node {
+	struct node {
 		int parent, lastPrev, _preorder, _postorder, realid, lastHLD;
 	} nodes[maxn];
 
@@ -70,11 +144,50 @@ namespace HLD
 	    return lo;
 	}
 };
+using namespace HLD;
+
+void removeAncestors(int u, Node *seg) {
+	while (true) {
+		seg->add(nodes[u].parent,u,0);
+		if (nodes[u].lastPrev == u) break; //top chain
+		u = nodes[u].lastPrev;
+	}
+}
 
 int main()
 {
-    ios_base::sync_with_stdio(false); cin.tie(NULL);
-
-
+	//freopen("in","r",stdin);
+    scanf("%d",&n);
+	for (int i = 0; i < n - 1; i++) {
+		int a, b; scanf("%d %d",&a,&b);
+		adj[a].push_back(b);
+		adj[b].push_back(a);
+	}
+	dfs_prep(1,1);
+	hld(1,1,1);
+	Node *seg = new Node(1,n);
+	scanf("%d",&q);
+	while (q--) {
+		int t, v; scanf("%d %d",&t,&v);
+		int u = real_to_hld[v];
+		if (t == 1) {
+			//fill children
+			seg->add(u,nodes[u].lastHLD,1);
+		}
+		else if (t == 2) {
+			removeAncestors(u,seg);
+		}
+		else {
+			int ans = seg->getsum(u,u);
+			printf("%d\n",ans);
+		}
+	}	
+	
+	
+	
+	
+	
+	
+	
     return 0;
 }

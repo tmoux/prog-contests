@@ -4,6 +4,7 @@
 #include <math.h>
 using namespace std;
 typedef long long ll;
+const ll INV = -1; //invalid number for lazy
 
 struct Node {
 	int s, e, m;
@@ -16,7 +17,7 @@ struct Node {
 		s = a;
 		e = b;
 		sum = 0;
-		lazy = 0;
+		lazy = INV;
 		if (s != e) {
 			m = (s+e)/2;
 			l = new Node(s,m);
@@ -29,7 +30,7 @@ struct Node {
 	}
 
 	void push() {
-		if (lazy == 0) return;
+		if (lazy == INV) return;
 		if (s != e) {
 			l->lazy = lazy;
 			l->sum = (l->e - l->s + 1) * lazy;
@@ -37,7 +38,7 @@ struct Node {
 			r->lazy = lazy;
 			r->sum = (r->e - r->s + 1) * lazy;
 		}
-		lazy = 0;
+		lazy = INV;
 	}
 
 	void pull() {

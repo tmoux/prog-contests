@@ -48,7 +48,7 @@ int main()
         blocked[xpos[k]][ypos[k]] = true;
     }
     int mx = 500, my = 500;
-    while (kx != mx && ky != my) {
+    while (kx != mx || ky != my) {
         auto p = tryMove(kx,ky,mx,my);
         int xx = p.second.first;
         int yy = p.second.second;
@@ -86,7 +86,7 @@ int main()
     else {
         tx = q4.first; ty = q4.second;
     }
-    while (kx != tx && ty != ty) {
+    while (kx != tx || ty != ty) {
         auto p = tryMove(kx,ky,tx,ty);
         int xx = p.second.first;
         int yy = p.second.second;
