@@ -13,15 +13,24 @@ int range_min(int l, int r) {
 }
 
 int query(int l, int r) {
-
+    int lo = l-1, hi = n+1;
+    while (lo + 1 < hi) {
+        int m = (lo+hi)/2;
+        if (range_min(l-1,m) >= pfx[l-1]) {
+            lo = m;
+        }
+        else hi = m;
+    }
+    if (lo == l-1) return 0;
+    auto it = upper_bound(vs[pfx[l-1]].begin(),vs[pfx[l-1]].end(),lo);      
+    if (it == vs[pfx[l-1]].begin()) return 0;
+    --it;
+    return *it - (l-1);
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false); cin.tie(NULL);
-    #ifdef OFFLINE
-    freopen("in","r",stdin);
-    #endif
     string s; cin >> s;
     n = s.size();
     for (int i = 0; i < n; i++) {
@@ -30,14 +39,15 @@ int main()
     	vs[pfx[i+1]].push_back(i+1);
     }
     //rmq
-    for (int i = 1; i <= n; i++)
+    for (int i = 0; i <= n; i++)
     	mn[0][i] = pfx[i];
     for (int k = 1; k < maxk; k++) {
-    	for (int i = 1; i <= n; i++) {
+    	for (int i = 0; i <= n; i++) {
     		int j = i + (1 << (k-1));
-    		if (j + (1 << (k-1)) - 1 <= n) {
+    		if (j <= n) {
     			mn[k][i] = min(mn[k-1][i],mn[k-1][j]);
     		}
+            else mn[k][i] = mn[k-1][i];
     	}
     }
 
@@ -45,10 +55,10 @@ int main()
     cin >> m;
     while (m--) {
     	int l, r; cin >> l >> r;
-    	int ans = query(l,r);
+    	int ans = 0;
+        for (int i = l; i < r; i++) ans = max(ans,query(i,r));
+        cout << ans << '\n';
     }
-
-
 
     return 0;
 }
