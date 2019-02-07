@@ -3,7 +3,7 @@ using namespace std;
 using ll = long long;
 
 const int maxn = 1e5+5, M = 1e9+7;
-int MX = 5;
+int MX = 1e9;
 int N, K, mn[maxn];
 
 ll madd(ll a, ll b) {
@@ -33,34 +33,41 @@ ll solve(int mval, int len) {
     ll xTok = modpow(x,K);
     vector<ll> dp(len+2);
     dp[0] = 1;
+    /*
     for (int i = 1; i <= len+1; i++) {
         dp[i] = mult(x,dp[i-1]);
         if (i-K-1 >= 0) dp[i] = msub(dp[i],mult(modpow(x+1,K),dp[i-K-1]));
         dp[i] = madd(dp[i],dp[i-1]);
     }
-    /*
+    */
     for (int i = 1; i <= min(K+1,len+1); i++) {
         dp[i] = modpow(x+1,i-1);
     }
-    for (int i = K+1; i <= len + 1; i++) {
+    for (int i = K; i <= len + 1; i++) {
         dp[i] = dp[i-1];
-        dp[i] = msub(dp[i],mult(dp[i-K-1],modpow(x,K-1)));
+        if (i-K-1 >= 0) dp[i] = msub(dp[i],mult(dp[i-K-1],modpow(x,K-1)));
         dp[i] = mult(dp[i],x);
         dp[i] = madd(dp[i],dp[i-1]);
     }
-    */
+    /*
+    printf("mval: %d, len = %d\n",mval,len);
     for (int i = 1; i <= len + 1; i++) {
         cout << i << ": " << dp[i] << '\n';
     }
+    */
     return dp[len+1];
 }
 
 int main()
 {
     //freopen("tracking2.in","r",stdin); freopen("tracking2.out","w",stdout);
-    ios_base::sync_with_stdio(false); cin.tie(NULL);
+    //ios_base::sync_with_stdio(false); cin.tie(NULL);
     cin >> N >> K;
     for (int i = 1; i <= N-K+1; i++) cin >> mn[i];
+    if (K == 1) {
+        cout << 1 << '\n';
+        return 0;
+    }
     vector<pair<int,int>> pairs;
     int curr = -1;
     int cnt = 0;

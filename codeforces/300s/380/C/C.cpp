@@ -1,64 +1,62 @@
 #include <bits/stdc++.h>
 using namespace std;
-typedef long long ll;
+using ll = long long;
 
-inline int lg(int x) { return 32 - __builtin_clz(x) - 1;}
+const int maxn = 1e6+6;
+int n, m;
+char ss[maxn];
 
-const int maxn = 1e6+6, maxk = 21;
-int n, m, pfx[maxn], mn[maxk][maxn];
-map<int,vector<int>> vs;
-int range_min(int l, int r) {
-	int k = lg(r-l+1);
-	return min(mn[k][l],mn[k][r-(1<<k)+1]);
+struct Node
+{
+    int ans, uLeft, uRight;    
+} nodes[4*maxn];
+
+Node comb(Node a, Node b) {
+    int t = min(a.uLeft,b.uRight);
+    Node ret;
+    ret.ans = a.ans + b.ans + 2*t;
+    ret.uLeft = a.uLeft + b.uLeft - t;
+    ret.uRight = a.uRight + b.uRight - t;
+    return ret;
 }
 
-int query(int l, int r) {
-    int lo = l-1, hi = n+1;
-    while (lo + 1 < hi) {
-        int m = (lo+hi)/2;
-        if (range_min(l-1,m) >= pfx[l-1]) {
-            lo = m;
-        }
-        else hi = m;
+int s[4*maxn], e[4*maxn];
+void build(int i, int se, int en) {
+    s[i] = se;
+    e[i] = en;
+    if (se == en) {
+        if (ss[se] == '(') nodes[i] = {0,1,0};
+        if (ss[se] == ')') nodes[i] = {0,0,1};
+        return;
     }
-    if (lo == l-1) return 0;
-    auto it = upper_bound(vs[pfx[l-1]].begin(),vs[pfx[l-1]].end(),lo);      
-    if (it == vs[pfx[l-1]].begin()) return 0;
-    --it;
-    return *it - (l-1);
+    int m = (se+en)>>1;
+    build(i*2,se,m);
+    build(i*2+1,m+1,en);
+    nodes[i] = comb(nodes[i*2],nodes[i*2+1]);
+    //printf("[%d,%d]: ans = %d, uLeft = %d, uRight = %d\n",se,en,nodes[i].ans,nodes[i].uLeft,nodes[i].uRight);
+}
+
+Node query(int i, int l, int r) {
+    if (s[i] == e[i]) return nodes[i];
+    if (l <= s[i] && e[i] <= r) return nodes[i];
+    int m = (s[i]+e[i])>>1;
+    Node ret = {0,0,0};
+    if (l <= m) ret = comb(query(i*2,l,r),ret);
+    if (r > m) ret = comb(ret,query(i*2+1,l,r));
+    return ret;
 }
 
 int main()
 {
     ios_base::sync_with_stdio(false); cin.tie(NULL);
-    string s; cin >> s;
-    n = s.size();
-    for (int i = 0; i < n; i++) {
-    	pfx[i+1] = (s[i] == '(' ? 1 : -1);
-    	pfx[i+1] += pfx[i];
-    	vs[pfx[i+1]].push_back(i+1);
-    }
-    //rmq
-    for (int i = 0; i <= n; i++)
-    	mn[0][i] = pfx[i];
-    for (int k = 1; k < maxk; k++) {
-    	for (int i = 0; i <= n; i++) {
-    		int j = i + (1 << (k-1));
-    		if (j <= n) {
-    			mn[k][i] = min(mn[k-1][i],mn[k-1][j]);
-    		}
-            else mn[k][i] = mn[k-1][i];
-    	}
-    }
-
-    //answer queries
+    string st; cin >> st;
+    n = st.size();
+    for (int i = 1; i <= n; i++) ss[i] = st[i-1];
+    build(1,1,n);
     cin >> m;
     while (m--) {
-    	int l, r; cin >> l >> r;
-    	int ans = 0;
-        for (int i = l; i < r; i++) ans = max(ans,query(i,r));
-        cout << ans << '\n';
+        int l, r; cin >> l >> r;
+        cout << query(1,l,r).ans << '\n';
     }
-
     return 0;
 }
