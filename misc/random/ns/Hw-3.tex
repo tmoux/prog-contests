@@ -1,0 +1,102 @@
+\documentclass[12pt]
+{article}
+
+\topmargin0in
+\headheight42pt
+\oddsidemargin0in
+\evensidemargin0in
+\textwidth6.5in
+\textheight8in
+
+\usepackage{fancyhdr}
+\usepackage{amsmath}
+\usepackage{physics}
+\usepackage{amssymb}
+\usepackage{relsize}
+\usepackage[shortlabels]{enumitem}
+\usepackage{mathtools}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+\pagestyle{fancy}
+\cfoot{}
+\rhead{\bf
+Timothy Mou \\
+Assignment 3 \\
+Page: \thepage}
+
+\newcommand{\announce}[1]
+{\vspace\baselineskip{\parindent0in {\bf #1}}}
+
+\begin{document}
+ch. 3: 34, 35, 41, 45-48, 53, 54
+
+\announce{Problem 34.} 
+Subgroups of $\bf{Z_3} \times \bf{Z_3}$: 
+\begin{enumerate}
+    \item $\{(0,0)\}$
+    \item \{(0,0),(1,0),(2,0)\}
+    \item \{(0,0),(0,1),(0,2)\}
+    \item \{(0,0),(1,1),(2,2)\}
+    \item \{(0,0),(1,2),(2,1)\}
+    \item $\bf{Z_3} \times \bf{Z_3}$
+\end{enumerate}
+
+Subgroups of $\bf{Z_9}$:
+\begin{enumerate}
+	\item \{0\}
+	\item \{0,3,6\}
+	\item $\bf{Z_9}$
+\end{enumerate}
+
+Since $\bf{Z_3} \times \bf{Z_3}$ has a different number of subgroups than $\bf{Z_9}$, they must be different.
+	
+\announce{Problem 35.}
+Let's label the elements of the symmetry group as $\{e,r_1,r_2,s_1,s_2,s_3\}$, where $r_1,r_2$ are rotations, and $s_1,s_2,s_3$ are reflections about one of the three sides. Then the subgroups are:
+\begin{enumerate}
+	\item $\{e\}$
+	\item $\{e,r_1,r_2\}$
+	\item $\{e,s_1\}$
+	\item $\{e,s_2\}$
+	\item $\{e,s_3\}$
+	\item $\{e,r_1,r_2,s_1,s_2,s_3\}$
+\end{enumerate}
+
+\announce{Problem 41.}
+The identity of $\bf{R^*}$ is $e = 1 + 0 \sqrt{2}$, so $e \in G$.
+Let $A = a + b \sqrt{2} \in G$. 
+Then since $A \neq 0 + 0\sqrt{2}$, $A^{-1} = \frac{1}{a + b\sqrt{2}} = \frac{1}{a + b\sqrt{2}} \cdot \frac{a-b\sqrt{2}}{a-b\sqrt{2}} = \frac{a-b\sqrt{2}}{a^2-2b^2} = \frac{a}{a^2-2b^2} + -\frac{b}{a^2-2b^2} \sqrt{2}$, and $\frac{a}{a^2-2b^2} , -\frac{b}{a^2-2b^2} \in \bf{Q}$, so $A^{-1} \in G$. 
+If $h_1 = a + b\sqrt{2}$ and $h_2 = c + d\sqrt{2}$, then $h_1 h_2 = (a + b\sqrt{2})(c + d\sqrt{2}) = ac + 2bd + ad\sqrt{2} + b\sqrt{2}c = (ac + 2bd) + (ad + bc)\sqrt{2}$, which is in $G$. Therefore, $G$ is a subgroup of $\bf{R^*}$.
+
+\announce{Problem 45.}
+Let $H, K$ be subgroups of $G$. 
+Since $e \in H$ and $e \in K$, $e \in H \cap K$. 
+If an element $h \in H \cap K$, then $h^{-1} \in H$ and $h^{-1} \in K$, so $h^{-1} \in H \cap K$. 
+If $h_1, h_2 \in H \cap K$, then $h_1 h_2 \in H$ and $h_1 h_2 \in K$, so $h_1 h_2 \in H \cap K$. 
+Therefore $H \cap K$ is a subgroup of $G$.
+
+\announce{Problem 46.}
+Let $H = \{e,r_1,r_2\}$ and $K = \{e,s_1\}$ be subgroups of the symmetry group of the equilateral triangle. 
+Then $H \cup K = \{e,r_1,r_2,s_1\}$ is not a subgroup, as $s_1r_1 \not\in H \cup K$.
+Therefore the statement is false.
+
+\announce{Problem 47.}
+Let $H = \{e,s_1\}$ and $K = \{e,s_2\}$ be subgroups of the symmetry group of the equilateral triangle. 
+Then $HK = \{e,s_1,s_2,s_1s_2\}$ is not a subgroup.
+Therefore the statement is false.
+
+In the case that $G$ is abelian, then $ee = e \in HK$. Let $a = hk, b = h'k' \in HK$, where $h,h' \in H, k,k' \in K$. Then $ab = hkh'k' = (hh')(kk') \in HK$, because $hh' \in H$ and $kk' \in K$. 
+If $hk \in HK$, then $(hk)^{-1} = h^{-1}k^{-1} \in HK$, since $h^{-1} \in H$ and $k^{-1} \in K$. Therefore if $G$ is abelian, then $HK$ is a subgroup of $G$.
+
+\announce{Problem 48.}
+Clearly $e \in Z(G)$ since $ge = eg = g$ for all $g \in G$. If $x \in Z(G)$, then $gx =xg \iff x^{-1}gxx^{-1} = x^{-1} x g x^{-1} \iff x^{-1} g = g x^{-1}$, so $x^{-1} \in Z(G)$. 
+If $x,y \in Z(G)$, then $gx = xg \implies g(xy) = x(gy) = (xy)g$, so $xy \in Z(G)$. Therefore $Z(G)$ is a subgroup of $G$.
+
+\announce{Problem 53.}
+$e \in C(H)$ since $eh = he$ for all $h \in H$. If $g \in C(H)$, then $gh = hg \iff g^{-1} g h g^{-1} = g^{-1} h g g^{-1} \iff h g^{-1} = g^{-1} h$, so $g^{-1} \in C(H)$. 
+If $g_1, g_2 \in C(H)$, then $g_1 h = h g_1 \implies g_1 h g_2 = h (g_1 g_2) = (g_1 g_2) h$, so $g_1 g_2 \in C(H)$. Therefore $C(H)$ is a subgroup of $G$.
+
+\announce{Problem 54.}
+Since $e \in H$, $geg^{-1} = e$, so $e \in gHg^{-1}$. Let $h \in H$, and $ghg^{-1} \in gHg^{-1}$. Then $(ghg^{-1})^{-1} = (g(gh)^{-1})^{1} = gh^{-1}g^{-1}$. Since $h^{-1} \in H$, then $gh^{-1}g^{-1} \in gHg^{-1}$, so $(ghg^{-1})^{-1} \in gHg^{-1}$.
+Let $gh_1g^{-1}, gh_2g^{-1} \in gHg^{-1}$. Then $(gh_1g^{-1})(gh_2g^{-1}) = gh_1(g^{-1}g)h_2g^{-1} = g(h_1h_2)g^{-1}$, which is in $gHg^{-1}$ since $h_1 h_2 \in H$. Therefore $gHg^{-1}$ is a subgroup of $G$.
+
+\end{document}
