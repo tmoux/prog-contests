@@ -70,12 +70,12 @@ Tree getTree(const vector<int>& comp) {
 
 Tree trees[maxn];
 int pt = 1;
-int dp[maxn][2505]; //# of paths using the first i nodes, that sum up to y (K-x included)
+int dp[5000][5000]; //# of paths using the first i nodes, that sum up to y (K-x included)
 
 int main()
 {
     ios_base::sync_with_stdio(false); cin.tie(NULL);
-    //freopen("mooriokart.in","r",stdin); freopen("mooriokart.out","w",stdout);
+    freopen("mooriokart.in","r",stdin); freopen("mooriokart.out","w",stdout);
     cin >> N >> m >> X >> Y;
     K = N - m; //K = # of components
     for (int i = 0; i < m; i++) {
