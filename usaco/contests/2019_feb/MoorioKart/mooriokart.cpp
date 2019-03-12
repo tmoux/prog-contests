@@ -48,11 +48,11 @@ void ffill(int i, vector<int>& comp) {
     }
 }
 
-void dfs_len(int i, int p, int d, map<int,int>& cnt) {
+void dfs_len(int i, int p, int orig, int d, map<int,int>& cnt) {
     if (d > 0) cnt[d]++;
     for (Edge e: adj[i]) {
         if (e.to == p) continue;
-        dfs_len(e.to,i,d+e.w,cnt);
+        dfs_len(e.to,i,orig,d+e.w,cnt);
     }
 }
 
@@ -60,9 +60,10 @@ Tree getTree(const vector<int>& comp) {
     Tree r;
     r.n = comp.size();
     for (int i: comp) {
-        dfs_len(i,i,0,r.cnt);
+        dfs_len(i,i,i,0,r.cnt);
     }
     for (auto& p: r.cnt) {
+        assert(p.second % 2 == 0);
         p.second /= 2;
     }
     return r;
@@ -75,7 +76,8 @@ int dp[5000][5000]; //# of paths using the first i nodes, that sum up to y (K-x 
 int main()
 {
     ios_base::sync_with_stdio(false); cin.tie(NULL);
-    freopen("mooriokart.in","r",stdin); freopen("mooriokart.out","w",stdout);
+    freopen("mooriokart.in","r",stdin); 
+    freopen("mooriokart.out","w",stdout);
     cin >> N >> m >> X >> Y;
     K = N - m; //K = # of components
     for (int i = 0; i < m; i++) {
@@ -114,25 +116,28 @@ int main()
 
 
     //now do dp to count sum of paths strictly less than Y
-    Y = Y - K * X; //can be negative
-    dp[0][0] = 1;
+    //cout << "Y = " << Y << '\n';
+    dp[0][min(Y,K*X)] = 1;
     for (int i = 1; i <= K; i++) {
         for (auto p: trees[i].cnt) {
-            for (int y = 0; y + p.first < Y; y++) {
+            for (int y = min(Y,K*X); y + p.first < Y; y++) {
                 dp[i][y+p.first] = madd(dp[i][y+p.first],mult(dp[i-1][y],p.second));
             }
         }
+        /*
+        for (int y = 0; y < Y; y++) {
+            if (dp[i][y] > 0) cout << i << ' ' << y << ": " << dp[i][y] << '\n';
+        }
+        */
     }
     int takeout = 0;
     for (int y = 0; y < Y; y++) {
-        takeout = madd(takeout,mult(dp[K][y],madd(y,mult(K,X))));
-        //cout << y << ": " << dp[K][y] << '\n';
+        takeout = madd(takeout,mult(dp[K][y],y));
     }
     sumall = (sumall - takeout + M) % M;
     //multiply by 2^(K-1) * (K-1)!
     sumall = mult(sumall,modexp(2,K-1));
-    for (int i = 2; i <= K-1; i++) sumall = mult(sumall,i);            
+    for (int i = 2; i <= K-1; i++) sumall = mult(sumall,i); 
     cout << sumall << '\n';
     return 0;
 }
-
