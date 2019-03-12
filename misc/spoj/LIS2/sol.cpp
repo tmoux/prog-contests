@@ -5,132 +5,84 @@ using ll = long long;
 const int maxn = 1e5+5;
 int N;
 
-struct Node {
-	int s, e, m;
-	//covers s,e;
-	ll sum;
-	ll maxi;
-	Node *l, *r;
-	
-	Node(int a, int b) {
-		s = a;
-		e = b;
-		sum = 0;
-		maxi = 0;
-		if (s != e) {
-			m = (s+e)/2;
-			l = new Node(s,m);
-			r = new Node(m+1,e);
-		}
-		else {
-			l = NULL;
-			r = NULL;
-		}
-	}
-
-
-	void add(int i, ll x) {
-		if (s == e) {
-            sum = max(sum,x);
-			maxi = sum;
-			return;
-		}
-		if (i <= m) {
-			l->add(i,x);
-		}
-		else if (i > m) {
-			r->add(i,x);
-		}
-		else assert(false);
-		sum = l->sum + r->sum;
-		maxi = max(l->maxi,r->maxi);
-	}
-
-	ll getmaxi(int st, int en) {
-		if (st <= s && e <= en) {
-			return maxi;
-		}
-		ll ret = 0;
-		if (st <= m) {
-			ret = max(ret,l->getmaxi(st,en));
-		}
-		if (en > m) {
-			ret = max(ret,r->getmaxi(st,en));
-		}
-		return ret;
-	}	
-
-	ll getsum(int st, int en) {
-		if (st <= s && e <= en) {
-			return sum;
-		}
-		ll ret = 0;
-		if (st <= m) {
-			ret += l->getsum(st,en);
-		}
-		if (en > m) {
-			ret += r->getsum(st,en);
-		}
-		return ret;
-	}
+struct Point
+{
+    int first, second, id;
+    bool operator<(const Point& r) const {
+        if (first != r.first) return first < r.first;
+        return second < r.second;
+    }
 };
 
-int dp[maxn];
+struct Hull : public vector<pair<int,int>>
+{
+    //maintains points in sorted x order, y must be nonincreasing
+    void insert(int x, int y) { //find the 
+        int n = this->size();
+        int lo = -1, hi = n;
+        while (lo + 1 < hi) {
+            int mid = (lo+hi)>>1;
+            if (h[mid].x < x) lo = mid;
+            hi = mid;    
+        }
+    }
+} lis[maxn];
+
+bool poss(int x, int y, int li) {
+    if (lis[li].empty()) return false;
+    pair<int,int> p = {x,y};
+    //find the point with largest x value s.t.
+    //q.x < x. Then check if q.y < y
+    Hull& h = lis[li];
+    int n = h.size();
+    int lo = -1, hi = n;
+    
+    if (lo == -1) return false;
+    return h[lo].y < y;
+}
 
 int main()
 {
     ios_base::sync_with_stdio(false); cin.tie(0);
     cin >> N;
-    vector<pair<int,int>> a(N);
+    vector<Point> a(N);
     for (int i = 0; i < N; i++) {
         cin >> a[i].first >> a[i].second;
+        a[i].id = i + 1;
     }
+    //Coordinate compress
     sort(a.begin(),a.end());
-    map<int,int> x;
+    map<int,int> mp;
     int pt = 1;
     for (auto& p: a) {
-        if (x.count(p.first)) p.first = x[p.first];
-        else p.first = x[p.first] = pt++;
+        if (mp.count(p.first)) p.first = mp[p.first];
+        else p.first = mp[p.first] = pt++;
     }
-    sort(a.begin(),a.end(),[](auto a, auto b) {
-            return a.second < b.second;
-            });
-    map<int,int> y;
+    sort(a.begin(),a.end(),[](auto a, auto b) { 
+        return a.second < b.second;});
+    mp.clear();
     pt = 1;
     for (auto& p: a) {
-        if (y.count(p.second)) p.second = y[p.second];
-        else p.second = y[p.second] = pt++;
+        if (mp.count(p.second)) p.second = mp[p.second];
+        else p.second = mp[p.second] = pt++;
     }
-    sort(a.begin(),a.end());
-    Node *root = new Node(0,N);
-    vector<vector<pair<int,int>>> batches;
-    vector<pair<int,int>> curr;
-    int prevx = -1;
+    sort(a.begin(),a.end(),[](auto a, auto b) {
+            return a.id < b.id;
+            });
+    //now its compressed
     for (auto p: a) {
-        if (p.first != prevx) {
-            if (prevx != -1) {
-                batches.push_back(curr);
-            }
-            curr.clear();
-            prevx = p.first;
+        int x = p.first;
+        int y = p.second;
+        //binary search for lis
+        int lo = 0, hi = N;
+        while (lo + 1 < hi) {
+             int mid = (lo+hi)>>1;
+            if (poss(x,y,mid)) lo = mid;
+            else hi = mid;
         }
-        curr.push_back(p);
+        //ans is lo + 1;
+        int li = lo + 1;
+        lis[li].insert(x,y); //insert point into hull           
     }
-    int ans = 0;
-    batches.push_back(curr);
-    for (vector<pair<int,int>>& batch: batches) {
-        vector<pair<int,int>> adds;
-        for (auto p: batch) {
-            int mx = root->getmaxi(0,p.second-1) + 1;
-            cout << p.first << ' ' << p.second << ": " << mx << '\n';
-            adds.push_back({p.second,mx});    
-            ans = max(ans,mx);
-        }
-        for (auto p: adds) {
-            root->add(p.first,p.second);
-        }
-        cout << '\n';
-    }
-    cout << ans << '\n';
 }
 
