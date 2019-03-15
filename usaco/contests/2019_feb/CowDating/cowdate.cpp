@@ -86,7 +86,7 @@ ld b[maxn];
 int main()
 {
     ios_base::sync_with_stdio(false); cin.tie(NULL);
-    //freopen("cowdate.in","r",stdin); freopen("cowdate.out","w",stdout);
+    freopen("cowdate.in","r",stdin); freopen("cowdate.out","w",stdout);
     cin >> N;
     for (int i = 0; i < N; i++) {
         cin >> a[i];
@@ -110,7 +110,7 @@ int main()
         //cout << (L+1) << ' ' << (ll)(prod*sum) << '\n';
         ans = max(ans,(ll)(prod*sum));
     }
-    if (ans % 10 == 9) ++ans;
+    //if (ans % 10 == 9) ++ans;
     cout << ans << '\n';
 
     return 0;

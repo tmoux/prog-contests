@@ -107,10 +107,7 @@ int main() {
 
 	cout << totalflow << endl;
 	fout << totalflow << endl;
-                                         
-
-                                                        
-	
+                                         	
 	endProgram(t1);
 	return 0;
 }
