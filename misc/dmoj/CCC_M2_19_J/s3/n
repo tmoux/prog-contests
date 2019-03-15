@@ -1,0 +1,13 @@
+(x1, y1), (x2, y2)
+Ax + By + C = 0
+
+m = (y2-y1)/(x2-x1) if (x2-x1) != 0 else (1LL<<62) (inf)
+y - y1 = m*(x-x1) = m*x - m*x1
+b = -m*x1 + y1 (handle case where m = inf)
+
+store m,b as fractions (num/den) in lowest terms
+
+For each line, store a count c
+c : (n choose 2) --> n
+For n points, subtract out (n choose 3)
+
