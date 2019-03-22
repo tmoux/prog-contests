@@ -51,5 +51,5 @@ int main()
         msub(ans,mult(mu[i],mult(f,inverse(m-f))));
     }
     cout << ans << '\n';
+    
 }
-
