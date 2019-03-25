@@ -7,10 +7,9 @@ using ll = long long;
 //a.szX -= b.szX, a.szY -= b.szY
 //Reset b to be the parent of itself
 //use random merging
-const int maxn = 3e5;
-int q;
-pair<int,int> queries[maxn+5];
-ll ans[maxn];
+const int maxn = 4e5;
+int N, q;
+ll ans[maxn+5];
 
 struct Node //node in segment tree of queries
 {
@@ -40,70 +39,42 @@ void addInterval(int i, int l, int r, const pair<int,int>& p) {
 }
 
 stack<int> active;
-ll currAns = 0;
+int currAns = 0;
 //DSU information
 int parent[2*maxn+10];
-pair<int,int> sz[2*maxn+10];
-
-pair<int,int>& operator+=(pair<int,int>& a, pair<int,int> b) {
-    a.first += b.first;
-    a.second += b.second;
-    return a;
-}
-
-pair<int,int>& operator-=(pair<int,int>& a, pair<int,int> b) {
-    a.first -= b.first;
-    a.second -= b.second;
-    return a;
-}
+int sz[2*maxn+10];
 
 int findParent(int i) {
     if (parent[i] == i) return i;
     return findParent(parent[i]);
 }
 
-ll getCount(pair<int,int> p) {
-    return 1LL*p.first*p.second;
-}
-
 void merge(int a, int b) {
-
     a = findParent(a);
     b = findParent(b);
     if (a == b) return;
-    if (sz[a].first+sz[a].second<sz[b].first+sz[b].second) 
-        swap(a,b);
-    currAns -= getCount(sz[a]);
-    currAns -= getCount(sz[b]);
+    if (sz[a] < sz[b]) swap(a,b);
     parent[b] = a;
     sz[a] += sz[b];
-    currAns += getCount(sz[a]);
+    currAns--;
     active.push(b);
-}
-
-void addEdge(const pair<int,int>& p) {
-    merge(p.first,p.second+maxn);
 }
 
 void rollback() {
     int b = active.top(); active.pop();
     int a = parent[b];
-    //assert(p.first==a);
-    currAns -= getCount(sz[a]);
     parent[b] = b;
     sz[a] -= sz[b];
-    currAns += getCount(sz[a]);
-    currAns += getCount(sz[b]);
+    currAns++;
 }
 
 void DFS(int i) {
     int t0 = active.size();
     //add this interval's edges
     for (const auto& p: nodes[i].edges) {
-        addEdge(p);
+        merge(p.first,p.second);
     }
     if (nodes[i].se == nodes[i].en) {
-        //cout << nodes[i].se << ": " << currAns << '\n';
         ans[nodes[i].se] = currAns;
     }
     else {
@@ -118,49 +89,47 @@ void DFS(int i) {
 
 int main()
 {
-    scanf("%d",&q);
+    ios_base::sync_with_stdio(false); cin.tie(0);
+    freopen("connect.in","r",stdin); freopen("connect.out","w",stdout);
+    cin >> N >> q;
     map<pair<int,int>,int> curr;
     build(1,1,q);
     //pair<int,int> first;
+    vector<int> queries;
     for (int i = 1; i <= q; i++) {
-        int x, y; scanf("%d %d",&x,&y);
-        pair<int,int> p = {x,y};
-        //if (i == 1) first = p;
-        queries[i] = p;
-        if (curr.count(p)) {
-            //add interval from [curr[{x,y}],i-1]
-            addInterval(1,curr[p],i-1,p);
-            curr.erase(p);
+        char c; cin >> c;
+        if (c == '?') {
+            queries.push_back(i);
         }
         else {
-            curr[p] = i;
+            int x, y; cin >> x >> y;
+            if (x > y) swap(x,y);
+            pair<int,int> p = {x,y};
+            if (c == '-') {
+                //add interval from [curr[{x,y}],i-1]
+                addInterval(1,curr[p],i-1,p);
+                curr.erase(p);
+            }
+            else {
+                assert(c == '+');
+                curr[p] = i;
+            }
         }
     }
     for (auto p: curr) {
         addInterval(1,p.second,q,p.first);
     }
-    /*
-    for (int i = 1; i <= 4*q; i++) {
-        printf("[%d, %d]:\n",nodes[i].se,nodes[i].en);
-        for (auto p: nodes[i].edges) {
-            cout << p.first << ' ' << p.second << '\n';
-        }
-    }
-    */
+
     //initialize DSU
-    for (int i = 1; i <= maxn; i++) {
+    for (int i = 1; i <= N; i++) {
         parent[i] = i;
-        sz[i].first = 1;
+        sz[i] = 1;
     }
-    for (int i = maxn+1; i <= 2*maxn; i++) {
-        parent[i] = i;
-        sz[i].second = 1;
-    }
+    currAns = N;
     //DFS on segment tree
     DFS(1);
     //output
-    for (int i = 1; i <= q; i++) {
-        cout << ans[i] << " \n"[i==q];
+    for (int i: queries) {
+        cout << ans[i] << '\n';
     }
 }
-
