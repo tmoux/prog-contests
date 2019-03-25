@@ -19,6 +19,9 @@ int modexp(int a, int b) {
     }
     return r;
 }
+int sqr(int x) {
+    return (1LL*x*x) % M;
+}
 int inverse(int x) {
     return modexp(x,M-2);
 }
@@ -26,33 +29,21 @@ int n, k, a[maxn];
 int d[maxn];
 int N;
 ll dp[2][maxn]; //dp[0][i] = # non-ones, dp[1][i] = # ones
+ll cntSame[maxn], cntDiff[maxn];
 
 bool val(int x) {
     return 1 <= x;
 }
 
 ll solve(int l, int r) {
-    if (l + 1 == r) {
-        return d[l] != d[r];
-    }
+    int len = r - l - 1;
     if (l == 0 && r == N + 1) {
-        int len = r - l - 1;
         return mult(k,modexp(k-1,len-1));
     }
     if (l == 0 || r == N + 1) {
-        int len = r - l - 1;
         return modexp(k-1,len);
     }
-    if (r - l - 1 == 1) {
-        return (d[l] == d[r] ? k-1 : k-2);        
-    }
-    dp[0][l] = d[l] == 1 ? 0 : 1;
-    dp[1][l] = 1 - dp[0][l];
-    for (int i = l + 1; i < r; i++) {
-        dp[0][i] = madd(mult(k-2,dp[0][i-1]),mult(k-1,dp[1][i-1]));
-        dp[1][i] = dp[0][i-1];
-    }
-    return madd(dp[0][r-1],dp[1][r-1]);
+    return d[l] == d[r] ? cntSame[len] : cntDiff[len];
 }
 
 ll getdp() {
@@ -74,6 +65,19 @@ int main()
     ios_base::sync_with_stdio(false); cin.tie(0);
     cin >> n >> k;
     for (int i = 1; i <= n; i++) cin >> a[i];
+    //fill in dp
+    cntSame[0] = 0;
+    cntDiff[0] = 1;
+    for (int i = 1; i <= n; i++) {
+        if (i&1) {
+            cntSame[i] = madd(sqr(cntSame[i/2]),mult(k-1,sqr(cntDiff[i/2])));
+            cntDiff[i] = madd(mult(2,mult(cntSame[i/2],cntDiff[i/2])),mult(k-2,sqr(cntDiff[i/2])));
+        }
+        else {
+            cntSame[i] = mult(k-1,cntDiff[i-1]);
+            cntDiff[i] = madd(cntSame[i-1],mult(k-2,cntDiff[i-1]));
+        }
+    }
     ll ans = 1;
     int pt = 1;
     for (int i = 1; i <= n; i+=2) {
