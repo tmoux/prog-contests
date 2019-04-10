@@ -92,6 +92,7 @@ int main()
     //ios_base::sync_with_stdio(false); cin.tie(0);
     int t; cin >> t;
     for (int qq = 1; qq <= t; qq++) {
+        cout << qq << endl;
         cin >> N;
         for (int i = 0; i < N; i++) cin >> wt[i];
         for (int i = 0; i <= N; i++) {
@@ -104,6 +105,7 @@ int main()
         }
         int maxans = 1;
         for (int i = 0; i < N; i++) {
+            //cout << i << endl;
             dp[i][1] = 0;
             segs[1]->add(i,0+wt[i]);
             for (int a = 2; a < 150 && i - (a-1) >= 0; a++) {
