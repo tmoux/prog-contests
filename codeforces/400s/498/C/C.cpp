@@ -1,11 +1,4 @@
-#include <iostream>
-#include <string>
-#include <vector>
-#include <algorithm>
-#include <math.h>
-#include <unordered_map>
-#include <unordered_set>
-#include <cstring>
+#include <bits/stdc++.h>
 using namespace std;
 typedef long long ll;
 
@@ -13,12 +6,12 @@ const int maxn = 105;
 const int INF = 999999;
 int n, m, A[maxn];
 pair<int,int> good[maxn];
-unordered_map<int,int> factors[maxn];
-unordered_map<int,int> divs[maxn]; //divs[i] is list of divisors of the two numbers
-unordered_map<int,vector<int>> pairsforP;
-unordered_set<int> primesUsed;
+map<int,int> factors[maxn];
+map<int,int> divs[maxn]; //divs[i] is list of divisors of the two numbers
+map<int,vector<int>> pairsforP;
+set<int> primesUsed;
 
-void factor(int n, unordered_map<int,int>& mp) {
+void factor(int n, map<int,int>& mp) {
     if (n == 1) return;
     for (int i = 2; i*i <= n; i++) {
         if (n % i == 0) {
