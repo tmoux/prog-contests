@@ -17,11 +17,46 @@ struct Perm {
         return Perm(r);
     }
 
+    Perm<N> inverse() {
+        vector<int> r(N+1);
+        for (int i = 1; i <= N; i++) {
+            r[p[i]] = i;
+        }
+        return Perm(r);
+    }
+
     bool operator==(const Perm<N>& b) {
         for (int i = 1; i <= N; i++) {
             if (p[i] != b.p[i]) return false;
         }
         return true;
+    }
+
+    string pretty() const {
+        vector<bool> vis(N+1);
+        string res;
+        vector<int> currCycle;
+        for (int i = 1; i <= N; i++) {
+            if (vis[i]) continue;
+            if (p[i] == i) continue;
+            else {
+                int c = i;
+                while (!vis[c]) {
+                    vis[c] = true;
+                    currCycle.push_back(c);
+                    c = p[c];
+                }
+                res += "(";
+                for (int j = 0; j < currCycle.size(); j++) {
+                    res += to_string(currCycle[j]);
+                    if (j < currCycle.size() - 1) res += " ";
+                }
+                res += ")";
+                currCycle.clear();
+            }
+        }
+        if (res.empty()) res = "()";
+        return res;
     }
 
     bool operator<(const Perm<N>& b) const {
@@ -34,12 +69,16 @@ struct Perm {
 
 template<int N>
 ostream& operator<<(ostream& out, const Perm<N>& c) {
+    /*
     out << "(";
     for (int i = 1; i <= N; i++) {
         out << c.p[i];
         if (i < N) out << ", ";
     }
     out << ")";
+    return out;
+    */
+    out << c.pretty();
     return out;
 }
 
@@ -58,31 +97,23 @@ int main()
                            Perm<4>({0,4,2,1,3}),
                            Perm<4>({0,4,3,2,1})};
 
-    vector<Perm<4>> H = {Perm<4>({0,1,2,3,4}),
-                         Perm<4>({0,2,3,1,4}),
-                         Perm<4>({0,3,1,2,4})};
-    set<set<Perm<4>>> ans;
-    for (auto a: alt) {
-        cout << a << ": ";
-        set<Perm<4>> s;
-        for (auto h : H) {
-            for (auto k: H) {
-                s.insert(h*(a*k));    
-            }
+    vector<int> per = {0,1,2,3,4};
+    vector<Perm<4>> s4;
+    do {
+        s4.push_back(Perm<4>(per));
+        //cout << Perm<5>(per) << '\n';
+    } while (next_permutation(per.begin()+1,per.end()));
+    
+    for (auto g: s4) {
+        set<Perm<4>> r;
+        for (auto x: s4) {
+            r.insert(x*g*x.inverse());
         }
-        for (auto b: s) {
-            cout << b << " , ";
+        cout << "element " << g << '\n';
+        for (auto p: r) {
+            cout << p << ", ";
         }
-        cout << "\n\n";
-        ans.insert(s);
-    }
-
-    cout << "answer:\n";
-    for (auto s: ans) {
-        for (auto a: s) {
-            cout << a << " , ";
-        }
-        cout << '\n';
+        cout << "\n";
     }
 
     return 0;

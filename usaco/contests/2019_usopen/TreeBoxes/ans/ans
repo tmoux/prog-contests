@@ -1,0 +1,81 @@
+/*
+ Category: Constructive + Trees
+ 
+ Solution Sketch:
+ We need to put a tree on a grid, so we root the tree, and then use a preorder traversal to assign the x-coordinates. In order to figure out how we should assign the y-coordinates, note that for each query we need to have rectangles that cover each node up to the LCA. In the preorder traversal, the values increase from the LCA down to the nodes, but so are other nodes that are under the LCA.
+ Therefore, we need to assign the y-coordinates in a way so that along a path down the tree, they increase as well but no other node on the path has an x-value and a y-value between the LCA and the end point. Since a preorder traversal processes a node's children in a specific order, we simply need to have the y-values be a similar traversal but processing the children in reversed order. Therefore, any node under an earlier child will be excluded by y, and later will be excluded by x. Any node outside of the LCA's subtree is clearly excluded as well.
+ We can do LCA with binary lifting, and use the coordinates of the two points and the LCA to form the rectangles. This solution is O(N lg N + Q lg N).
+*/
+
+#include <vector>
+#include "grader.h"
+#define MAXN 100000
+
+using namespace std;
+
+vector<int> adj[MAXN];
+int par[MAXN][17], l[MAXN], r[MAXN], xv[MAXN], yv[MAXN], xt, yt;
+
+void dfs(int x, int p = -1) {
+    par[x][0] = p;
+    l[x] = xv[x] = ++xt;
+    for (int i = 0; i < adj[x].size(); i++) {
+        if (adj[x][i] == p) continue;
+        dfs(adj[x][i], x);
+    }
+    r[x] = xt;
+}
+
+void dfs2(int x, int p = -1) {
+    yv[x] = ++yt;
+    for (int i = adj[x].size() - 1; i >= 0; i--) {
+        if (adj[x][i] == p) continue;
+        dfs2(adj[x][i], x);
+    }
+}
+
+bool anc(int a, int b) {
+    return l[a] <= l[b] && r[b] <= r[a];
+}
+
+int lca(int a, int b) {
+    if (anc(a, b)) return a;
+    if (anc(b, a)) return b;
+    for (int i = 16; i >= 0; i--) {
+        if (par[a][i] != -1 && !anc(par[a][i], b)) a = par[a][i];
+    }
+    return par[a][0];
+}
+
+
+void addRoad(int a, int b) {
+    adj[a].push_back(b);
+    adj[b].push_back(a);
+}
+
+void buildFarms() {
+    int n = getN();
+    dfs(0); dfs2(0);
+    for (int i = 0; i < n; i++) setFarmLocation(i, xv[i], yv[i]);
+    for (int i = 1; i < 17; i++) {
+        for (int j = 0; j < n; j++) {
+            par[j][i] = par[j][i - 1];
+            if (par[j][i] != -1) par[j][i] = par[par[j][i]][i - 1];
+        }
+    }
+}
+
+void notifyFJ(int a, int b) {
+    int c = lca(a, b);
+    if (c == a) addBox(xv[c], yv[c], xv[b], yv[b]);
+    else if (c == b) addBox(xv[c], yv[c], xv[a], yv[a]);
+    else {
+        if (xv[a] > xv[b]) {
+            int tmp = b;
+            b = a;
+            a = tmp;
+        }
+        addBox(xv[c], yv[c], xv[a], yv[a]);
+        addBox(xv[a], yv[c], xv[b], yv[b]);
+    }
+}

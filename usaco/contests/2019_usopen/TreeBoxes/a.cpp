@@ -57,8 +57,8 @@ void DFS2(int i, int p) {
         ys[i] = 1;
     }
     else {
-        int y = 0;
-        int x = 0;
+        int y = 1;
+        int x = 1;
         for (int j: adj[i]) {
             y += ys[j];
         }
@@ -97,7 +97,7 @@ void buildFarms(){
     }
     DFS2(0,-1);
     //set 1 at rightmost top corner
-    px[0] = 100; py[0] = 100;
+    px[0] = n; py[0] = n;
     DFS3(0,-1);
     for (int i = 0; i < n; i++) {
         setFarmLocation(i,px[i],py[i]);    
