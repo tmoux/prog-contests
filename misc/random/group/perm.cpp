@@ -97,6 +97,20 @@ int main()
                            Perm<4>({0,4,2,1,3}),
                            Perm<4>({0,4,3,2,1})};
 
+    for (auto x: alt) {
+        set<Perm<4>> r;
+        for (auto g: alt) {
+            if (g*x*g.inverse() == x) {
+                r.insert(g);
+            }
+        }
+        cout << x << ":\n";
+        for (auto g: r) {
+            cout << g << ", ";
+        }
+        cout << '\n';
+    }
+    /*
     vector<int> per = {0,1,2,3,4};
     vector<Perm<4>> s4;
     do {
@@ -115,6 +129,7 @@ int main()
         }
         cout << "\n";
     }
+    */
 
     return 0;
 }
