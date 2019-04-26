@@ -1,6 +1,3 @@
-#include <bits/stdc++.h>
-using namespace std;
-using ll = long long;
 using poly = vector<int>;
 
 const int M = 1e6+3;
@@ -66,27 +63,6 @@ poly scale(const poly& a, int s) {
     return ans;
 }
 
-int ask(int x) {
-    cout << "? " << x << endl;
-    int r; cin >> r;
-    if (r == -1) exit(0);
-    return r;
-}
-
-void answer(int x) {
-    cout << "! " << x << endl;
-    exit(0);
-}
-
-ostream& operator<<(ostream& os, const poly& p) {
-    for (int i = 0; i < p.size(); i++) {
-        if (i == 0) os << p[i];
-        else os << p[i] << "x^" << i;
-        if (i < p.size()-1) os << " + ";
-    }
-    return os;
-}
-
 poly interpolate(vector<pair<int,int>> qs) {
     poly f;
     for (auto p: qs) {
@@ -110,20 +86,11 @@ poly interpolate(vector<pair<int,int>> qs) {
     return f;
 }
 
-int main()
-{
-    ios_base::sync_with_stdio(false); cin.tie(0);
-    vector<pair<int,int>> qs;
-    for (int i = 0; i <= 10; i++) {
-        int y = ask(i);
-        qs.push_back({i,y});
+ostream& operator<<(ostream& os, const poly& p) {
+    for (int i = 0; i < p.size(); i++) {
+        if (i == 0) os << p[i];
+        else os << p[i] << "x^" << i;
+        if (i < p.size()-1) os << " + ";
     }
-    poly f = interpolate(qs);
-    for (int i = 0; i < M; i++) {
-        if (eval(f,i) == 0) {
-            answer(i);
-        }
-    }
-    answer(-1);
+    return os;
 }
-
