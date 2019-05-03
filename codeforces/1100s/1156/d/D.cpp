@@ -32,6 +32,10 @@ struct Edge
 
 vector<Edge> adj[maxn];
 
+ll ch2(ll x) {
+    return x*(x-1);
+}
+
 int main()
 {
     cin >> n;
@@ -62,21 +66,24 @@ int main()
     */
     ll ans = 0;
     set<int> f[2];
-    for (int i = 1; i <= n; i++) {
-        int j = dsu[0].Find(i);
-        if (!f[0].count(j)) {
-            f[0].insert(j);
-            ans += -dsu[0].p[j] + dsu[0].d[j] - 1;
-        }
-
-        j = dsu[1].Find(i);
-        if (!f[1].count(j)) {
-            f[1].insert(j);
-            ans += -dsu[1].p[j] + dsu[1].d[j] - 1;
+    for (int j = 0; j < 2; j++) {
+        for (int i = 1; i <= n; i++) {
+            int par = dsu[j].Find(i);
+            if (f[j].count(par)) continue;
+            f[j].insert(par);
+            int sz = -dsu[j].p[par];
+            //cout << sz << ": " << ch2(sz) << '\n';
+            ans += ch2(sz);
         }
     }
+    for (int i = 1; i <= n; i++) {
+        int p1 = dsu[0].Find(i);
+        int s1 = -dsu[0].p[p1];
+        int p2 = dsu[1].Find(i);
+        int s2 = -dsu[1].p[p2];
+        ans += 1LL*(s1-1)*(s2-1);
+    }
     cout << ans << '\n';
-
 
     return 0;
 }
