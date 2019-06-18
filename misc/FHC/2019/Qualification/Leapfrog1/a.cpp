@@ -11,21 +11,8 @@ int main()
         string s; cin >> s;
         int n = s.size();
         int bc = 0;
-        bool flag = false;
-        for (char c: s) {
-            if (c == 'B') bc++;
-        }
-        if (bc < n/2) {
-            flag = false;    
-        }
-        else if (bc == n-1) {
-            //all filled, can't win
-            flag = false;
-        }
-        else {
-            flag = true;
-        }
-        cout << (flag ? "Y" : "N") << '\n';
+        for (char c: s) if (c == 'B') bc++;
+        cout << (n/2 <= bc && bc <= n-2 ? 'Y' : 'N') << '\n';
     }
 
 }
