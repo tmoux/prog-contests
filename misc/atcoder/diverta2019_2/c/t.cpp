@@ -1,63 +1,69 @@
-#include <bits/stdc++.h>
- 
-#define endl '\n'
-#define fi first
-#define se second
-#define MOD(n,k) ( ( ((n) % (k)) + (k) ) % (k))
-#define forn(i,n) for (int i = 0; i < n; i++)
-#define forr(i,a,b) for (int i = a; i <= b; i++)
-#define all(v) v.begin(), v.end()
-#define pb(x) push_back(x)
- 
-using namespace std;
- 
-typedef long long ll;
-typedef long double ld;
-typedef pair<int, int> ii;
-typedef vector<int> vi;
-typedef vector<vi> vvi;
-typedef vector<ii> vii;
-const int MX = 100005;
-int n, a[MX], s = 0, p = 0;
-vii res;
- 
-int main () {
-	ios_base::sync_with_stdio(0); cin.tie(0);
+struct Node {
+	int s, e, m;
+	//covers s,e;
+	ll sum;
+	ll maxi;
+	Node *l, *r;
 	
-	cin >> n;
-	for (int i = 0; i < n; i++) {
-		cin >> a[i];
-		if (a[i] < 0) p++;
-	}
-	sort(a, a+n);
- 
-	p = max(1, p);
-	p = min(n - 1, p);
- 
-	if (p == n - 1) {
-		s = a[n - 1];
-		for (int i = 0; i < n - 1; i++) {
-			res.emplace_back(s, a[i]);
-			s -= a[i];
+	Node(int a, int b) {
+		s = a;
+		e = b;
+		sum = 0;
+		maxi = 0;
+		if (s != e) {
+			m = (s+e)/2;
+			l = new Node(s,m);
+			r = new Node(m+1,e);
 		}
-	} else {
-		res.emplace_back(a[p-1], a[p]);
-		s = a[p-1] - a[p];
-		for (int i = p + 1; i < n - 1; i++) {
-			res.emplace_back(s, a[i]);
-			s -= a[i];
-		}
-		res.emplace_back(a[n-1], s);
-		s = a[n-1] - s;
-		for (int i = 0; i < p - 1; i++) {
-			res.emplace_back(s, a[i]);
-			s -= a[i];
+		else {
+			l = NULL;
+			r = NULL;
 		}
 	}
- 
-	cout << s << endl;
-	for (ii &r : res)
-		cout << r.fi << " " << r.se << endl;
- 
-	return 0;
-}
+
+
+	void add(int i, ll x) {
+		if (s == e) {
+			sum += x;
+			maxi = sum;
+			return;
+		}
+		if (i <= m) {
+			l->add(i,x);
+		}
+		else if (i > m) {
+			r->add(i,x);
+		}
+		else assert(false);
+		sum = l->sum + r->sum;
+		maxi = max(l->maxi,r->maxi);
+	}
+
+	ll getmaxi(int st, int en) {
+		if (st <= s && e <= en) {
+			return maxi;
+		}
+		ll ret = 0;
+		if (st <= m) {
+			ret = max(ret,l->getmaxi(st,en));
+		}
+		if (en > m) {
+			ret = max(ret,r->getmaxi(st,en));
+		}
+		return ret;
+	}	
+
+	ll getsum(int st, int en) {
+		if (st <= s && e <= en) {
+			return sum;
+		}
+		ll ret = 0;
+		if (st <= m) {
+			ret += l->getsum(st,en);
+		}
+		if (en > m) {
+			ret += r->getsum(st,en);
+		}
+		return ret;
+	}
+};
