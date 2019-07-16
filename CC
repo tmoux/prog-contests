@@ -1,9 +1,0 @@
-#!/bin/bash
-
-def=$(ls *.cpp | head -n 1)
-file=${1:-$def}
-#echo $file
-ex=${file%%.*}
-g++ $file -o $ex
-#echo $ex
-
