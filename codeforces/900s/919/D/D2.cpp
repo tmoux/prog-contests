@@ -17,7 +17,7 @@ int maxletter[maxn][alphsize];
 int N, M;
 
 bool visited[maxn], recStack[maxn];
-ifstream fin("D.in");
+//ifstream fin("D.in");
 
 bool isCycleUtil(int v) {
 	if (visited[v] == false) {
