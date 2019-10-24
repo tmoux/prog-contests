@@ -5,35 +5,35 @@
 #include <math.h>
 using namespace std;
 typedef long long ll;
+typedef long double ld;
 
-struct Vertex {
+struct Point {
     int x, y;
-};
 
-int det(int a, int b, int c, int d) {
-    return a*d-b*c;
-}
-
-struct Square {
-    Vertex vs[4];    
-    bool isIntersect(Vertex a1, a2, b1, b2) {
-        //if ab intersects cd
-        int a = a2.x-a1.x;
-        int b = b2.x-b1.x;
-        int c = b1.x-a1.x;
-        int d = a2.y-a1.y;
-        
+    Point operator-(const Point& rhs) const {
+        return {x-rhs.x,y-rhs.y};
     }
 };
+
+int cross(Point a, Point b) {
+    return a.x*b.y-a.y*b.x;
+}
+
+Point a[4], b[4];    
+
 
 int main()
 {
     //ios_base::sync_with_stdio(false); cin.tie(NULL);
-    //then check if sides ever intersect
-    //check if completely contained
+    for (int i = 0; i < 4; i++) {
+        cin >> a[i].x >> a[i].y;
+    }
+    for (int i = 0; i < 4; i++) {
+        cin >> b[i].x >> b[i].y;
+    }
+    cout << cross({0,1},{1,0}) << '\n';
     
-
-
+    
 
     return 0;
 }
