@@ -8,23 +8,23 @@ int main()
     int t; cin >> t;
     while (t--) {
         string s; cin >> s;
-        int ans = 0;
-        vector<int> numZeros(s.size());
-        for (int i = 0; i < s.size(); i++) {
-            if (i > 1 && s[i-1] == '1') numZeros[i] = 1;
-            else numZeros[i] = numZeros[i-1] + 1;
+        int n = s.size();
+        vector<int> nxt(n);
+        for (int i = n-1; i >= 0; i--) {
+            if (s[i] == '1') nxt[i] = i;
+            else nxt[i] = i==n-1?n:nxt[i+1];
         }
-        for (int i = 0; i < s.size(); i++) {
+        int ans = 0;
+        for (int i = 0; i < n; i++) {
             int curr = 0;
-            for (int j = i, t = 0; j >= max(0,i-20); j--, t++) {
-                if (s[j] == '1') {
-                    curr |= (1<<t);
-                    if (curr == t+1) ans += numZeros[j];
-                }
+            for (int j = nxt[i]; j < min(n,nxt[i]+20); j++) {
+                curr *= 2;
+                if (s[j] == '1') curr++;
+                int len = j-i+1;
+                if (len == curr) ans++;
             }
         }
         cout << ans << '\n';
     }
-
 }
 

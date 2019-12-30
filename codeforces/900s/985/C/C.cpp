@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <set>
 #include <math.h>
 using namespace std;
 typedef long long ll;
@@ -13,20 +14,27 @@ int main()
 {
     //ios_base::sync_with_stdio(false); cin.tie(NULL);
     cin >> n >> k >> l;
-    vector<ll> A(n*k);
-    for (int i = 0; i < n*k; i++) cin >> A[i];
-    sort(A.begin(),A.end());
-    if (A[n-1] - A[0] > l) {
-        cout << "0\n";
-        return 0;
+    multiset<int> s;
+    for (int i = 0; i < n*k; i++) {
+        int ai; cin >> ai;
+        s.insert(ai);
     }
-    
-    ll totalSum = 0;
-    auto it = upper_bound(A.begin(),A.end(),A[0]+l);
-    it--;
-     
-
-    return 0;
+    int mn = *s.begin();
+    ll ans = 0;
+    for (int i = 0; i < n; i++) {
+        auto it = s.upper_bound(mn+l);
+        if (it == s.begin()) {
+            cout << 0 << '\n';
+            return 0;
+        }
+        multiset<int> ms;
+        ms.insert(*prev(it));
+        s.erase(prev(it));
+        for (int j = 0; j < k-1; j++) {
+            ms.insert(*prev(s.end()));
+            s.erase(prev(s.end()));
+        }
+        ans += *ms.begin();
+    }
+    cout << ans << endl;
 }
-	
-
