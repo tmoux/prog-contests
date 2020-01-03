@@ -9,7 +9,7 @@ int mult(int a, int b) {
 int modexp(int a, int b) {
     int res = 1;
     while (b > 0) {
-        if (b&1) b >>= 1;
+        if (b&1) res = mult(res,a);
         a = mult(a,a);
         b >>= 1;
     }

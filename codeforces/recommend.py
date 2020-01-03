@@ -1,6 +1,13 @@
+#!/usr/bin/env python
 import sys
 import requests
 import random
+import argparse
+from argparse import RawTextHelpFormatter
+
+#Recommends unsolved problems within a specified rating range.
+#The "weighted random" option is intended to give you random problems, but be biased towards problems that have more solves.
+#See --help for more details
 
 API = "https://codeforces.com/api/"
 URL = "https://codeforces.com/contest/"
@@ -11,7 +18,7 @@ def weighted_choice(weights):
     rnd = random.random() * sum(weights)
     for i, w in enumerate(weights):
         rnd -= w
-        if rnd < 0:
+        if rnd <= 0:
             return i
 
 def weighted_shuffle(a,w):
@@ -27,7 +34,7 @@ def weighted_shuffle(a,w):
         w[j] = 0
     return r
 
-def getProblems(l, r):
+def getProblems(l, r, tags):
     request = requests.get(API+"problemset.problems").json()
     if request["status"] != "OK":
         print("Problemset request failed")
@@ -40,6 +47,8 @@ def getProblems(l, r):
     #return map of contestId to list of contests
     mp = {}
     problems = list(filter(lambda x: "rating" in x and l <= x["rating"] and x["rating"] <= r,problems))
+    if tags:
+        problems = list(filter(lambda x: any(y in x["tags"] for y in tags),problems))
     return problems
 
 def filterSolved(all_problems,handle):
@@ -57,20 +66,33 @@ def filterSolved(all_problems,handle):
 
     return unsolved_problems
 
-#format: [handle] [lower_bound] [upper_bound] [count] [0=random, 1=#solved decreasing, weighted random# 
 def main():
-    if len(sys.argv) < 6:
-        print("#format: [handle] [lower_bound] [upper_bound] [count] [0=random, 1=#solved decreasing, weighted random")
-        sys.exit()
+    parser = argparse.ArgumentParser(description="Recommends unsolved Codeforces problems within a difficulty range",formatter_class=RawTextHelpFormatter)
+    parser.add_argument("-n","--handle", help="Codeforces handle",type=str,default="silxi")
+    parser.add_argument("-r","--rating", help="Upper and lower bound for problem rating. Default behavior is to fetche all problems.",nargs=2,type=int,default=[0,5000])
+    parser.add_argument("-c","--count",help="Number of problems to be recommended",type=int,default=5)
+    parser.add_argument("-o","--order",help="Method by which problems are recommended.\n0 = Pure random\n1 = Sorted decreasing by solve count\n2 = Random, but biased towards problems which that have more solves",type=int,default=2)
+    parser.add_argument("-t","--tags",help="Filters problems that match at least one of the tags",type=str,nargs='*',default=[])
 
-    handle = sys.argv[1]
-    lb = int(sys.argv[2])
-    ub = int(sys.argv[3])
-    count = int(sys.argv[4])
-    order = int(sys.argv[5])
+    args = parser.parse_args()
+    handle = args.handle
+    lb = int(args.rating[0])
+    ub = int(args.rating[1])
+    count = int(args.count)
+    order = int(args.order)
+    tags = args.tags
 
-    all_problems = getProblems(lb,ub)
+    """
+    print("handle = %s"%handle)
+    print("rating = [%d, %d]"%(lb,ub))
+    print("count = %d"%count)
+    print("order = %d"%order)
+    """
+
+    all_problems = getProblems(lb,ub,tags)
     problem_list = filterSolved(all_problems,handle)
+
+    #print(len(all_problems),len(problem_list))
 
     ret = []
 
@@ -86,7 +108,7 @@ def main():
         problem_list = weighted_shuffle(problem_list,w)
         ret = problem_list[:count]
 
-    print("Recommend %d problems:"%(count))
+    print("Recommended %d problems:"%(count))
     for i in ret:
         print(URL+"%d/problem/%s"%(i["contestId"],i["index"]))
 
