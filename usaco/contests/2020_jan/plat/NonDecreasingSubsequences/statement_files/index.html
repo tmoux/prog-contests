@@ -1,0 +1,336 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0047)http://www.usaco.org/index.php?page=viewcontest -->
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+
+ <title>USACO</title>
+ <link rel="stylesheet" type="text/css" href="./statement_files/usaco.css">
+ <script src="./statement_files/jquery.min.js.download"></script>
+ <script src="./statement_files/d3.v3.min.js.download"></script>
+ <meta http-equiv="EXPIRES" content="0">
+ <meta http-equiv="CACHE-CONTROL" content="NO-CACHE">
+ <meta http-equiv="PRAGMA" content="NO-CACHE">
+
+<script type="text/x-mathjax-config;executed=true">
+MathJax.Hub.Config({
+    "HTML-CSS": {
+	scale: 85,
+	preferredFont: "STIX"
+    },
+  tex2jax: {
+    inlineMath: [['$','$'],['\\(','\\)']],
+    processEscapes: true,
+    skipTags: ['pre'],
+    processClass: "mathjax",
+    ignoreClass: "no-mathjax"
+  }
+});
+</script>
+<script src="./statement_files/MathJax.js.download" id=""></script>
+
+<style type="text/css">.MathJax_Hover_Frame {border-radius: .25em; -webkit-border-radius: .25em; -moz-border-radius: .25em; -khtml-border-radius: .25em; box-shadow: 0px 0px 15px #83A; -webkit-box-shadow: 0px 0px 15px #83A; -moz-box-shadow: 0px 0px 15px #83A; -khtml-box-shadow: 0px 0px 15px #83A; border: 1px solid #A6D ! important; display: inline-block; position: absolute}
+.MathJax_Menu_Button .MathJax_Hover_Arrow {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 4px; -webkit-border-radius: 4px; -moz-border-radius: 4px; -khtml-border-radius: 4px; font-family: 'Courier New',Courier; font-size: 9px; color: #F0F0F0}
+.MathJax_Menu_Button .MathJax_Hover_Arrow span {display: block; background-color: #AAA; border: 1px solid; border-radius: 3px; line-height: 0; padding: 4px}
+.MathJax_Hover_Arrow:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_Hover_Arrow:hover span {background-color: #CCC!important}
+</style><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_About.MathJax_MousePost {outline: none}
+.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 2px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+.MathJax_MenuItem {padding: 2px 2em; background: transparent}
+.MathJax_MenuArrow {position: absolute; right: .5em; padding-top: .25em; color: #666666; font-size: .75em}
+.MathJax_MenuActive .MathJax_MenuArrow {color: white}
+.MathJax_MenuArrow.RTL {left: .5em; right: auto}
+.MathJax_MenuCheck {position: absolute; left: .7em}
+.MathJax_MenuCheck.RTL {right: .7em; left: auto}
+.MathJax_MenuRadioCheck {position: absolute; left: 1em}
+.MathJax_MenuRadioCheck.RTL {right: 1em; left: auto}
+.MathJax_MenuLabel {padding: 2px 2em 4px 1.33em; font-style: italic}
+.MathJax_MenuRule {border-top: 1px solid #CCCCCC; margin: 4px 1px 0px}
+.MathJax_MenuDisabled {color: GrayText}
+.MathJax_MenuActive {background-color: Highlight; color: HighlightText}
+.MathJax_MenuDisabled:focus, .MathJax_MenuLabel:focus {background-color: #E8E8E8}
+.MathJax_ContextMenu:focus {outline: none}
+.MathJax_ContextMenu .MathJax_MenuItem:focus {outline: none}
+#MathJax_AboutClose {top: .2em; right: .2em}
+.MathJax_Menu .MathJax_MenuClose {top: -10px; left: -10px}
+.MathJax_MenuClose {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; font-family: 'Courier New',Courier; font-size: 24px; color: #F0F0F0}
+.MathJax_MenuClose span {display: block; background-color: #AAA; border: 1.5px solid; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; line-height: 0; padding: 8px 0 6px}
+.MathJax_MenuClose:hover {color: white!important; border: 2px solid #CCC!important}
+.MathJax_MenuClose:hover span {background-color: #CCC!important}
+.MathJax_MenuClose:hover:focus {outline: none}
+</style><style type="text/css">.MathJax_Preview .MJXf-math {color: inherit!important}
+</style><style type="text/css">.MJX_Assistive_MathML {position: absolute!important; top: 0; left: 0; clip: rect(1px, 1px, 1px, 1px); padding: 1px 0 0 0!important; border: 0!important; height: 1px!important; width: 1px!important; overflow: hidden!important; display: block!important; -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none}
+.MJX_Assistive_MathML.MJX_Assistive_MathML_Block {width: 100%!important}
+</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; -webkit-box-sizing: content-box; -moz-box-sizing: content-box; box-sizing: content-box; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
+#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
+#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
+</style><style type="text/css">.MathJax_Preview {color: #888}
+#MathJax_Message {position: fixed; left: 1em; bottom: 1.5em; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
+#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
+.MathJax_Error {color: #CC0000; font-style: italic}
+</style><style type="text/css">.MJXp-script {font-size: .8em}
+.MJXp-right {-webkit-transform-origin: right; -moz-transform-origin: right; -ms-transform-origin: right; -o-transform-origin: right; transform-origin: right}
+.MJXp-bold {font-weight: bold}
+.MJXp-italic {font-style: italic}
+.MJXp-scr {font-family: MathJax_Script,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-frak {font-family: MathJax_Fraktur,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-sf {font-family: MathJax_SansSerif,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-cal {font-family: MathJax_Caligraphic,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-mono {font-family: MathJax_Typewriter,'Times New Roman',Times,STIXGeneral,serif}
+.MJXp-largeop {font-size: 150%}
+.MJXp-largeop.MJXp-int {vertical-align: -.2em}
+.MJXp-math {display: inline-block; line-height: 1.2; text-indent: 0; font-family: 'Times New Roman',Times,STIXGeneral,serif; white-space: nowrap; border-collapse: collapse}
+.MJXp-display {display: block; text-align: center; margin: 1em 0}
+.MJXp-math span {display: inline-block}
+.MJXp-box {display: block!important; text-align: center}
+.MJXp-box:after {content: " "}
+.MJXp-rule {display: block!important; margin-top: .1em}
+.MJXp-char {display: block!important}
+.MJXp-mo {margin: 0 .15em}
+.MJXp-mfrac {margin: 0 .125em; vertical-align: .25em}
+.MJXp-denom {display: inline-table!important; width: 100%}
+.MJXp-denom > * {display: table-row!important}
+.MJXp-surd {vertical-align: top}
+.MJXp-surd > * {display: block!important}
+.MJXp-script-box > *  {display: table!important; height: 50%}
+.MJXp-script-box > * > * {display: table-cell!important; vertical-align: top}
+.MJXp-script-box > *:last-child > * {vertical-align: bottom}
+.MJXp-script-box > * > * > * {display: block!important}
+.MJXp-mphantom {visibility: hidden}
+.MJXp-munderover {display: inline-table!important}
+.MJXp-over {display: inline-block!important; text-align: center}
+.MJXp-over > * {display: block!important}
+.MJXp-munderover > * {display: table-row!important}
+.MJXp-mtable {vertical-align: .25em; margin: 0 .125em}
+.MJXp-mtable > * {display: inline-table!important; vertical-align: middle}
+.MJXp-mtr {display: table-row!important}
+.MJXp-mtd {display: table-cell!important; text-align: center; padding: .5em 0 0 .5em}
+.MJXp-mtr > .MJXp-mtd:first-child {padding-left: 0}
+.MJXp-mtr:first-child > .MJXp-mtd {padding-top: 0}
+.MJXp-mlabeledtr {display: table-row!important}
+.MJXp-mlabeledtr > .MJXp-mtd:first-child {padding-left: 0}
+.MJXp-mlabeledtr:first-child > .MJXp-mtd {padding-top: 0}
+.MJXp-merror {background-color: #FFFF88; color: #CC0000; border: 1px solid #CC0000; padding: 1px 3px; font-style: normal; font-size: 90%}
+.MJXp-scale0 {-webkit-transform: scaleX(.0); -moz-transform: scaleX(.0); -ms-transform: scaleX(.0); -o-transform: scaleX(.0); transform: scaleX(.0)}
+.MJXp-scale1 {-webkit-transform: scaleX(.1); -moz-transform: scaleX(.1); -ms-transform: scaleX(.1); -o-transform: scaleX(.1); transform: scaleX(.1)}
+.MJXp-scale2 {-webkit-transform: scaleX(.2); -moz-transform: scaleX(.2); -ms-transform: scaleX(.2); -o-transform: scaleX(.2); transform: scaleX(.2)}
+.MJXp-scale3 {-webkit-transform: scaleX(.3); -moz-transform: scaleX(.3); -ms-transform: scaleX(.3); -o-transform: scaleX(.3); transform: scaleX(.3)}
+.MJXp-scale4 {-webkit-transform: scaleX(.4); -moz-transform: scaleX(.4); -ms-transform: scaleX(.4); -o-transform: scaleX(.4); transform: scaleX(.4)}
+.MJXp-scale5 {-webkit-transform: scaleX(.5); -moz-transform: scaleX(.5); -ms-transform: scaleX(.5); -o-transform: scaleX(.5); transform: scaleX(.5)}
+.MJXp-scale6 {-webkit-transform: scaleX(.6); -moz-transform: scaleX(.6); -ms-transform: scaleX(.6); -o-transform: scaleX(.6); transform: scaleX(.6)}
+.MJXp-scale7 {-webkit-transform: scaleX(.7); -moz-transform: scaleX(.7); -ms-transform: scaleX(.7); -o-transform: scaleX(.7); transform: scaleX(.7)}
+.MJXp-scale8 {-webkit-transform: scaleX(.8); -moz-transform: scaleX(.8); -ms-transform: scaleX(.8); -o-transform: scaleX(.8); transform: scaleX(.8)}
+.MJXp-scale9 {-webkit-transform: scaleX(.9); -moz-transform: scaleX(.9); -ms-transform: scaleX(.9); -o-transform: scaleX(.9); transform: scaleX(.9)}
+.MathJax_PHTML .noError {vertical-align: ; font-size: 90%; text-align: left; color: black; padding: 1px 3px; border: 1px solid}
+</style></head>
+
+<body class="no-mathjax"><div id="MathJax_Message" style="display: none;"></div>
+ <div align="center">
+  <div class="shadow1">
+
+   <div class="content">
+
+  
+ <a href="http://www.usaco.org/index.php"><img src="./statement_files/usaco_logo.png" height="130px" border="0px"></a> 
+
+    <div class="navbar" align="left" border="10px">
+     <ul>
+      <li><a href="http://www.usaco.org/index.php">Overview</a></li> 
+      <li><a href="http://www.usaco.org/index.php?page=training">Training</a></li>
+      <li><a href="http://www.usaco.org/index.php?page=contests">Contests</a></li>
+      <li><a href="http://www.usaco.org/index.php?page=history">History</a></li>
+      <li><a href="http://www.usaco.org/index.php?page=staff">Staff</a></li>
+      <li><a href="http://www.usaco.org/index.php?page=resources">Resources</a></li>
+     </ul>
+    </div><br>
+
+   
+    
+<div style="position:relative; float:left; left:10px; top:-50px; width:550px;"> 
+    <div class="panel">
+	
+	<h2> Contest is Running! </h2>
+	
+	<p>Contest: <b>USACO 2020 January Contest, Platinum</b><br>
+	    
+	    Your 4-hour block of time has now ended.  Submissions no longer accepted.<br>
+<br>Click a problem below to view the problem text:</p>
+<a style="text-decoration:none;" href="http://www.usaco.org/index.php?page=viewproblem&amp;cpid=984"><div class="panel historypanel"><div style="position:relative;float:left;padding-right:10px;"><h1 style="display:inline;">1</h1></div><div style:'position:relative;float:right;'=""><b>Cave Paintings</b><br><i>Submitted and Graded</i></div></div></a><a style="text-decoration:none;" href="http://www.usaco.org/index.php?page=viewproblem&amp;cpid=985"><div class="panel historypanel"><div style="position:relative;float:left;padding-right:10px;"><h1 style="display:inline;">2</h1></div><div style:'position:relative;float:right;'=""><b>Non-Decreasing Subsequences</b><br><i>Submitted and Graded</i></div></div></a><a style="text-decoration:none;" href="http://www.usaco.org/index.php?page=viewproblem&amp;cpid=986"><div class="panel historypanel"><div style="position:relative;float:left;padding-right:10px;"><h1 style="display:inline;">3</h1></div><div style:'position:relative;float:right;'=""><b>Falling Portals</b><br><i>Submitted and Graded</i></div></div></a><h2> Clarifications </h2>
+<p> No clarifications at this point.</p>
+<h2> January 2020 Contest Details </h2>
+
+<p>The USACO 2020 January contest is available January 17 through
+January 20. Participation is free, and open to all, although only
+high-school (pre-college) students in the USA are eligible for
+selection as finalists to attend the USACO training camp and to
+compete for the USA IOI team. </p>
+
+<p>The contest is available in four divisions: bronze, silver, gold, and
+    platinum.  All returning participants start out
+   in their former divisions, and new participants start 
+    out in the bronze division.  The contest is for individuals only, not teams.</p>
+
+<p>Participants who score particularly well in their current division will be
+    promoted to the next division for future contests (promotion criteria
+    is announced at the end of the contest and varies on a per-contest basis, 
+    since every contest is different).
+    Promotion within a contest is also possible, if you achieve a perfect
+    score.  If you are promoted within a contest, you will be able to take
+    higher-level contests with a full clock (no penalty based on the 
+   time already spent on ealier contests). </p>
+
+<p>Each contest has 3 problems to which you will submit solution
+    programs in C, C++, Pascal, Java, or Python.  Problems are
+    algorithmic in nature, and your score for each problem depends on
+    the number of input cases your program can solve within the time
+    limit (for this contest: 2 seconds per input case for C, C++, and
+    Pascal, and 4 seconds per input case for Java and Python). If your
+    program correctly solves the sample input case (included in the
+    text of each problem), you will receive feedback on how it
+    performs on each of our judging inputs.  For example, you will be
+    told if your program produced the right answer, timed out,
+    experience a run-time error, etc.  Note that although you receive
+    this feedback, the remaining judge inputs beyond the sample case
+    are not disclosed during the contest.  Problems are intended to be
+    challenging; it is rarely the case that a large number of
+    competitors receive near-perfect scores! </p>
+
+<p>The contest is 4 contiguous hours in length.  You can take the
+    contest during any 4-hour block of time you want during the larger
+    contest window from Jan 17 through Jan 20.  When you start the
+    contest, your personal 4-hour timer starts counting down, and you
+    will be able to view the contest problems and submit solutions via
+    this website. The contest closes January 20 at 23:59 UTC-12 time
+    (even if your personal clock is still running at that time, so do
+    not wait until the very last minute to start!).  </p>
+
+<p>Results will be posted on this website shortly after the end of the contest. </p>
+
+<h2> Instructions and Rules </h2>
+
+<p>Detailed contest instructions and rules are available <a href="http://www.usaco.org/index.php?page=instructions">here</a>.  Please read them if you
+have not already done so.  Note that if you program in Java, there are
+special requirements to follow (e.g., submitting your entire program
+in one file), which are outlined in the instructions. Please email
+the contest director (bcdean@clemson.edu) if you come across any
+technical problems.  
+</p>
+
+<h2> Language Availability </h2>
+
+<p>The contest is currently available in the following languages: en.
+<br> Additional translations may become available later in the contest.</p>
+
+
+
+    </div>
+</div>
+
+<div style="position:relative; float:right; right:10px; top:-50px; width:300px;"> 
+    
+    <div class="panel" style="background-color:#FFF;">
+      <h2> Your Account </h2>
+
+                       Welcome, <strong>Timothy Mou</strong><br>
+	 <div style="padding-top:6px;">
+          <button type="button" onclick="window.location=&#39;index.php?page=editaccount&#39;">Edit Account Settings</button>
+          <button type="button" onclick="window.location=&#39;current/tpcm/logout.php&#39;">Logout</button>
+	 </div>
+        				 
+  </div>
+
+<script>
+
+  $(".form_error").hide()
+	
+  $(":submit").click(function(event)
+  {
+    var f = $(this).closest("form");
+    event.preventDefault();
+    $.post("current/tpcm/login-session.php", f.serialize(), (function(form)
+    {
+	return function(resp)
+        {
+	  $(".form_error", form).hide();
+	  var success = parseInt(resp.code);
+	  	  if (success) window.location = "index.php?page=viewcontest";
+	  	  else {
+    	    $(".form_error", form).show();
+	    $(".form_error", form).text(resp.msg);
+	    $(":password", form).val("");
+	  };
+	};
+    })(f), 'json');
+  });
+</script>
+
+</div>
+
+<br style="clear:both">
+
+<script>
+    	// shade contests by clicking on their header
+	var sc_offset = -1;
+
+	function updateClocks()
+	{
+		$('.countdown').each(function(x)
+		{
+			// get the time remaining in seconds
+			var endtime = parseInt($(this).data('endtime'));
+			var sec = endtime - Math.floor(new Date()/1000) - sc_offset;
+
+			// closes while we are watching it
+			if (endtime != -1 && sec <= 0) window.location='index.php?page=viewcontest';
+
+			// convert time remaining to days, hrs, min, sec
+			var min = Math.floor(sec / 60); sec %= 60;		
+			var hrs = Math.floor(min / 60); min %= 60;		
+	
+			// zero pad the values
+			if (min < 10) min = '0' + min;
+			if (sec < 10) sec = '0' + sec;
+			
+			// generate text and print information to the screen
+			var interval;
+			if (hrs > 24) {
+			   interval = Math.floor(hrs/24) + ' days, ' + hrs%24 + ' hrs, ' + min + ' min, ' + sec + ' sec';
+			} else {
+			   interval = hrs + ' hrs, ' + min + ' min, ' + sec + ' sec';
+			}
+			$(this).text(endtime == -1 ? 'no end time' : interval);
+		}).width(300);
+		
+		setTimeout(updateClocks, 500);
+	};
+
+	$(document).ready(function(){
+		$.post('current/tpcm/get-time.php', null, function(data)
+		{
+			sc_offset = data.time - Math.floor(new Date()/1000);
+			updateClocks();
+		}, 'json');
+	});
+
+</script>
+
+<script>
+function startContest () {
+  var c = confirm ("Are you sure you want to start the contest now?  Once your timer starts, you will have only 4 hours to complete the contest.");
+  if (c) { window.location = 'index.php?page=viewcontest&startcontest=1'; }
+}
+</script>
+
+   </div>
+  </div>
+ </div>
+
+ <br style="clear:both">
+
+
+
+
+
+
+</body><auto-scroll></auto-scroll></html>
