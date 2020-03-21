@@ -24,36 +24,19 @@ struct FN
 
 struct Hull: public deque<FN> //convex hull for maximum
 {
-    void addFront(const FN& l) {
-        //slopes coming in -1,-2,-3,...so add to front of deque rather than back (querying for maximum)
-        //if adding to back, need to change the indices
-        while (this->size() >= 2 && 
-            comp(l,(*this)[0],(*this)[1])) {
-            this->pop_front();    
+    void addFN(const FN& l) {
+        while (size() >= 2 && 
+            comp((*this)[size()-2],(*this)[size()-1],l)) {
+            this->pop_back();    
         }
-        this->push_front(l);
+        this->push_back(l);
     }
 
     ll query(ll x) {
-        return hullSearch(x,*this,0,this->size()-1);        
-    }
-
-    friend ll hullSearch(ll x, const Hull& hull, int lo, int hi) {
-        //queries for maximum
-        //O(log n)
-        //searches [lo, hi] in hull
-        if (hull.size() == 1) return hull.front().eval(x);
-        if (lo == hi) return hull[lo].eval(x);
-        if (x <= hull[lo].intersect(hull[lo+1])) return hull[lo].eval(x);
-        if (x >= hull[hi].intersect(hull[hi-1])) return hull[hi].eval(x);
-        while (lo + 1 < hi) {
-            int m = (lo+hi)/2;
-            ll x1 = (ll)hull[m].intersect(hull[m-1]);
-            ll x2 = (ll)hull[m].intersect(hull[m+1]);
-            if (x1 <= x && x <= x2) return hull[m].eval(x);
-            if (x < x1) hi = m;
-            else lo = m;
+        if (size() == 0) return -(1LL<<62); //handle empty hull
+        while (size() >= 2 && (*this)[1].eval(x) >= (*this)[0].eval(x)) {
+            pop_front();
         }
-        return hull[lo].eval(x);
+        return (*this)[0].eval(x);
     }
 };
