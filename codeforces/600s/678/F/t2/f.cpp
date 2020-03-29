@@ -64,7 +64,7 @@ vector<int> special[maxn];
 
 int main() {
     cin >> n;
-    sq = 3*(int)sqrt(n);
+    sq = 10*(int)sqrt(n);
     for (int i = 1; i <= n; i++) {
         int tt, a, b; cin >> tt >> a;
         if (tt == 1) {
