@@ -10,6 +10,13 @@ int main() {
     cout << t << '\n';
     while (t--) {
         cout << n << ' ' << m << '\n';
+        /*
+        for (int i = 1; i <= n; i++) {
+            for (int j = i+1; j <= n; j++) {
+                cout << i << ' ' << j << '\n';
+            }
+        }
+        */
         set<pair<int,int>> s;
         for (int i = 0; i < m; i++) {
             int u, v;

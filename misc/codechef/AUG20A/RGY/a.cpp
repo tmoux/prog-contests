@@ -26,10 +26,13 @@ set<int>* dfs(int i, int p, int d, int last) {
     st.push_back(i);
     set<int>* ni = new set<int>;
     ni->insert(0);
+    //cout << "entering " << i << ", last = " << last << endl;
     for (int j: adj[i]) {
         if (j == p) continue;
-        if (vis[j] && (depth[i]-depth[j])%2==1 && depth[j] >= last) {
+        if (ans[mp[make_pair(i,j)]] != 0) continue;
+        if (vis[j] && (depth[i]-depth[j]) % 2 == 1 && depth[j] >= last) {
             //even cycle
+            //cout << "found cycle " << i << ' ' << j << endl;
             for (int idx = st.size()-1, x = 0; idx >= 0; idx--, x ^= 1) {
                 int color = x ? -1 : 1;
                 if (st[idx] == i) ans[mp[make_pair(i,j)]] = color;
@@ -44,6 +47,7 @@ set<int>* dfs(int i, int p, int d, int last) {
         }
     }
     for (int j: adj[i]) {
+        if (ans[mp[make_pair(i,j)]] != 0) continue;
         if (!vis[j]) {
             auto nj = dfs(j,i,d+1,last);
             auto it = nj->lower_bound(depth[i]);
@@ -52,18 +56,9 @@ set<int>* dfs(int i, int p, int d, int last) {
         }
     }
     st.pop_back();
-    /*
-    cout << i << "::: ";
-    for (auto j: (*ni)) {
-        cout << j << ' ';
-    }
-    cout << '\n';
-    */
+    //cout << "exiting " << i << endl;
     return ni;
 }
-
-random_device device;
-mt19937 gen(device());
 
 void solve() {
     cin >> N >> M;
@@ -84,14 +79,22 @@ void solve() {
         mp[make_pair(a,b)] = i;
         mp[make_pair(b,a)] = i;
     }
-    for (int i = 1; i <= N; i++) shuffle(adj[i].begin(),adj[i].end(),gen);
-    for (int i = 1; i <= N; i++) {
-       if (vis[i]) continue; 
-       st.clear();
-       dfs(i,i,0,0);
+    random_device device;
+    mt19937 gen(device());
+    vector<int> p;
+    for (int i = 1; i <= N; i++) p.push_back(i);
+    for (int iter = 0; iter < 4; iter++) {
+        shuffle(p.begin(),p.end(),gen);
+        for (int i = 1; i <= N; i++) vis[i] = false;
+        for (int i: p) {
+           if (vis[i]) continue; 
+           st.clear();
+           dfs(i,i,0,0);
+        }
     }
 
     //sanity checks
+    /*
     vector<int> v(N+1,0);
     int yellow = 0;
     for (int i = 0; i < M; i++) {
@@ -106,16 +109,15 @@ void solve() {
     double R = ((double)(yellow)/N);
     cout << "R = " << R << endl;
     cout << yellow << ' ' << N << endl;
-    for (int i = 0; i < M; i++) {
-        if (ans[i] == 0) cout << edges[i].first << ' ' << edges[i].second << endl;
-    }
+    */
+    //for (int i = 0; i < M; i++) {
+    //    if (ans[i] == 0) cout << edges[i].first << ' ' << edges[i].second << endl;
+    //}
     //assert(R < 3);
-    /*
     //output
     for (int i = 0; i < M; i++) {
         cout << ans[i] << '\n';
     }
-    */
 }
 
 int main() {
