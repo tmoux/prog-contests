@@ -30,11 +30,11 @@ dead = [] #list of id's of cows that have stopped
 eaten = [] #list of cells that have already been eaten
 ans = [0] * n
 for e in events:
-    if e.id not in dead:
-        if e.point in eaten:
+    if e.id not in dead: #if the cows has stopped, skip it
+        if e.point in eaten: #if this point has been eaten already, stop
             ans[e.id] = e.time
             dead.append(e.id)
-        else:
+        else: #add the point to the list and keep going
             eaten.append(e.point)
 # output answer
 for i in range(n):
