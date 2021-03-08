@@ -1,0 +1,533 @@
+| Team Name                      | School                                      |   # Solved |   Penalty |
+|--------------------------------+---------------------------------------------+------------+-----------|
+| MIT ZEROONE                    | Massachusetts Institute of Technology       |          8 |       292 |
+| aqtdab                         | University of Waterloo                      |          8 |       330 |
+| Waterloo Gold                  | University of Waterloo                      |          8 |       452 |
+| cout << 1/0 << endl;           | Swarthmore College                          |          8 |       475 |
+| Waterloo White                 | University of Waterloo                      |          8 |       522 |
+| UIUC 3                         | University of Illinois at Urbana–Champaign  |          8 |       545 |
+| UCLA 1                         | University of California, Los Angeles       |          8 |       793 |
+| rpeng fan club                 | Georgia Institute of Technology             |          8 |       857 |
+| logn/loglogn                   | University of British Columbia              |          8 |      1403 |
+| Trung Dang                     | Purdue University                           |          7 |       283 |
+| Riley Borgard                  | Purdue University                           |          7 |       361 |
+| 5 - Hour Energy                | Rutgers University                          |          7 |       401 |
+| UNC_Alternate                  | University of North Carolina at Chapel Hill |          7 |       442 |
+| UCF Freezer                    | University of Central Florida               |          7 |       465 |
+| UCLA 3                         | University of California, Los Angeles       |          7 |       467 |
+| Bear1                          | University of California, Berkeley          |          7 |       473 |
+| Stanford Cardinal              | Stanford University                         |          7 |       478 |
+| Bear23                         | University of California, Berkeley          |          7 |       480 |
+| UIUC 2                         | University of Illinois at Urbana–Champaign  |          7 |       505 |
+| team 1                         | Duke University                             |          7 |       544 |
+| Procrastinating 2 Assignmen... | McGill University                           |          7 |       589 |
+| davidberard                    | University of British Columbia              |          7 |       597 |
+| Comets 1                       | The University of Texas at Dallas           |          7 |       650 |
+| Sublinear Substring Seekers    | Ohio State University                       |          7 |       684 |
+| tmt514                         | University of Michigan                      |          6 |       216 |
+| tamoo                          | Texas A&M University                        |          6 |       217 |
+| Mong-En Ip                     | University of Central Florida               |          6 |       269 |
+| ToTAMOon                       | Texas A&M University                        |          6 |       270 |
+| U of T White                   | University of Toronto                       |          6 |       286 |
+| SFU_Lavender                   | Simon Fraser University                     |          6 |       289 |
+| GT 01                          | Georgia Institute of Technology             |          6 |       292 |
+| UIUC 11                        | University of Illinois at Urbana–Champaign  |          6 |       296 |
+| UT O(range)                    | University of Texas at Austin               |          6 |       299 |
+| MIT ZEROTWO                    | Massachusetts Institute of Technology       |          6 |       356 |
+| SBU-Bitmasked Bandits          | Stony Brook University                      |          6 |       394 |
+| Purdue-Coach                   | Purdue University                           |          6 |       398 |
+| UT Ochre                       | University of Texas at Austin               |          6 |       405 |
+| Yale                           | Yale University                             |          6 |       431 |
+| Alberta Gray                   | University of Alberta                       |          6 |       448 |
+| U of T Blue                    | University of Toronto                       |          6 |       449 |
+| Team 1!                        | University of North Texas                   |          6 |       476 |
+| UBC O(1)                       | University of British Columbia              |          6 |       580 |
+| Yibo Huang                     | Virginia Tech                               |          6 |       592 |
+| UCI Retired Ol Pals            | University of California, Irvine            |          6 |       643 |
+| BJU Bruins 1                   | Bob Jones University                        |          6 |       749 |
+| GT 07                          | Georgia Institute of Technology             |          6 |       768 |
+| GT 02                          | Georgia Institute of Technology             |          5 |       117 |
+| The ineligibles                | Texas A&M University                        |          5 |       129 |
+| UT Brown                       | University of Texas at Austin               |          5 |       131 |
+| UCLA 2                         | University of California, Los Angeles       |          5 |       144 |
+| Stevens-1                      | Stevens Institute of Technology             |          5 |       168 |
+| UT Apple (suggested by Jame... | University of Texas at Austin               |          5 |       168 |
+| Crystal Sharpe                 | Mount Allison University                    |          5 |       170 |
+| UIUC 9                         | University of Illinois at Urbana–Champaign  |          5 |       173 |
+| Bear7                          | University of California, Berkeley          |          5 |       193 |
+| Slack Overflow                 | North Carolina State University             |          5 |       198 |
+| Bear20                         | University of California, Berkeley          |          5 |       210 |
+| Bear9                          | University of California, Berkeley          |          5 |       214 |
+| richzli                        | Purdue University                           |          5 |       215 |
+| Unordered_set                  | University of Florida                       |          5 |       219 |
+| breathe_in_boi                 | University of Texas at Austin               |          5 |       219 |
+| Deque                          | University of Florida                       |          5 |       220 |
+| Rockets in 4                   | University of Texas at Austin               |          5 |       223 |
+| Comets 3                       | The University of Texas at Dallas           |          5 |       230 |
+| Bear5                          | University of California, Berkeley          |          5 |       238 |
+| Rockin' Roblox                 | Texas A&M University                        |          5 |       252 |
+| wasp                           | McGill University                           |          5 |       254 |
+| Default Team                   | Purdue University                           |          5 |       255 |
+| Ruborcalor                     | McGill University                           |          5 |       256 |
+| Poly 1                         | New York University                         |          5 |       257 |
+| University of Lethbridge WA    | University of Lethbridge                    |          5 |       263 |
+| byu-ints                       | Brigham Young University                    |          5 |       268 |
+| Lafayette 3                    | Lafayette College                           |          5 |       271 |
+| Comets4                        | The University of Texas at Dallas           |          5 |       272 |
+| Stanford White                 | Stanford University                         |          5 |       275 |
+| FnEscVictory                   | Rutgers University                          |          5 |       277 |
+| UT Fulvous                     | University of Texas at Austin               |          5 |       283 |
+| Supermind_Taichi_Master        | Vanderbilt University                       |          5 |       287 |
+| SBU-What’s a DP?               | Stony Brook University                      |          5 |       298 |
+| Rochester #6                   | University of Rochester                     |          5 |       299 |
+| \7                             | Texas A&M University                        |          5 |       309 |
+| Comets 2                       | The University of Texas at Dallas           |          5 |       311 |
+| go penguinz                    | San José State University                   |          5 |       321 |
+| UCLA 5                         | University of California, Los Angeles       |          5 |       326 |
+| Problem G Gang                 | Rutgers University                          |          5 |       335 |
+| andrewting                     | University of British Columbia              |          5 |       338 |
+| Rochester #3                   | University of Rochester                     |          5 |       338 |
+| .rem                           | University of British Columbia              |          5 |       339 |
+| UIUC 5                         | University of Illinois at Urbana–Champaign  |          5 |       355 |
+| Ryan Dancy                     | University of Waterloo                      |          5 |       361 |
+| GT 03                          | Georgia Institute of Technology             |          5 |       368 |
+| Tim Dong                       | Washington University in St. Louis          |          5 |       369 |
+| Utah Z                         | University of Utah                          |          5 |       382 |
+| UBC01                          | University of British Columbia              |          5 |       387 |
+| SBU-NON CS MAJORS              | Stony Brook University                      |          5 |       390 |
+| UIUC 4                         | University of Illinois at Urbana–Champaign  |          5 |       391 |
+| VU Team 02                     | Vanderbilt University                       |          5 |       391 |
+| Team Red                       | University of Windsor                       |          5 |       411 |
+| NJIT - Team 5                  | New Jersey Institute of Technology          |          5 |       416 |
+| Harvard 2                      | Harvard University                          |          5 |       417 |
+| Cuernos de Fuego               | University of Texas at Austin               |          5 |       421 |
+| Piada                          | Texas A&M University                        |          5 |       423 |
+| Lafayette 2                    | Lafayette College                           |          5 |       431 |
+| Bear43                         | University of California, Berkeley          |          5 |       440 |
+| Valiant                        | University of Michigan                      |          5 |       447 |
+| Conquering Heroes              | University of Michigan                      |          5 |       447 |
+| Victors                        | University of Michigan                      |          5 |       454 |
+| O(E^mu)                        | Eastern Mennonite University                |          5 |       469 |
+| SBU-KTM FAN CLUB               | Stony Brook University                      |          5 |       475 |
+| Bear54                         | University of California, Berkeley          |          5 |       484 |
+| Robert Slutsky                 | Washington University in St. Louis          |          5 |       488 |
+| UCF Jay                        | University of Central Florida               |          5 |       491 |
+| Fiona Barry                    | University of Central Florida               |          5 |       492 |
+| localMaxima                    | University of Winnipeg                      |          5 |       498 |
+| Bear48                         | University of California, Berkeley          |          5 |       529 |
+| Bear31                         | University of California, Berkeley          |          5 |       531 |
+| Leaders and the Best           | University of Michigan                      |          5 |       561 |
+| Yizhou Chen                    | Simon Fraser University                     |          5 |       562 |
+| Team_1                         | University of North Texas                   |          5 |       598 |
+| ViTorch                        | New York University                         |          5 |       726 |
+| UIUC 6                         | University of Illinois at Urbana–Champaign  |          5 |       785 |
+| UofL Cards Black               | University of Louisville                    |          4 |       137 |
+| Vector                         | University of Florida                       |          4 |       144 |
+| 9 hour energy                  | Rutgers University                          |          4 |       153 |
+| TRY hards                      | Texas A&M University                        |          4 |       162 |
+| U of T Gold                    | University of Toronto                       |          4 |       166 |
+| Yiheng Yao                     | Washington University in St. Louis          |          4 |       183 |
+| Bear15                         | University of California, Berkeley          |          4 |       185 |
+| YeOldeMemoryOverflow           | Ohio State University                       |          4 |       203 |
+| idjuana                        | University of British Columbia              |          4 |       216 |
+| Number Theorists               | Riverside City College                      |          4 |       223 |
+| Uky-blue                       | University of Kentucky                      |          4 |       231 |
+| UofL Cards Red                 | University of Louisville                    |          4 |       232 |
+| Rochester #7                   | University of Rochester                     |          4 |       237 |
+| UCF Roomba                     | University of Central Florida               |          4 |       243 |
+| Team E                         | Princeton University                        |          4 |       245 |
+| team 7                         | Duke University                             |          4 |       250 |
+| Joseph Dyer                    | Virginia Tech                               |          4 |       251 |
+| RIT Team 1                     | Rochester Institute of Technology           |          4 |       255 |
+| techkai                        | University of British Columbia              |          4 |       256 |
+| Harman Singh                   | Simon Fraser University                     |          4 |       258 |
+| Bear32                         | University of California, Berkeley          |          4 |       259 |
+| VU Team 06                     | Vanderbilt University                       |          4 |       270 |
+| VU Team 01                     | Vanderbilt University                       |          4 |       273 |
+| Alberta Bronze                 | University of Alberta                       |          4 |       279 |
+| RIT Team 2                     | Rochester Institute of Technology           |          4 |       293 |
+| UIUC 16                        | University of Illinois at Urbana–Champaign  |          4 |       294 |
+| Team Colonel By                | University of California, Los Angeles       |          4 |       305 |
+| Dunder Mifflin Scranton        | Dakota State University                     |          4 |       308 |
+| byu-chars                      | Brigham Young University                    |          4 |       321 |
+| UKy-bbb                        | University of Kentucky                      |          4 |       321 |
+| GT 04                          | Georgia Institute of Technology             |          4 |       326 |
+| Nathaniel Brown                | Baylor University                           |          4 |       344 |
+| UIUC 19                        | University of Illinois at Urbana–Champaign  |          4 |       357 |
+| UCLA 6                         | University of California, Los Angeles       |          4 |       377 |
+| Alibek Zhakubayev              | Baylor University                           |          4 |       395 |
+| Bear39                         | University of California, Berkeley          |          4 |       406 |
+| team 11                        | Duke University                             |          4 |       412 |
+| Hendrix Black                  | Hendrix College                             |          4 |       421 |
+| DP with friends                | New York University                         |          4 |       430 |
+| Calvin Godfrey                 | Virginia Tech                               |          4 |       432 |
+| Rochester #10                  | University of Rochester                     |          4 |       452 |
+| Black                          | Northern Kentucky University                |          4 |       463 |
+| Union LDJ                      | Union College                               |          4 |       470 |
+| SELU1                          | Southeastern Louisiana University           |          4 |       471 |
+| RIT Team 7                     | Rochester Institute of Technology           |          4 |       486 |
+| Poly 2                         | New York University                         |          4 |       522 |
+| Py Terminators                 | University of Winnipeg                      |          4 |       532 |
+| NEU 1                          | Northeastern University                     |          4 |       538 |
+| Matthew McCaskill              | Baylor University                           |          4 |       581 |
+| Jinze Wu                       | Simon Fraser University                     |          4 |       582 |
+| Nicholai Dimov                 | Washington University in St. Louis          |          3 |        56 |
+| Red                            | South Dakota School of Mines and Technology |          3 |        66 |
+| team 2                         | Duke University                             |          3 |        70 |
+| The Busiest Beaver             | University of Texas at Austin               |          3 |        76 |
+| UIUC 7                         | University of Illinois at Urbana–Champaign  |          3 |        77 |
+| Squirtle Squad                 | Virginia Tech                               |          3 |        83 |
+| Penguins                       | Purdue University                           |          3 |        85 |
+| .emily                         | University of British Columbia              |          3 |        85 |
+| Logan Pipes                    | Mount Allison University                    |          3 |       100 |
+| Redhawk2                       | Southeast Missouri State University         |          3 |       100 |
+| Matthew MacLean                | Mount Allison University                    |          3 |       108 |
+| Luoxi Meng                     | Simon Fraser University                     |          3 |       109 |
+| Cookout Labs                   | Ohio State University                       |          3 |       112 |
+| Pandemonium                    | San José State University                   |          3 |       116 |
+| Priority_queue                 | University of Florida                       |          3 |       120 |
+| byu-strings                    | Brigham Young University                    |          3 |       124 |
+| Rochester #5                   | University of Rochester                     |          3 |       124 |
+| EV7                            | University of Central Florida               |          3 |       130 |
+| Siddharth Akalwadi             | Virginia Tech                               |          3 |       130 |
+| Marauder Gold                  | Millersville University of Pennsylvania     |          3 |       132 |
+| Mercer Binary Bears Team B     | Mercer University                           |          3 |       133 |
+| Alberta Purple                 | University of Alberta                       |          3 |       138 |
+| Rochester #2                   | University of Rochester                     |          3 |       138 |
+| Grumps                         | Louisiana State University                  |          3 |       140 |
+| UIUC 15                        | University of Illinois at Urbana–Champaign  |          3 |       147 |
+| Mehedi Meraj                   | Mount Allison University                    |          3 |       148 |
+| Utah Y                         | University of Utah                          |          3 |       153 |
+| Rishi Saran Vijayarajan        | Simon Fraser University                     |          3 |       159 |
+| NJIT - Team 4                  | New Jersey Institute of Technology          |          3 |       163 |
+| BVU Gold                       | Buena Vista University                      |          3 |       165 |
+| GT 05                          | Georgia Institute of Technology             |          3 |       165 |
+| Team Tsumo                     | College of William and Mary                 |          3 |       166 |
+| Siam Abd Al-Ilah               | Washington University in St. Louis          |          3 |       169 |
+| Team-1                         | University of North Texas                   |          3 |       172 |
+| Gold                           | College of William and Mary                 |          3 |       173 |
+| UIUC 20                        | University of Illinois at Urbana–Champaign  |          3 |       174 |
+| Monks                          | DePaul University                           |          3 |       176 |
+| VU Team 05                     | Vanderbilt University                       |          3 |       183 |
+| Mercer Binary Bears Team A     | Mercer University                           |          3 |       188 |
+| Utah X                         | University of Utah                          |          3 |       188 |
+| UCF Smoke Alarm                | University of Central Florida               |          3 |       193 |
+| SR                             | New York University                         |          3 |       195 |
+| Mercer Binary Bears Team C     | Mercer University                           |          3 |       196 |
+| Mira Donaldson                 | Mount Allison University                    |          3 |       196 |
+| PSH Zealots                    | Penn State Harrisburg                       |          3 |       196 |
+| Alberta Red                    | University of Alberta                       |          3 |       196 |
+| Bear49                         | University of California, Berkeley          |          3 |       198 |
+| Set                            | University of Florida                       |          3 |       200 |
+| Uncountably Many Squirrels     | Ohio State University                       |          3 |       203 |
+| We are who we are              | San José State University                   |          3 |       204 |
+| Bear14                         | University of California, Berkeley          |          3 |       204 |
+| FSC4                           | Florida Southern College                    |          3 |       206 |
+| GT 06                          | Georgia Institute of Technology             |          3 |       206 |
+| Green                          | College of William and Mary                 |          3 |       221 |
+| AURed                          | Arcadia University                          |          3 |       230 |
+| VU Team 07                     | Vanderbilt University                       |          3 |       235 |
+| lipu                           | Ohio State University                       |          3 |       245 |
+| Alberta Black                  | University of Alberta                       |          3 |       246 |
+| FSC5                           | Florida Southern College                    |          3 |       257 |
+| UKy-uno                        | University of Kentucky                      |          3 |       266 |
+| Jake Browning                  | Washington University in St. Louis          |          3 |       266 |
+| teamname                       | Swarthmore College                          |          3 |       273 |
+| Denison                        | Denison University                          |          3 |       275 |
+| FSU Broncos                    | Fayetteville State University               |          3 |       281 |
+| It just works                  | Texas A&M University                        |          3 |       281 |
+| VU Team 09                     | Vanderbilt University                       |          3 |       282 |
+| BJU Bruins 3                   | Bob Jones University                        |          3 |       287 |
+| Bear42                         | University of California, Berkeley          |          3 |       288 |
+| Alberta Blue                   | University of Alberta                       |          3 |       289 |
+| keidakira                      | University of Central Florida               |          3 |       290 |
+| Bear50                         | University of California, Berkeley          |          3 |       295 |
+| Brought to You By Stack Ove... | Liberty University                          |          3 |       297 |
+| Thomas Westbrook               | Washington University in St. Louis          |          3 |       302 |
+| BJU Bruins 2                   | Bob Jones University                        |          3 |       303 |
+| NJIT - Team 3                  | New Jersey Institute of Technology          |          3 |       306 |
+| Rochester #1                   | University of Rochester                     |          3 |       306 |
+| LU ACM                         | Lamar University                            |          3 |       315 |
+| Evilying                       | Ohio State University                       |          3 |       319 |
+| Bear52                         | University of California, Berkeley          |          3 |       319 |
+| byu-floats                     | Brigham Young University                    |          3 |       324 |
+| byu-doubles                    | Brigham Young University                    |          3 |       331 |
+| wct                            | Purdue University                           |          3 |       336 |
+| dennismv                       | University of Michigan                      |          3 |       341 |
+| BJU Bruins 7                   | Bob Jones University                        |          3 |       342 |
+| USAFA - Team 2                 | United States Air Force Academy             |          3 |       343 |
+| SFU_Lapis                      | Simon Fraser University                     |          3 |       346 |
+| team 14                        | Duke University                             |          3 |       353 |
+| VectorSpace                    | Purdue University                           |          3 |       354 |
+| Ashley Lu Couch                | Baylor University                           |          3 |       365 |
+| UIUC 14                        | University of Illinois at Urbana–Champaign  |          3 |       374 |
+| RIT Team 6                     | Rochester Institute of Technology           |          3 |       377 |
+| Jerry Lee fan club             | San José State University                   |          3 |       390 |
+| Team Blue                      | University of Windsor                       |          3 |       390 |
+| FSC3                           | Florida Southern College                    |          3 |       401 |
+| Bug Breakers                   | New York University                         |          3 |       406 |
+| Moore Cowbell                  | Northwestern University                     |          3 |       428 |
+| Karl's Team                    | Texas A&M University                        |          3 |       441 |
+| L and the Cool Js              | University of Lethbridge                    |          3 |       469 |
+| Galaxy                         | New York University                         |          3 |       538 |
+| Jonah Kelley                   | Baylor University                           |          3 |       542 |
+| Please No Graph Theory         | Liberty University                          |          3 |       577 |
+| Uky-BigMAC                     | University of Kentucky                      |          2 |        39 |
+| NJIT - Team 6                  | New Jersey Institute of Technology          |          2 |        48 |
+| Lasagna Legacy                 | Lewis & Clark College                       |          2 |        49 |
+| Redhawk 1                      | Southeast Missouri State University         |          2 |        54 |
+| BJU Bruins 5                   | Bob Jones University                        |          2 |        61 |
+| Lafayette 4                    | Lafayette College                           |          2 |        62 |
+| Alberta Orange                 | University of Alberta                       |          2 |        65 |
+| NotMuchToLearn                 | University of British Columbia              |          2 |        65 |
+| Thundering Rattlesnakes        | Ohio State University                       |          2 |        69 |
+| Justin Hughes                  | Mount Allison University                    |          2 |        70 |
+| Bear44                         | University of California, Berkeley          |          2 |        72 |
+| Constructed Abnormally         | Texas A&M University                        |          2 |        73 |
+| William Wick                   | Washington University in St. Louis          |          2 |        82 |
+| Golden Rams 1                  | West Chester University                     |          2 |        94 |
+| Hanqing Yang                   | Washington University in St. Louis          |          2 |       101 |
+| UWT Huskies                    | University of Washington                    |          2 |       102 |
+| Push Then Rebase               | Swarthmore College                          |          2 |       104 |
+| SLU Team 6                     | St. Lawrence University                     |          2 |       105 |
+| Nicholas Tu                    | Washington University in St. Louis          |          2 |       105 |
+| wildcat3                       | California State University, Chico          |          2 |       107 |
+| Pi's Last Digits               | Dakota State University                     |          2 |       107 |
+| Michael Ibanez                 | Baylor University                           |          2 |       108 |
+| Ethan Dickey                   | Baylor University                           |          2 |       110 |
+| TigerThePro                    | University of British Columbia              |          2 |       114 |
+| RIT Team 8                     | Rochester Institute of Technology           |          2 |       116 |
+| Push to Production             | Ohio State University                       |          2 |       118 |
+| Leonardo DiPerna               | Virginia Tech                               |          2 |       119 |
+| psi(x) ~ x                     | University of British Columbia              |          2 |       120 |
+| Python3++                      | Swarthmore College                          |          2 |       123 |
+| Alberta Turquoise              | University of Alberta                       |          2 |       142 |
+| VU Team 08                     | Vanderbilt University                       |          2 |       143 |
+| BVU Beavers                    | Buena Vista University                      |          2 |       155 |
+| Mercer Binary Bears Team D     | Mercer University                           |          2 |       158 |
+| VU Team 03                     | Vanderbilt University                       |          2 |       159 |
+| MtSAC gold                     | Mt. San Antonio College                     |          2 |       162 |
+| Rochester #8                   | University of Rochester                     |          2 |       164 |
+| Frank Liang                    | Washington University in St. Louis          |          2 |       170 |
+| RUGamers?                      | Rutgers University                          |          2 |       174 |
+| team 6                         | Duke University                             |          2 |       178 |
+| Chtholly Nota Seniorious       | University of California, San Diego         |          2 |       179 |
+| RIT Team 5                     | Rochester Institute of Technology           |          2 |       189 |
+| Joseph Yu                      | Baylor University                           |          2 |       192 |
+| Garrett Thompson               | Baylor University                           |          2 |       199 |
+| Alex Blackwell                 | Simon Fraser University                     |          2 |       200 |
+| wildcat1                       | California State University, Chico          |          2 |       201 |
+| Hendrix White                  | Hendrix College                             |          2 |       204 |
+| University of Lethbridge TLE   | University of Lethbridge                    |          2 |       205 |
+| Clemson B                      | Clemson University                          |          2 |       209 |
+| Chaos                          | Ohio State University                       |          2 |       223 |
+| felixhe                        | University of British Columbia              |          2 |       226 |
+| Brooklynn Stone                | Baylor University                           |          2 |       228 |
+| Team 5                         | University of Tennessee at Martin           |          2 |       228 |
+| BJU Bruins 6                   | Bob Jones University                        |          2 |       236 |
+| wildcat2                       | California State University, Chico          |          2 |       247 |
+| Windows Vista Fan Club         | Dakota State University                     |          2 |       247 |
+| USAFA - Team 4                 | United States Air Force Academy             |          2 |       261 |
+| FSC1                           | Florida Southern College                    |          2 |       262 |
+| Give Me Liberty                | Liberty University                          |          2 |       262 |
+| Golden Rams 2                  | West Chester University                     |          2 |       267 |
+| Bear51                         | University of California, Berkeley          |          2 |       270 |
+| Bear41                         | University of California, Berkeley          |          2 |       274 |
+| FSC2                           | Florida Southern College                    |          2 |       279 |
+| Daniel Brunner                 | Baylor University                           |          2 |       288 |
+| James Luper                    | Baylor University                           |          2 |       298 |
+| D2 UBC Ogopogo                 | University of British Columbia              |          2 |       301 |
+| Ali Tohidi                     | Simon Fraser University                     |          2 |       304 |
+| M||E                           | Emory University                            |          2 |       315 |
+| Bear38                         | University of California, Berkeley          |          2 |       331 |
+| Aditi Diwan                    | Virginia Tech                               |          2 |       334 |
+| Yiting Wang                    | Baylor University                           |          2 |       339 |
+| BJU Bruins 4                   | Bob Jones University                        |          2 |       343 |
+| Eric Liu                       | Simon Fraser University                     |          2 |       348 |
+| NaN                            | Dakota State University                     |          2 |       382 |
+| byu-pointers                   | Brigham Young University                    |          2 |       392 |
+| Perfect1                       | Montreal Polytechnic                        |          2 |       479 |
+| Griffons                       | Missouri Western State University           |          1 |        22 |
+| Bob Rein                       | Baylor University                           |          1 |        28 |
+| BJU Bruins 8                   | Bob Jones University                        |          1 |        42 |
+| htmlbot                        | University of British Columbia              |          1 |        46 |
+| USAFA - Team 1                 | United States Air Force Academy             |          1 |        49 |
+| RCC::3nPlus1                   | Riverside City College                      |          1 |        63 |
+| PSH Crusaders                  | Penn State Harrisburg                       |          1 |        65 |
+| ssd352                         | University of Alberta                       |          1 |        67 |
+| pooner                         | University of British Columbia              |          1 |        79 |
+| Mercer Binary Bears Team E     | Mercer University                           |          1 |        93 |
+| Clemson A                      | Clemson University                          |          1 |       100 |
+| Brad Buckingham                | Baylor University                           |          1 |       115 |
+| Bobcats 2                      | Montana State University                    |          1 |       116 |
+| Dangerous Fleet                | Ohio State University                       |          1 |       122 |
+| Mercer Binary Bears Team F     | Mercer University                           |          1 |       126 |
+| NJIT - Team 2                  | New Jersey Institute of Technology          |          1 |       135 |
+| Warren Burrus                  | Baylor University                           |          1 |       137 |
+| Hendrix Orange                 | Hendrix College                             |          1 |       144 |
+| TrashBoat                      | Ohio State University                       |          1 |       154 |
+| USAFA - Team 3                 | United States Air Force Academy             |          1 |       156 |
+| Bear40                         | University of California, Berkeley          |          1 |       163 |
+| Nick Cook                      | Baylor University                           |          1 |       198 |
+| Java++                         | St. Lawrence University                     |          1 |       209 |
+| Clemson D                      | Clemson University                          |          1 |       218 |
+| MorE                           | Emory University                            |          1 |       228 |
+| Baku EU 1                      | Baku Engineering University                 |          0 |         0 |
+| Andres Alvarez                 | Baylor University                           |          0 |         0 |
+| Michael Gillman                | Baylor University                           |          0 |         0 |
+| Sophie Kearney                 | Baylor University                           |          0 |         0 |
+| Test                           | Baylor University                           |          0 |         0 |
+| Zekang Liu                     | Baylor University                           |          0 |         0 |
+| BU - Team 1                    | Boston University                           |          0 |         0 |
+| BU - Team 2                    | Boston University                           |          0 |         0 |
+| temp-team3                     | Brigham Young University                    |          0 |         0 |
+| BVU Blue                       | Buena Vista University                      |          0 |         0 |
+| BVU Buford                     | Buena Vista University                      |          0 |         0 |
+| BVU Infrared                   | Buena Vista University                      |          0 |         0 |
+| BVU Ultraviolet                | Buena Vista University                      |          0 |         0 |
+| ClemsonTiger                   | Clemson University                          |          0 |         0 |
+| team 10                        | Duke University                             |          0 |         0 |
+| team 12                        | Duke University                             |          0 |         0 |
+| team 13                        | Duke University                             |          0 |         0 |
+| team 3                         | Duke University                             |          0 |         0 |
+| team 4                         | Duke University                             |          0 |         0 |
+| team 5                         | Duke University                             |          0 |         0 |
+| team 8                         | Duke University                             |          0 |         0 |
+| team 9                         | Duke University                             |          0 |         0 |
+| Lafayette 1                    | Lafayette College                           |          0 |         0 |
+| MIT ZEROFOUR                   | Massachusetts Institute of Technology       |          0 |         0 |
+| MIT ZEROTHREE                  | Massachusetts Institute of Technology       |          0 |         0 |
+| Coach                          | Millersville University of Pennsylvania     |          0 |         0 |
+| Bobcats 1                      | Montana State University                    |          0 |         0 |
+| NJIT - Team 1                  | New Jersey Institute of Technology          |          0 |         0 |
+| hellony                        | New York University                         |          0 |         0 |
+| Team 16                        | North Dakota State University               |          0 |         0 |
+| Team Choloman                  | Northwestern University                     |          0 |         0 |
+| BAIGY                          | Ohio State University                       |          0 |         0 |
+| Decent Coder                   | Ohio State University                       |          0 |         0 |
+| It's Jacob.                    | Ohio State University                       |          0 |         0 |
+| Purple panda                   | Ohio State University                       |          0 |         0 |
+| Seemingly Short Raven          | Ohio State University                       |          0 |         0 |
+| Harry Cha Team                 | Purdue University                           |          0 |         0 |
+| Nghia Hoang                    | Purdue University                           |          0 |         0 |
+| Shivam                         | Purdue University                           |          0 |         0 |
+| The Boiler Basher              | Purdue University                           |          0 |         0 |
+| RIT Team 10                    | Rochester Institute of Technology           |          0 |         0 |
+| RIT Team 3                     | Rochester Institute of Technology           |          0 |         0 |
+| RIT Team 4                     | Rochester Institute of Technology           |          0 |         0 |
+| RIT Team 9                     | Rochester Institute of Technology           |          0 |         0 |
+| BadMathRightAnswer             | Rutgers University                          |          0 |         0 |
+| RyersO(n)                      | Ryerson University                          |          0 |         0 |
+| Valid Syntax                   | San José State University                   |          0 |         0 |
+| Chengjie Huang                 | Simon Fraser University                     |          0 |         0 |
+| Hao Wu                         | Simon Fraser University                     |          0 |         0 |
+| Kailun Wang                    | Simon Fraser University                     |          0 |         0 |
+| Karan Pathania                 | Simon Fraser University                     |          0 |         0 |
+| Michael Lu                     | Simon Fraser University                     |          0 |         0 |
+| Rohan Ben Joseph               | Simon Fraser University                     |          0 |         0 |
+| Sajjad Shamanian Esfahani      | Simon Fraser University                     |          0 |         0 |
+| Sarthak Kar                    | Simon Fraser University                     |          0 |         0 |
+| Yuchun Li                      | Simon Fraser University                     |          0 |         0 |
+| CAOS was here                  | Southern Illinois University Edwardsville   |          0 |         0 |
+| Stanford Red                   | Stanford University                         |          0 |         0 |
+| Overloading Operators          | Swarthmore College                          |          0 |         0 |
+| IDK                            | Syrian Virtual University                   |          0 |         0 |
+| 1st Team                       | Texas A&M University                        |          0 |         0 |
+| JavaNode                       | Texas A&M University                        |          0 |         0 |
+| The Proud Pirate               | Texas A&M University                        |          0 |         0 |
+| Unaccompanied                  | Texas A&M University                        |          0 |         0 |
+| Touro-W 1                      | Touro College                               |          0 |         0 |
+| Touro-W 2                      | Touro College                               |          0 |         0 |
+| Trinity University             | Trinity University (Texas)                  |          0 |         0 |
+| ..vince                        | University of British Columbia              |          0 |         0 |
+| alex587                        | University of British Columbia              |          0 |         0 |
+| apricot2012                    | University of British Columbia              |          0 |         0 |
+| D2 UBC O(k)                    | University of British Columbia              |          0 |         0 |
+| Damon                          | University of British Columbia              |          0 |         0 |
+| eishan                         | University of British Columbia              |          0 |         0 |
+| Kyle                           | University of British Columbia              |          0 |         0 |
+| Milad                          | University of British Columbia              |          0 |         0 |
+| Nickick                        | University of British Columbia              |          0 |         0 |
+| pshift217                      | University of British Columbia              |          0 |         0 |
+| ShayanH                        | University of British Columbia              |          0 |         0 |
+| starzxy                        | University of British Columbia              |          0 |         0 |
+| TooOldButNotAram               | University of British Columbia              |          0 |         0 |
+| UBC02                          | University of British Columbia              |          0 |         0 |
+| UBC03                          | University of British Columbia              |          0 |         0 |
+| UBC05                          | University of British Columbia              |          0 |         0 |
+| UBC06                          | University of British Columbia              |          0 |         0 |
+| UBC08                          | University of British Columbia              |          0 |         0 |
+| UBC13                          | University of British Columbia              |          0 |         0 |
+| UBC14                          | University of British Columbia              |          0 |         0 |
+| UBC15                          | University of British Columbia              |          0 |         0 |
+| UBC16                          | University of British Columbia              |          0 |         0 |
+| UBC17                          | University of British Columbia              |          0 |         0 |
+| xyzTiger                       | University of British Columbia              |          0 |         0 |
+| Bear10                         | University of California, Berkeley          |          0 |         0 |
+| Bear11                         | University of California, Berkeley          |          0 |         0 |
+| Bear12                         | University of California, Berkeley          |          0 |         0 |
+| Bear13                         | University of California, Berkeley          |          0 |         0 |
+| Bear16                         | University of California, Berkeley          |          0 |         0 |
+| Bear17                         | University of California, Berkeley          |          0 |         0 |
+| Bear18                         | University of California, Berkeley          |          0 |         0 |
+| Bear19                         | University of California, Berkeley          |          0 |         0 |
+| Bear2                          | University of California, Berkeley          |          0 |         0 |
+| Bear21                         | University of California, Berkeley          |          0 |         0 |
+| Bear22                         | University of California, Berkeley          |          0 |         0 |
+| Bear24                         | University of California, Berkeley          |          0 |         0 |
+| Bear25                         | University of California, Berkeley          |          0 |         0 |
+| Bear26                         | University of California, Berkeley          |          0 |         0 |
+| Bear27                         | University of California, Berkeley          |          0 |         0 |
+| Bear28                         | University of California, Berkeley          |          0 |         0 |
+| Bear29                         | University of California, Berkeley          |          0 |         0 |
+| Bear3                          | University of California, Berkeley          |          0 |         0 |
+| Bear30                         | University of California, Berkeley          |          0 |         0 |
+| Bear33                         | University of California, Berkeley          |          0 |         0 |
+| Bear34                         | University of California, Berkeley          |          0 |         0 |
+| Bear35                         | University of California, Berkeley          |          0 |         0 |
+| Bear36                         | University of California, Berkeley          |          0 |         0 |
+| Bear37                         | University of California, Berkeley          |          0 |         0 |
+| Bear4                          | University of California, Berkeley          |          0 |         0 |
+| Bear46                         | University of California, Berkeley          |          0 |         0 |
+| Bear47                         | University of California, Berkeley          |          0 |         0 |
+| Bear53                         | University of California, Berkeley          |          0 |         0 |
+| Bear55                         | University of California, Berkeley          |          0 |         0 |
+| Bear56                         | University of California, Berkeley          |          0 |         0 |
+| Bear6                          | University of California, Berkeley          |          0 |         0 |
+| Bear8                          | University of California, Berkeley          |          0 |         0 |
+| UD1                            | University of Dallas                        |          0 |         0 |
+| ud2                            | University of Dallas                        |          0 |         0 |
+| RON                            | University of Dhaka                         |          0 |         0 |
+| UIUC 17                        | University of Illinois at Urbana–Champaign  |          0 |         0 |
+| UIUC 18                        | University of Illinois at Urbana–Champaign  |          0 |         0 |
+| Rochester #4                   | University of Rochester                     |          0 |         0 |
+| Rochester #9                   | University of Rochester                     |          0 |         0 |
+| Team 1                         | University of Tennessee at Martin           |          0 |         0 |
+| Team 10                        | University of Tennessee at Martin           |          0 |         0 |
+| Team 2                         | University of Tennessee at Martin           |          0 |         0 |
+| Team 3                         | University of Tennessee at Martin           |          0 |         0 |
+| Team 4                         | University of Tennessee at Martin           |          0 |         0 |
+| Team 6                         | University of Tennessee at Martin           |          0 |         0 |
+| Team 7                         | University of Tennessee at Martin           |          0 |         0 |
+| Team 9                         | University of Tennessee at Martin           |          0 |         0 |
+| Alan Turing's abs              | University of Texas at Austin               |          0 |         0 |
+| Stop                           | University of Texas at Austin               |          0 |         0 |
+| UT Vermillion                  | University of Texas at Austin               |          0 |         0 |
+| cameron                        | University of Waterloo                      |          0 |         0 |
+| Kev                            | University of Waterloo                      |          0 |         0 |
+| kw                             | University of Waterloo                      |          0 |         0 |
+| Practice                       | University of Waterloo                      |          0 |         0 |
+| Waterloo Sky Blue              | University of Waterloo                      |          0 |         0 |
+| Wesley Leung                   | University of Waterloo                      |          0 |         0 |
+| Xuanji                         | University of Waterloo                      |          0 |         0 |
+| Jared Joo                      | Virginia Tech                               |          0 |         0 |
+| Matt Davison                   | Virginia Tech                               |          0 |         0 |
+| Tori Mannarelli                | Virginia Tech                               |          0 |         0 |
+| Trevor Miller                  | Virginia Tech                               |          0 |         0 |
+| Aviva Bergman                  | Washington University in St. Louis          |          0 |         0 |
+| Deepthi Kailash                | Washington University in St. Louis          |          0 |         0 |
+| Joe Frazier                    | Washington University in St. Louis          |          0 |         0 |
+| Riya Gupta                     | Washington University in St. Louis          |          0 |         0 |
+| Victoria Black                 | Washington University in St. Louis          |          0 |         0 |
+| Wilbur Martin                  | Washington University in St. Louis          |          0 |         0 |
+| Yipeng Wang                    | Washington University in St. Louis          |          0 |         0 |

@@ -1,3 +1,6 @@
+#pragma comment(linker, "/stack:200000000")
+#pragma GCC optimize("Ofast")
+#pragma GCC target("sse,sse2,sse3,ssse3,sse4,popcnt,abm,mmx,avx,tune=native")
 #include <bits/stdc++.h>
 using namespace std;
 typedef unsigned long long ll;
@@ -37,7 +40,7 @@ vector<int> masks[1<<5][maxn];
 int main()
 {
     ios_base::sync_with_stdio(false); cin.tie(NULL);
-    //freopen("cowpatibility.in","r",stdin); freopen("cowpatibility.out","w",stdout);
+    freopen("cowpatibility.in","r",stdin); freopen("cowpatibility.out","w",stdout);
     cin >> N;
     for (int i = 0; i < (1 << 5); i++) pop[i] = popcount(i);
     for (int i = 0; i < N; i++) {
@@ -47,7 +50,7 @@ int main()
         sort(a[i],a[i]+5);
         for (int mask = 1; mask < (1 << 5); mask++) {
             vector<int>& v = masks[mask][i];
-            v.reserve(100);
+            v.reserve(5);
             int idx = 0;
             for (int j = 0; j < 5; j++) {
                 if (mask & (1<<j)) {

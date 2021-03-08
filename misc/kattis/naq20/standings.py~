@@ -1,0 +1,11 @@
+import pandas as pd
+import requests
+from bs4 import BeautifulSoup
+
+url = 'https://naq20.kattis.com/standings'
+#?filter=3419
+
+r = requests.get(url+"?filter=3419")
+html = r.text
+soup = BeautifulSoup(html,features="lxml")
+standings = soup.find('table',id="standings").tbody
