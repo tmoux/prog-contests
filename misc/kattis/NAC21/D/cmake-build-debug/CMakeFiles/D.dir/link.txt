@@ -1,0 +1,1 @@
+/usr/bin/c++ -g CMakeFiles/D.dir/D.cpp.o CMakeFiles/D.dir/D2.cpp.o -o D 

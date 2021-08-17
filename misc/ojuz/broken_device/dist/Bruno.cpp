@@ -15,6 +15,16 @@ long long Bruno(int N, int A[]) {
         else if (r == 5) ans += "11";
         else if (r == 6) ans += "0";
         else if (r == 7) ans += "01";
+        /*
+        000 : x
+        001 : 0
+        010 : 1
+        011 : 00
+        100 : 10
+        101 : 11
+        110 : 0
+        111 : 01
+        */
     }
     /*
     std::cerr << "Encoded string: ";

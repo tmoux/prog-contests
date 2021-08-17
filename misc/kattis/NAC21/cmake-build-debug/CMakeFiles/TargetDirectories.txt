@@ -1,0 +1,3 @@
+/home/tmou/cp/misc/kattis/NAC21/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/tmou/cp/misc/kattis/NAC21/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/tmou/cp/misc/kattis/NAC21/cmake-build-debug/CMakeFiles/NAC21.dir

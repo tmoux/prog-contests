@@ -11,7 +11,7 @@ void Anna(int N, long long X, int K, int P[]) {
     int pos = 0;
     for (int i = 0; i < N; i += 3) {
         int cnt = (blocked[i] == 0) + (blocked[i+1] == 0) + (blocked[i+2] == 0);
-        if (cnt > 1 || (X >> pos) == 0) {
+        if (cnt > 1/* || (X >> pos) == 0*/) {
             ans += "000";
         }
         else if (cnt == 1) {

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="delegatedBuild" value="false" />
+        <option name="distributionType" value="WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/Problems/A. Color Revolution" />
+            <option value="$PROJECT_DIR$/Problems/B. Boot Camp" />
+            <option value="$PROJECT_DIR$/Problems/C. Spring Cleaning" />
+            <option value="$PROJECT_DIR$/Problems/D. Constructing the Dungeon" />
+            <option value="$PROJECT_DIR$/Problems/E. Magic Tricks" />
+            <option value="$PROJECT_DIR$/Problems/F. Dune II  Battle For Arrakis" />
+            <option value="$PROJECT_DIR$/Problems/G. Two IP Cameras" />
+            <option value="$PROJECT_DIR$/Problems/H. Game with Segments" />
+            <option value="$PROJECT_DIR$/Problems/I. Pac-Man 2.0" />
+            <option value="$PROJECT_DIR$/util" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>

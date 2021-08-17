@@ -1,0 +1,123 @@
+<div class="problem-statement">
+ <div class="header">
+  <div class="title">
+   E. Magic Tricks
+  </div>
+  <div class="time-limit">
+   <div class="property-title">
+    time limit per test
+   </div>2 seconds
+  </div>
+  <div class="memory-limit">
+   <div class="property-title">
+    memory limit per test
+   </div>256 megabytes
+  </div>
+  <div class="input-file">
+   <div class="property-title">
+    input
+   </div>standard input
+  </div>
+  <div class="output-file">
+   <div class="property-title">
+    output
+   </div>standard output
+  </div>
+ </div>
+ <div>
+  <p>Masha is going to participate in a talent show conducted by the university she studies at. She wants to impress the audience with lots of different magic tricks!</p>
+  <p>For one of her tricks, she uses $n$ sponge balls, one of which is a special one. First, she arranges the balls in a row in such a way that the special ball is put on position $k$ (positions are numbered from $1$ to $n$ from left to right). After that, she performs $m$ swaps: during the $i$-th swap, she chooses the ball on position $x_i$ and the ball on position $y_i$, and swaps them.</p>
+  <p>Since Masha is a magician, she fakes some of her actions to trick the audience — when she starts performing a swap, she may fake it, so it is not performed (but it looks like it is performed for the audience). There are no constraints on which swaps Masha should fake or should actually perform — for example, she may fake all of the swaps, or even not fake anything at all.</p>
+  <p>For the trick to work perfectly, the special ball should end up on a specific position — Masha has not decided yet, which position is perfect. Since faking swaps is difficult, for each position she wants to know the minimum number of swaps she has to fake so that the special ball ends up there. </p>
+  <p>Unfortunately, Masha is a magician, neither a mathematician nor a programmer. So she needs your help in calculating what she wants!</p>
+ </div>
+ <div class="input-specification">
+  <div class="section-title">
+   Input
+  </div>
+  <p>The first line contains three integers $n$, $m$ and $k$ ($2 \le n \le 2 \cdot 10^5$; $1 \le m \le 2 \cdot 10^5$; $1 \le k \le n$) — the number of balls, the number of swaps and the initial position of the special ball, respectively.</p>
+  <p>Then $m$ lines follow, the $i$-th line contains two integers $x_i$ and $y_i$ ($1 \le x_i, y_i \le n$; $x_i \ne y_i$) denoting the $i$-th swap.</p>
+ </div>
+ <div class="output-specification">
+  <div class="section-title">
+   Output
+  </div>
+  <p>Print $n$ integers. The $i$-th integer should be the minimum number of swaps Masha has to fake so the special ball ends up on position $i$ (or $-1$, if Masha cannot put the special ball there).</p>
+ </div>
+ <div class="sample-tests">
+  <div class="section-title">
+   Examples
+  </div>
+  <div class="sample-test">
+   <div class="input">
+    <div class="title">
+     Input
+    </div>
+    <pre>4 5 1
+3 4
+2 1
+4 1
+3 1
+3 1
+</pre>
+   </div>
+   <div class="output">
+    <div class="title">
+     Output
+    </div>
+    <pre>2 0 3 1 
+</pre>
+   </div>
+   <div class="input">
+    <div class="title">
+     Input
+    </div>
+    <pre>5 7 4
+3 2
+3 2
+4 2
+3 4
+4 1
+3 2
+5 2
+</pre>
+   </div>
+   <div class="output">
+    <div class="title">
+     Output
+    </div>
+    <pre>2 2 0 3 1 
+</pre>
+   </div>
+   <div class="input">
+    <div class="title">
+     Input
+    </div>
+    <pre>7 15 5
+5 3
+4 2
+6 1
+2 4
+1 6
+3 7
+5 6
+4 2
+6 4
+2 6
+6 3
+6 3
+7 6
+2 6
+7 2
+</pre>
+   </div>
+   <div class="output">
+    <div class="title">
+     Output
+    </div>
+    <pre>-1 1 1 1 2 1 0 
+</pre>
+   </div>
+  </div>
+ </div>
+</div>

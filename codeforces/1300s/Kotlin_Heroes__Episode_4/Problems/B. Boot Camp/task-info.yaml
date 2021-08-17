@@ -1,0 +1,38 @@
+type: codeforces
+files:
+- name: testData/1/input.txt
+  visible: true
+  text: |-
+    4
+    4 5 7
+    1011
+    4 4 10
+    0101
+    5 3 4
+    11011
+    6 4 6
+    011101
+  learner_created: false
+- name: testData/1/output.txt
+  visible: true
+  text: |-
+    12
+    8
+    8
+    14
+  learner_created: false
+- name: src/Main.kt
+  visible: true
+  text: "private fun readLn() = readLine()!! // string line\nprivate fun readInt()\
+    \ = readLn().toInt() // single int\nprivate fun readLong() = readLn().toLong()\
+    \ // single long\nprivate fun readDouble() = readLn().toDouble() // single double\n\
+    private fun readStrings() = readLn().split(\" \") // list of strings\nprivate\
+    \ fun readInts() = readStrings().map { it.toInt() } // list of ints\nprivate fun\
+    \ readLongs() = readStrings().map { it.toLong() } // list of longs\nprivate fun\
+    \ readDoubles() = readStrings().map { it.toDouble() } // list of doubles\n\nfun\
+    \ main() {\n    \n}"
+  learner_created: false
+feedback_link: https://codeforces.com/contest/1346/problem/B?locale=en
+status: Solved
+feedback:
+  time: Wed, 11 Aug 2021 20:21:00 UTC

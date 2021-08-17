@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/tmou/cp/codeforces/1500s/1555/c/c.cpp
+bits/stdc++.h
+-
+
+/home/tmou/cp/codeforces/1500s/1555/d/d.cpp
+bits/stdc++.h
+-
+
+/home/tmou/cp/codeforces/1500s/1555/e/e.cpp
+bits/stdc++.h
+-
+
+/home/tmou/cp/codeforces/1500s/1555/e/gen.cpp
+bits/stdc++.h
+-
+
+/home/tmou/cp/codeforces/1500s/1555/f/f.cpp
+bits/stdc++.h
+-
+
