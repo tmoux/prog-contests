@@ -14,8 +14,8 @@ struct Node {
 			r = new Node(m+1,e);
 		}
 		else {
-			l = NULL;
-			r = NULL;
+			l = nullptr;
+			r = nullptr;
 		}
 	}
 

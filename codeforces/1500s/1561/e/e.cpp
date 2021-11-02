@@ -33,11 +33,51 @@ ostream &operator<<(ostream &o, const vector<T> &v) {
     return o;
 }
 
+void fix(vector<int>& a, int n, vector<int>& ans) {
+    if (n >= 3) {
+        int x = n-1;
+        int y = n-2;
+        int pos_x = (int)distance(a.begin(), find(all(a), x));
+        int pos_y = (int)distance(a.begin(), find(all(a), y));
+
+        auto rev = [&](int p) {
+            assert(p % 2 == 0);
+            ans.push_back(p+1);
+            reverse(a.begin(), a.begin()+p+1);
+            pos_x = (int)distance(a.begin(), find(all(a), x));
+            pos_y = (int)distance(a.begin(), find(all(a), y));
+        };
+
+        rev(pos_x);
+        rev(pos_y-1);
+        rev(n-1);
+        rev(pos_x);
+        rev(n-1);
+
+        fix(a, n-2, ans);
+    }
+}
+
 void solve() {
     int n; cin >> n;
     vector<int> a(n);
-    for (auto& i: a) cin >> i;
-    
+    for (auto& i: a) {
+        cin >> i; i--;
+    }
+    for (int i = 0; i < n; i++) {
+        if (i % 2 != a[i] % 2) {
+            cout << -1 << '\n';
+            return;
+        }
+    }
+    vector<int> ans;
+    fix(a, n, ans);
+    //output
+    cout << ans.size() << '\n';
+    for (int i: ans) {
+        cout << i << ' ';
+    }
+    cout << '\n';
 }
 
 int main() {
