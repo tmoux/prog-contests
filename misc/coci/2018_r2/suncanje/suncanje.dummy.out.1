@@ -1,5 +1,0 @@
-NE
-DA
-NE
-DA
-DA
