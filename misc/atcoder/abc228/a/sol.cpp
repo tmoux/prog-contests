@@ -56,45 +56,10 @@ namespace std {
 } // namespace std
 // }}}
 
-bool brute(int N, int M, vector<int> B, vector<int> Z) {
-  vector<int> fB;
-  FOR(i, 1, sz(B)) {
-    fB.push_back(B[i] - B[i-1]);
-    if (fB.back() < 0) return false;
-  }
-  
-  int i = 0;
-  for (int x: fB) {
-    //cerr << "trying to find " << x << endl;
-    //check if there is a j s.t. sum(Z[i]..Z[j]) = x
-    bool found = false;
-    const int MAX = 100002;
-    bitset<MAX> sum;
-    // vector<bool> sum(x+1, false);
-    vector<int> ones;
-    while (i < M) {
-      sum |= (sum<<Z[i]);
-      sum[Z[i]] = true;
-      i++;
-      if (sum[x]) {
-        found = true;
-        break;
-      }
-    }
-
-    if (!found) return false;
-  }
-  return true;
-}
-
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int T; cin >> T;
-  while (T--) {
-    int N, M; cin >> N >> M;
-    vector<int> B(N), Z(M);
-    for (auto& i: B) cin >> i;
-    for (auto& i: Z) cin >> i;
-    cout << (brute(N, M, B, Z) ? "YES" : "NO") << '\n';
-  }
+  int S, T, X; cin >> S >> T >> X;
+  T = (T - S + 24) % 24;
+  X = (X - S + 24) % 24;
+  cout << ((X < T) ? "Yes" : "No") << '\n';
 }

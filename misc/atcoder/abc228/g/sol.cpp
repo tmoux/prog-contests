@@ -54,47 +54,28 @@ namespace std {
     return y_combinator_result<std::decay_t<Fun>>(std::forward<Fun>(fun));
   }
 } // namespace std
-// }}}
 
-bool brute(int N, int M, vector<int> B, vector<int> Z) {
-  vector<int> fB;
-  FOR(i, 1, sz(B)) {
-    fB.push_back(B[i] - B[i-1]);
-    if (fB.back() < 0) return false;
-  }
-  
-  int i = 0;
-  for (int x: fB) {
-    //cerr << "trying to find " << x << endl;
-    //check if there is a j s.t. sum(Z[i]..Z[j]) = x
-    bool found = false;
-    const int MAX = 100002;
-    bitset<MAX> sum;
-    // vector<bool> sum(x+1, false);
-    vector<int> ones;
-    while (i < M) {
-      sum |= (sum<<Z[i]);
-      sum[Z[i]] = true;
-      i++;
-      if (sum[x]) {
-        found = true;
-        break;
-      }
-    }
+template<typename T>
+concept Container = requires(T a)
+{
+  { a.begin() } -> std::same_as<typename T::iterator>;
+  { a.end() } -> std::same_as<typename T::iterator>;
+};
 
-    if (!found) return false;
+#define DEBUG(x) cerr << #x << ": " << x << '\n'
+template<class T, template <class> class U>
+ostream& operator<<(ostream& o, const U<T>& v) 
+  requires Container<U<T>> && (!requires(std::ostream o, T a) { operator<<(o, a); })
+{
+  o << "[";
+  for (auto it = v.begin(); it != v.end(); ++it) {
+    o << *it; if (next(it) != v.end()) o << ", ";
   }
-  return true;
+  o << "]";
+  return o;
 }
+// }}}
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int T; cin >> T;
-  while (T--) {
-    int N, M; cin >> N >> M;
-    vector<int> B(N), Z(M);
-    for (auto& i: B) cin >> i;
-    for (auto& i: Z) cin >> i;
-    cout << (brute(N, M, B, Z) ? "YES" : "NO") << '\n';
-  }
 }
