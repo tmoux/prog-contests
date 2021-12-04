@@ -3,6 +3,7 @@
 module CubicalTest where
 
 open import Cubical.Core.Everything
+open import Cubical.Foundations.Prelude
 
 _ : I
 _ = i0
@@ -51,3 +52,7 @@ functionExtensionality
   → (p : ∀ a → f a ≡ g a)
   → f ≡ g
 functionExtensionality p = λ i a → p a i
+
+--HCOMP BLACK MAGIC
+--transitivity : (A : Set) (a b c : A) → a ≡ b → b ≡ c → a ≡ c
+--transitivity A a b c p q = λ i → hcomp (λ j → λ { (i = i0) → a ; (i = i1) → q j }) (p i)

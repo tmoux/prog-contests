@@ -3,31 +3,6 @@ module Solution where
 
 open import Preloaded
 
-{- Preloaded:
-
-{-# OPTIONS --safe #-}
-module Preloaded where
-
-open import Relation.Nullary
-open import Relation.Binary.PropositionalEquality
-open import Data.Sum
-open import Data.Product
-open import Data.Bool
-open import Data.Nat
-
-even : ℕ → Bool
-even 0 = true
-even (suc n) = not (even n)
-
-EM = (A : Set) → A ⊎ ¬ A
-
-LPO = (f : ℕ → Bool) → (∀ n → f n ≡ false) ⊎ (∃ λ n → f n ≡ true)
-
-LLPO = (f : ℕ → Bool) → (∀ n m → n ≢ m → f n ≡ false ⊎ f m ≡ false) →
-  (∀ n → even n ≡ true → f n ≡ false) ⊎ (∀ n → even n ≡ false → f n ≡ false)
-
--}
-
 open import Relation.Nullary
 open import Relation.Binary.PropositionalEquality hiding ( [_] )
 open import Data.Sum
@@ -52,16 +27,18 @@ even-or-odd (suc x) with (even x)
 ... | true = inj₂ refl
 ... | false = inj₁ refl
 
+true-false-contra : {x : Bool} → x ≡ true → x ≡ false → ⊥
+true-false-contra x-true x-false with trans (sym x-true) x-false
+... | ()
+
 even-is-not-odd : (x y : ℕ) → even x ≡ true → even y ≡ false → x ≢ y
-even-is-not-odd x y even-x odd-y = {!!}
+even-is-not-odd x y even-x odd-y x≡y rewrite x≡y = ⊥-elim (true-false-contra even-x odd-y)
 
 LPO⇒LLPO : LPO → LLPO
 LPO⇒LLPO lpo f atmost-one-true = 
-  [ (λ all-false → inj₁ λ n x → all-false n) 
-  , g ] 
-  (lpo f)
+  [ (λ all-false → inj₁ λ n x → all-false n) , g ] (lpo f)
   where 
     g : (∃ (λ n → f n ≡ true)) → ((n : ℕ) → even n ≡ true → f n ≡ false) ⊎ ((n : ℕ) → even n ≡ false → f n ≡ false)
     g (x , fx-true) with (even-or-odd x)
-    ... | inj₁ x-is-even = inj₂ λ y y-odd → [ (λ fx-false → {!!}) , (λ x → x) ] (atmost-one-true x y (even-is-not-odd x y x-is-even y-odd))
-    ... | inj₂ x-is-odd = inj₁ λ y y-even → {![ ? , ? ] (atmost-one-true x y (even-is-not-odd y x y-even x-is-odd))!} 
+    ... | inj₁ x-is-even = inj₂ λ y y-odd → [ (λ fx-false → ⊥-elim (true-false-contra fx-true fx-false)) , (λ x → x) ] (atmost-one-true x y (even-is-not-odd x y x-is-even y-odd))
+    ... | inj₂ x-is-odd = inj₁ λ y y-even → [ (λ x → x) , (λ fx-false → ⊥-elim (true-false-contra fx-true fx-false) ) ] (atmost-one-true y x (even-is-not-odd y x y-even x-is-odd)) 
