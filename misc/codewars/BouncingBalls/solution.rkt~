@@ -1,0 +1,6 @@
+#lang racket
+(provide bouncing-balls)
+
+(define (bouncing-balls h bounce window)
+  ; your code
+)

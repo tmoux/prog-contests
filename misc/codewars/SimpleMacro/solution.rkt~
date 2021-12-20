@@ -1,0 +1,5 @@
+#lang racket
+(provide last-symbol)
+
+(define-syntax-rule (last-symbol x y)
+  x)
