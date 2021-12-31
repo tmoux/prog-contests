@@ -1,0 +1,24 @@
+{-# OPTIONS --safe #-}
+module Uneval where
+
+open import Agda.Builtin.Reflection
+
+open import Relation.Nullary
+open import Eval
+{- Preloaded code are in the Eval module:
+
+data Eval : Set where
+  _!+_ : Eval → Eval → Eval
+  _!*_ : Eval → Eval → Eval
+  !lit : ℕ → Eval
+  !zro : Eval
+  !suc : Eval → Eval
+-}
+
+open import Data.Unit
+open import Data.List using ([]; _∷_)
+open import Data.Maybe using (Maybe; just; nothing; maybe′)
+
+-- ??? How can I prevent the evaluation of the argument ???
+parseℕ : ℕ → Eval
+parseℕ _ = ?

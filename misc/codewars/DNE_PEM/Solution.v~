@@ -1,0 +1,9 @@
+Definition axiom_pem := forall (P : Prop), P \/ ~P.
+
+Definition axiom_dne := forall (P : Prop), ~ ~P -> P.
+
+Theorem from : axiom_dne -> axiom_pem.
+Proof. Admitted.
+
+Theorem to : axiom_pem -> axiom_dne.
+Proof. Admitted.

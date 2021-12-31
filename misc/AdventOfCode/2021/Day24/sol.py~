@@ -1,0 +1,48 @@
+from z3 import *
+
+BLOCK_SIZE = 18
+lines = sys.stdin.readlines()
+chunks = [list(map(lambda x: x.split(), lines[i:i+BLOCK_SIZE])) for i in range(0, len(lines), BLOCK_SIZE)]
+
+def solve(mode):
+    solver = Optimize()
+
+    VARS = len(chunks)
+    w = [Int('w' + str(i)) for i in range(VARS)]
+    for i in range(VARS):
+        solver.add(1 <= w[i], w[i] <= 9)
+
+    zs = [Int('z')]
+    solver.add(zs[0] == 0)
+    for (i, chunk) in enumerate(chunks):
+        A = int(chunk[4][2])
+        B = int(chunk[5][2])
+        C = int(chunk[15][2])
+        # print(A, B, C)
+
+        zs.append(Int('z'+str(i)))
+
+        solver.add(If(zs[-2] % 26 + B != w[i]
+                    , zs[-1] == (zs[-2] / A) * 26 + w[i] + C
+                    , zs[-1] == zs[-2] / A))  
+
+    solver.add(zs[-1] == 0)
+
+    model_number = Int('model_number')
+    solver.add(model_number == sum(10**(VARS-i-1) * w[i] for i in range(VARS)))
+
+    if mode == 1:
+        solver.maximize(model_number)
+    elif mode == 2:
+        solver.minimize(model_number)
+
+    if solver.check() == sat:
+        m = solver.model()
+        for v in w:
+            print(v, m[v])
+        for v in zs:
+            print(v, m[v])
+        print(model_number, m[model_number])
+
+solve(1)
+solve(2)
