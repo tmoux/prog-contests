@@ -6,6 +6,7 @@ using ll = long long;
 using ld = long double;
 
 // Template {{{
+#define REP(n) for (int _=0; _<(n); _++)
 #define FOR(i, a, b) for (int i=a; i<(b); i++)
 #define F0R(i, a) for (int i=0; i<(a); i++)
 #define FORd(i,a,b) for (int i = (b)-1; i >= a; i--)
@@ -16,24 +17,6 @@ using ld = long double;
 
 template<class T> bool ckmin(T& a, const T& b) { return b < a ? a = b, 1 : 0; }
 template<class T> bool ckmax(T& a, const T& b) { return a < b ? a = b, 1 : 0; }
-
-template<typename T>
-T maxv(T a) {
-  return a;
-}
-template<typename T, typename ... Args>
-T maxv(T a, Args ... args) {
-  return std::max(a, maxv(args...));
-}
-
-template<typename T>
-T minv(T a) {
-  return a;
-}
-template<typename T, typename ... Args>
-T minv(T a, Args ... args) {
-  return std::min(a, minv(args...));
-}
 
 namespace std {
   template<class Fun>
@@ -55,25 +38,33 @@ namespace std {
     }
 } // namespace std
 
+#define DEBUG(x) cerr << #x << ": " << x << '\n'
+template<typename A, typename B> 
+ostream& operator<<(ostream &os, const pair<A, B> &p) { 
+  return os << '(' << p.first << ", " << p.second << ')'; 
+}
+template<typename T_container, 
+  typename T = typename enable_if<!is_same<T_container, string>::value, 
+  typename T_container::value_type>::type> 
+  ostream& operator<<(ostream &os, const T_container &v) { 
+    os << '['; string sep; 
+    for (const T &x : v) 
+      os << sep << x, sep = ", "; 
+    return os << ']'; 
+  }
 // }}}
 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int T; cin >> T;
-  int n, m; cin >> n >> m;
-  cout << T << '\n';
-  while (T--) {
-    cout << n << ' ' << m << '\n';
-    F0R(_, m) {
-      int u, v;
-      do {
-        u = rng() % n + 1;
-        v = rng() % n + 1;
-      } while (u == v);
-      int w = rng() % 2 + 1;
-      cout << u << ' ' << v << ' ' << w << '\n';
+  int N; cin >> N;
+  cout << 3*N << '\n';
+  F0R(i, 3) {
+    REP(N) {
+      int x = rng() % 2000000000 - 1000000000;
+      int y = rng() % 2000000000 - 1000000000;
+      cout << x << ' ' << y << ' ' << i+1 << '\n';
     }
   }
 }

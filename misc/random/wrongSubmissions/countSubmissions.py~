@@ -1,0 +1,6 @@
+import requests
+import json
+
+def getContestStandings(id):
+    response = requests.get(f"https://codeforces.com/api/contest.standings?contestId={id}&from=1&count=100")
+    return response

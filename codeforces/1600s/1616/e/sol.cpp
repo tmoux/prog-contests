@@ -90,6 +90,7 @@ struct Fenwick
     }
 };
 
+
 const ll INF = 1e18;
 struct IndexTracker {
   vector<int> indices[26];
