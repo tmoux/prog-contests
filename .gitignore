@@ -6,3 +6,5 @@ CMakeLists.txt
 **/in
 **/out
 **/Makefile
+**/t1
+**/t2
