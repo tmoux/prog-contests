@@ -1,9 +1,6 @@
 #include <bits/stdc++.h>
- 
 using namespace std;
- 
 using ll = long long;
-using ld = long double;
 
 // Template {{{
 #define REP(n) for (int _=0; _<(n); _++)
@@ -57,4 +54,15 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
+  int n, m; cin >> n >> m;
+  vector<string> a(n);
+  for (auto& i: a) cin >> i;
+  set<string> s;
+  REP(m) {
+    string t; cin >> t;
+    s.insert(t);
+  }
+  F0R(i, n) {
+    cout << (s.count(a[i]) ? "Yes" : "No") << '\n';
+  }
 }
