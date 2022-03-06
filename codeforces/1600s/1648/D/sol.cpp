@@ -1,9 +1,6 @@
 #include <bits/stdc++.h>
- 
 using namespace std;
- 
 using ll = long long;
-using ld = long double;
 
 // Template {{{
 #define REP(n) for (int _=0; _<(n); _++)

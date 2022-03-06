@@ -52,7 +52,8 @@ template<typename T_container,
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-namespace atcoder {/*{{{*/
+// From Atcoder ACL
+namespace atcoder {
   // @param n `0 <= n`
   // @return minimum non-negative `x` s.t. `n <= 2**x`
   int ceil_pow2(int n) {
@@ -88,7 +89,6 @@ namespace atcoder {/*{{{*/
       }
 
       S prod(int l, int r) const {
-        r++; // make inclusive
         assert(0 <= l && l <= r && r <= _n);
         S sml = e(), smr = e();
         l += size;
@@ -166,94 +166,46 @@ namespace atcoder {/*{{{*/
       void update(int k) { d[k] = op(d[2 * k], d[2 * k + 1]); }
   };
 } // namespace atcoder
-using atcoder::segtree;/*}}}*/
-namespace Seg {
-  int op(int a, int b) { return max(a, b); }
-  int e() { return 0; }
-}
-segtree<int, Seg::op, Seg::e> seg;
+using atcoder::segtree;
 
-const int maxn = 2e5+5;
-int n;
-int h[maxn];
-vector<int> adj[maxn];
-int mxH = 0;
-int par[maxn];
+int op(int a, int b) { return max(a, b); }
 
+int e() { return -1; }
 
-int tin[maxn], tout[maxn], t = 0;
+int target;
 
-ll cur = 0;
-vector<int> add[maxn];
-void recalc(int i, int p) {
-  int mx = 0;
-  if (p == par[i]) 
-    mx = seg.prod(tin[i]+1, tout[i]);
-  else if (i == p) {
-    ckmax(mx, seg.prod(0, tin[i]-1));
-    ckmax(mx, seg.prod(tin[i]+1, n-1));
-  }
-  else {
-    // avoid [tin[i], tin[i]], [tin[p], tout[p]]
-    ckmax(mx, seg.prod(0, tin[i]-1));
-    ckmax(mx, seg.prod(tin[i]+1, tin[p]-1));
-    ckmax(mx, seg.prod(tout[p]+1, n-1));
-  }
-
-  if (!add[i].empty()) cur -= add[i].back();
-  add[i].push_back(max(0, h[i] - mx));
-  cur += add[i].back();
-}
-
-vector<int> segarray;
-void dfs(int i, int p) {
-  tin[i] = t++;
-  segarray[tin[i]] = h[i];
-  par[i] = p;
-  for (int j: adj[i]) if (j != p) {
-    dfs(j, i);
-  }
-  tout[i] = t-1;
-}
-
-ll ans = 1e18;
-void dfs2(int i, int p) {
-  ll tr = cur + mxH;
-  ckmin(ans, tr);
-  for (int j: adj[i]) if (j != p) {
-    recalc(i, j);
-    recalc(j, j);
-
-    dfs2(j, i);
-
-    cur -= add[i].back();
-    add[i].pop_back();
-    cur += add[i].back();
-
-    cur -= add[j].back();
-    add[j].pop_back();
-    cur += add[j].back();
-  }
-}
+bool f(int v) { return v < target; }
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  cin >> n;
-  for (int i = 1; i <= n; i++) {
-    cin >> h[i];
-    ckmax(mxH, h[i]);
-  }
-  REP(n-1) {
-    int u, v; cin >> u >> v;
-    adj[u].push_back(v);
-    adj[v].push_back(u);
-  }
-  segarray.resize(n);
-  dfs(1, 0);
-  seg = segtree<int, Seg::op, Seg::e>(segarray);
 
-  for (int i = 1; i <= n; i++) recalc(i, par[i]);
-  dfs2(1, 0);
-  cout << ans << '\n';
+  int n, q;
+  scanf("%d %d", &n, &q);
+  vector<int> a(n);
+  for (int i = 0; i < n; i++) {
+    scanf("%d", &(a[i]));
+  }
 
+  segtree<int, op, e> seg(a);
+
+  for (int i = 0; i < q; i++) {
+    int t;
+    scanf("%d", &t);
+    if (t == 1) {
+      int x, v;
+      scanf("%d %d", &x, &v);
+      x--;
+      seg.set(x, v);
+    } else if (t == 2) {
+      int l, r;
+      scanf("%d %d", &l, &r);
+      l--;
+      printf("%d\n", seg.prod(l, r));
+    } else if (t == 3) {
+      int p;
+      scanf("%d %d", &p, &target);
+      p--;
+      printf("%d\n", seg.max_right<f>(p) + 1);
+    }
+  }
 }
