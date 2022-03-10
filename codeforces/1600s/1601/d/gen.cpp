@@ -54,24 +54,6 @@ namespace std {
       return y_combinator_result<std::decay_t<Fun>>(std::forward<Fun>(fun));
     }
 } // namespace std
-
-  template<typename T>
-concept Container = requires(T a)
-{
-  { a.begin() } -> std::same_as<typename T::iterator>;
-  { a.end() } -> std::same_as<typename T::iterator>;
-};
-
-template<class T, template <class> class U>
-ostream& operator<<(ostream& o, const U<T>& v) requires Container<U<T>>
-{
-  o << "[";
-  for (auto it = v.begin(); it != v.end(); ++it) {
-    o << *it; if (next(it) != v.end()) o << ", ";
-  }
-  o << "]";
-  return o;
-}
 // }}}
 
 int main() {
