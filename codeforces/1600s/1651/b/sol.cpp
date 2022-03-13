@@ -54,4 +54,21 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
+  int T; cin >> T;
+  const int B = 1e9;
+  vector<ll> v = {1};
+  while (v.back() * 3 <= B) {
+    v.push_back(v.back() * 3);
+  }
+  while (T--) {
+    int n; cin >> n;
+    if (n <= sz(v)) {
+      cout << "YES\n";
+      F0R(i, n) cout << v[i] << ' ';
+      cout << '\n';
+    }
+    else {
+      cout << "NO\n";
+    }
+  }
 }

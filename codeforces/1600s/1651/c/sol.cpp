@@ -54,4 +54,38 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
+  int T; cin >> T;
+  while (T--) {
+    int n; cin >> n;
+    vector<ll> a(n), b(n);
+    F0R(i, n) cin >> a[i];
+    F0R(i, n) cin >> b[i];
+    ll A = a.front();
+    ll B = a.back();
+    ll C = b.front();
+    ll D = b.back();
+
+    sort(all(a));
+    sort(all(b));
+    auto smallest = [](int x, const vector<ll>& v) -> ll {
+      auto it = lower_bound(all(v), x);
+      ll ret = 2e9;
+      if (it != v.end()) ckmin(ret, *it - x);
+      if (it != v.begin()) ckmin(ret, x - *prev(it));
+      return ret;
+    };
+
+    ll ans = 1e18;
+    ckmin(ans, abs(A - C) + abs(B - D));
+    ckmin(ans, abs(A - D) + abs(B - C));
+
+    ckmin(ans, abs(A - C) + smallest(B, b) + smallest(D, a));
+    ckmin(ans, abs(A - D) + smallest(B, b) + smallest(C, a));
+    ckmin(ans, abs(B - C) + smallest(A, b) + smallest(D, a));
+    ckmin(ans, abs(B - D) + smallest(A, b) + smallest(C, a));
+
+    ckmin(ans, smallest(A, b) + smallest(B, b) + smallest(C, a) + smallest(D, a));
+
+    cout << ans << '\n';
+  }
 }

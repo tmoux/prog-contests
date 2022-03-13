@@ -1,0 +1,8 @@
+#!/bin/bash
+
+while [ true ]
+do
+  echo "500000" | ./gen > t1
+  echo "Running test"
+  time ./sol < t1
+done

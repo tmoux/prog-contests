@@ -52,6 +52,65 @@ ostream& operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
+const int dx[] = {0, -1, 0, 1};
+const int dy[] = {1, 0, -1, 0};
+
+int dist(array<int, 2> a, array<int, 2> b) {
+  return abs(a[0]-b[0]) + abs(a[1]-b[1]);
+}
+vector<array<int, 2>> adj(array<int, 2> p) {
+  vector<array<int, 2>> ret;
+  F0R(k, 4) {
+    int nx = p[0] + dx[k];
+    int ny = p[1] + dy[k];
+    ret.push_back({nx, ny});
+  }
+  return ret;
+}
+
+const int maxn = 2e5+5;
+int n;
+
+map<array<int, 2>, int> s;
+array<int, 2> p[maxn], ans[maxn];
+bool vis[maxn];
+
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
+  cin >> n;
+  F0R(i, n) {
+    cin >> p[i][0] >> p[i][1];
+    s[p[i]] = i;
+  }
+
+  queue<int> q;
+  F0R(i, n) {
+    bool found = false;
+    for (auto pt: adj(p[i])) {
+      if (!s.count(pt)) {
+        found = true;
+        ans[i] = pt;
+      }
+    }
+    if (found) {
+      vis[i] = true;
+      q.push(i);
+    }
+  }
+  while (!q.empty()) {
+    int i = q.front(); q.pop();
+    for (auto pt: adj(p[i])) {
+      if (s.count(pt)) {
+        int j = s[pt];
+        if (!vis[j]) {
+          ans[j] = ans[i];
+          vis[j] = true;
+          q.push(j);
+        }
+      }
+    }
+  }
+  F0R(i, n) {
+    cout << ans[i][0] << ' ' << ans[i][1] << '\n';
+  }
 }

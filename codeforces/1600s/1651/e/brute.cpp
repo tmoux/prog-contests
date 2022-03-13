@@ -52,11 +52,75 @@ ostream& operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
+const int maxn = 1505;
+int n;
+vector<int> adj[2*maxn];
+
+struct DSU {
+  int n;
+  vector<int> par;
+  DSU(int _n) {
+    n = _n;
+    par.resize(n+1, -1);
+  }
+
+  int Find(int i) {
+    return par[i] < 0 ? i : par[i] = Find(par[i]);
+  }
+
+  bool Union(int x, int y) { //return true if x and y were not connected
+    x = Find(x);
+    y = Find(y);
+    if (x == y) return false;
+    if (par[x] > par[y]) swap(x, y);
+    par[x] += par[y];
+    par[y] = x;
+    return true;
+  }
+
+  int size(int i) {
+    return -par[Find(i)];
+  }
+};
+
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int T; cin >> T;
-  while (T--) {
-    int n; cin >> n;
-    cout << ((1<<n) - 1) << '\n';
+  cin >> n;
+  REP(2*n) {
+    int x, y; cin >> x >> y;
+    adj[x].push_back(y);
+    adj[y].push_back(x);
   }
+
+  int ans = 0;
+  for (int l = 1; l <= n; l++) {
+    for (int r = l; r <= n; r++) {
+      for (int L = n+1; L <= 2*n; L++) {
+        for (int R = L; R <= 2*n; R++) {
+          DSU dsu(2*n);
+          FOR(i, l, r+1) {
+            for (int j: {0, 1}) {
+              if (L <= adj[i][j] && adj[i][j] <= R) {
+                dsu.Union(i, adj[i][j]);
+              }
+            }
+          }
+          FOR(i, L, R+1) {
+            for (int j: {0, 1}) {
+              if (l <= adj[i][j] && adj[i][j] <= r) {
+                dsu.Union(i, adj[i][j]);
+              }
+            }
+          }
+
+          int cnt = 0;
+          FOR(i, l, r+1) if (dsu.Find(i) == i) cnt += dsu.size(i)/2;
+          FOR(i, L, R+1) if (dsu.Find(i) == i) cnt += dsu.size(i)/2;
+          ans += cnt;
+          // cout << l << ' ' << r << ' ' << L << ' ' << R << ": " << cnt << endl;
+        }
+      }
+    }
+  }
+  cout << ans << '\n';
 }
