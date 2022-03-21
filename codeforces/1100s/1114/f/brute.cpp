@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
-using ll = unsigned long long;
+using ll = long long;
 
 // Template {{{
 #define REP(n) for (int _=0; _<(n); _++)
@@ -52,96 +52,73 @@ template<typename T_container,
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-namespace ModInt { //{{{
-  template<int MOD>
-    struct mod_int {
-      int val;
+struct Node {/*{{{*/
+  int s, e, m;
+  //covers s,e;
+  int sum;
+  int lazy;
+  Node *l, *r;
 
-      mod_int() : val(0) {}
-      mod_int(int _val) : val(_val % MOD) {}
+  Node(int a, int b) {
+    s = a;
+    e = b;
+    sum = 0;
+    lazy = 0;
+    if (s != e) {
+      m = (s+e)/2;
+      l = new Node(s,m);
+      r = new Node(m+1,e);
+    }
+    else {
+      l = NULL;
+      r = NULL;
+    }
+  }
 
-      mod_int operator+() const {
-        return mod_int(val); 
-      }
-      mod_int operator-() const {
-        return mod_int(MOD-val); 
-      }
-      mod_int inverse() const {
-        assert(val != 0);
-        return *this ^ (MOD - 2);
-      }
+  void push() {
+    if (s != e) {
+      l->lazy += lazy;
+      l->sum += (l->e - l->s + 1) * lazy;
 
-      bool operator==(const mod_int& b) const {
-        return val == b.val;
-      }
+      r->lazy += lazy;
+      r->sum += (r->e - r->s + 1) * lazy;
+    }
+    lazy = 0;
+  }
 
-      bool operator!=(const mod_int& b) const {
-        return !(*this == b);
-      }
+  void add(int st, int en, int x) {
+    //lazy: already accounted for in your own node, not the childs nodes
+    if (st <= s && e <= en) {
+      lazy += x;
+      sum += (e - s + 1) * x;
+      return;
+    }
+    push();
+    if (st <= m) {
+      l->add(st,en,x);
+    }
+    if (en > m) {
+      r->add(st,en,x);
+    }
+    sum = l->sum + r->sum;
+  }
 
-      mod_int& operator+=(const mod_int& b) {
-        val += b.val;
-        if (val >= MOD) val -= MOD;
-        return *this;
-      }
-      mod_int& operator-=(const mod_int& b) {
-        return *this += -b;
-      }
-      mod_int& operator*=(const mod_int& b) {
-        val = (1LL*val*b.val) % MOD;
-        return *this;
-      }
-      mod_int& operator/=(const mod_int& b) {
-        val = (1LL*val*b.inverse().val) % MOD;
-        return *this;
-      }
-
-      mod_int& operator++(int) {
-        return *this += 1;
-      }
-
-      mod_int& operator--(int) {
-        return *this -= 1;
-      }
-
-      friend mod_int operator+(const mod_int& a, const mod_int& b) {
-        mod_int c = a; c += b;
-        return c;
-      }
-      friend mod_int operator-(const mod_int& a, const mod_int& b) {
-        mod_int c = a; c -= b;
-        return c;
-      }
-      friend mod_int operator*(const mod_int& a, const mod_int& b) {
-        mod_int c = a; c *= b;
-        return c;
-      }
-      friend mod_int operator/(const mod_int& a, const mod_int& b) {
-        mod_int c = a; c /= b;
-        return c;
-      }
-
-      friend mod_int operator^(mod_int a, int b) {
-        mod_int res(1);
-        while (b > 0) {
-          if (b&1) res *= a;
-          a *= a;
-          b >>= 1;
-        }
-        return res;
-      }
-
-      friend ostream& operator<<(ostream& o, const mod_int& x) {
-        return o << x.val;
-      };
-      friend istream& operator>>(istream& i, mod_int& x) {
-        i >> x.val; x.val %= MOD;
-        return i;
-      }
-    };
-} //}}}
-const int MOD = 1e9+7;
-using mint = ModInt::mod_int<MOD>;
+  int getsum(int st, int en) {
+    push();
+    //if completely included
+    if (st <= s && e <= en) {
+      return sum;
+    }
+    int ret = 0;
+    if (st <= m) {
+      ret += l->getsum(st,en);
+    }
+    if (en > m) {
+      ret += r->getsum(st,en);
+    }
+    return ret;
+  }
+};/*}}}*/
 
 namespace atcoder {/*{{{*/
   // @param n `0 <= n`
@@ -331,101 +308,25 @@ namespace atcoder {/*{{{*/
 using atcoder::lazy_segtree;
 
 namespace Seg {
-  mint op(mint l, mint r) { return l * r; }
-  mint e() { return mint(1); }
-  mint mapping(mint mult, mint r) { return mult * r; }
-  mint composition(mint x, mint y) { return x * y; };
-  mint id() { return mint(1); }
+  int op(int l, int r) { return l + r; }
+  int e() { return 0; }
+  int mapping(int add, int r) { return add + r; }
+  int composition(int x, int y) { return x + y; };
+  int id() { return 0; }
 }
 
-using lazy_seg = lazy_segtree<mint, Seg::op, Seg::e, mint, Seg::mapping, Seg::composition, Seg::id>;
-
-namespace Seg2 {
-  ll op(ll l, ll r) { return l | r; }
-  ll e() { return 0LL; }
-  ll mapping(ll mult, ll r) { return mult | r; }
-  ll composition(ll x, ll y) { return x | y; };
-  ll id() { return 0LL; }
-}
-using bit_seg = lazy_segtree<ll, Seg2::op, Seg2::e, ll, Seg2::mapping, Seg2::composition, Seg2::id>;
-
-struct Node {
-	int s, e, m;
-	//covers s,e;
-	mint sum;
-	mint lazy;
-	Node *l, *r;
-	
-	Node(int a, int b) {
-		s = a;
-		e = b;
-		sum = 1;
-		lazy = 1;
-		if (s != e) {
-			m = (s+e)/2;
-			l = new Node(s,m);
-			r = new Node(m+1,e);
-		}
-		else {
-			l = NULL;
-			r = NULL;
-		}
-	}
-
-	void push() {
-		if (s != e) {
-			l->lazy *= lazy;
-			l->sum *= lazy ^ (l->e - l->s + 1);
-
-			r->lazy *= lazy;
-			r->sum *= lazy ^ (r->e - r->s + 1);
-		}
-		lazy = 1;
-	}
-
-	void add(int st, int en, mint x) {
-		//lazy: already accounted for in your own node, not the childs nodes
-		if (st <= s && e <= en) {
-			lazy *= x;
-      sum *= x ^ (e - s + 1);
-			return;
-		}
-		push();
-		if (st <= m) {
-			l->add(st,en,x);
-		}
-		if (en > m) {
-			r->add(st,en,x);
-		}
-		sum = l->sum * r->sum;
-	}
-
-	mint getsum(int st, int en) {
-		push();
-		//if completely included
-		if (st <= s && e <= en) {
-			return sum;
-		}
-		mint ret = 1;
-		if (st <= m) {
-			ret *= l->getsum(st,en);
-		}
-		if (en > m) {
-			ret *= r->getsum(st,en);
-		}
-		return ret;
-	}
-};
+using lazy_seg = lazy_segtree<int, Seg::op, Seg::e, int, Seg::mapping, Seg::composition, Seg::id>;
+lazy_seg psum[65];
 
 const int maxn = 305;
 int spf[maxn];
-int prime[65];
+bool isprime[maxn];
 int primeToId[maxn]; int counter = 0;
 
 void init_spf() {
   spf[1] = 1;
   for (int i = 2; i < maxn; i++) if (!spf[i]) {
-    prime[counter] = i;
+    isprime[i] = true;
     primeToId[i] = counter++;
     for (int j = i; j < maxn; j += i) {
       if (!spf[j]) spf[j] = i;
@@ -433,31 +334,124 @@ void init_spf() {
   }
 }
 
-ll mask[maxn];
+vector<pair<int,int>> factors[maxn];
+
+namespace ModInt { //{{{
+  template<int MOD>
+    struct mod_int {
+      int val;
+
+      mod_int() : val(0) {}
+      mod_int(int _val) : val(_val % MOD) {}
+
+      mod_int operator+() const {
+        return mod_int(val); 
+      }
+      mod_int operator-() const {
+        return mod_int(MOD-val); 
+      }
+      mod_int inverse() const {
+        assert(val != 0);
+        return *this ^ (MOD - 2);
+      }
+
+      bool operator==(const mod_int& b) const {
+        return val == b.val;
+      }
+
+      bool operator!=(const mod_int& b) const {
+        return !(*this == b);
+      }
+
+      mod_int& operator+=(const mod_int& b) {
+        val += b.val;
+        if (val >= MOD) val -= MOD;
+        return *this;
+      }
+      mod_int& operator-=(const mod_int& b) {
+        return *this += -b;
+      }
+      mod_int& operator*=(const mod_int& b) {
+        val = (1LL*val*b.val) % MOD;
+        return *this;
+      }
+      mod_int& operator/=(const mod_int& b) {
+        val = (1LL*val*b.inverse().val) % MOD;
+        return *this;
+      }
+
+      mod_int& operator++(int) {
+        return *this += 1;
+      }
+
+      mod_int& operator--(int) {
+        return *this -= 1;
+      }
+
+      friend mod_int operator+(const mod_int& a, const mod_int& b) {
+        mod_int c = a; c += b;
+        return c;
+      }
+      friend mod_int operator-(const mod_int& a, const mod_int& b) {
+        mod_int c = a; c -= b;
+        return c;
+      }
+      friend mod_int operator*(const mod_int& a, const mod_int& b) {
+        mod_int c = a; c *= b;
+        return c;
+      }
+      friend mod_int operator/(const mod_int& a, const mod_int& b) {
+        mod_int c = a; c /= b;
+        return c;
+      }
+
+      friend mod_int operator^(mod_int a, int b) {
+        mod_int res(1);
+        while (b > 0) {
+          if (b&1) res *= a;
+          a *= a;
+          b >>= 1;
+        }
+        return res;
+      }
+
+      friend ostream& operator<<(ostream& o, const mod_int& x) {
+        return o << x.val;
+      };
+      friend istream& operator>>(istream& i, mod_int& x) {
+        i >> x.val; x.val %= MOD;
+        return i;
+      }
+    };
+} //}}}
+const int MOD = 1e9+7;
+using mint = ModInt::mod_int<MOD>;
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
   init_spf();
   for (int x = 1; x <= 300; x++) {
     int y = x;
+    map<int,int> cnt;
     while (y > 1) {
       int fac = spf[y];
-      mask[x] |= 1LL << primeToId[fac];
+      cnt[fac]++;
       y /= fac;
     }
+    for (auto p: cnt) factors[x].push_back(p);
   }
   int n, q; cin >> n >> q;
-  vector<mint> a(n);
-  vector<ll> b(n);
+  F0R(i, counter) {
+    psum[i] = lazy_seg(n);
+  }
+
+
   F0R(i, n) {
     int x; cin >> x;
-    a[i] = mint(x);
-    b[i] = mask[x];
+    for (auto [p, c]: factors[x]) {
+      psum[primeToId[p]].apply(i, c);
+    }
   }
-  // lazy_seg productSeg(a);
-  Node productSeg = Node(0, n-1);
-  F0R(i, n) productSeg.add(i, i, a[i]);
-  bit_seg bitSeg(b);
 
   REP(q) {
     string s;
@@ -466,42 +460,17 @@ int main() {
     l--; r--;
     if (s == "MULTIPLY") {
       int x; cin >> x;
-      productSeg.add(l, r, x);
-      bitSeg.apply(l, r, mask[x]);
-
-      /*
-      FOR(i, l, r+1) {
-        a[i] *= x;
-        b[i] |= mask[x];
+      for (auto [p, c]: factors[x]) {
+        psum[primeToId[p]].apply(l, r, c);
       }
-      */
     }
     else {
-      mint ans = productSeg.getsum(l, r);
-      ll pmask = bitSeg.prod(l, r);
-
-      /*
-      mint p = mint(1);
-      ll q = 0LL;
-      FOR(i, l, r+1) {
-        p *= a[i];
-        q |= b[i];
-      }
-      */
-      // cout << ans << ' ' << p << '\n';
-      // cout << pmask << ' ' << q << '\n';
-      // assert(ans == p);
-      // assert(pmask == q);
-
-      //F0R(i, counter) {
-      //  if (pmask & (1LL<<i)) {
-      //    cout << "bit " << prime[i] << endl;
-      //  }
-      //}
-
-      F0R(i, counter) {
-        if (pmask & (1LL<<i)) {
-          ans *= (mint(1) - mint(prime[i]).inverse());
+      mint ans = 1;
+      F0R(p, 301) if (isprime[p]) {
+        int k = psum[primeToId[p]].prod(l, r);
+        if (k > 0) {
+          ans *= mint(p) ^ (k-1);
+          ans *= mint(p) - 1;
         }
       }
       cout << ans << '\n';
