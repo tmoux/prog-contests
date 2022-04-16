@@ -1,0 +1,10 @@
+#!/bin/bash
+
+for dir in */ ; do
+  if [ $# -eq 0 ]
+  then
+    find $dir -type f -executable # -exec rm {} +
+  else
+    find $dir -type f -executable -exec rm {} +
+  fi
+done
