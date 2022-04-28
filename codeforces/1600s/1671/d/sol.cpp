@@ -59,34 +59,59 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
+const int maxn = 2e5 + 5;
+int n, x;
+int a[maxn];
+
+ll dp[maxn][4][4];
+
+int getLast(int last, int i) {
+  if (last == 0) {
+    assert(i != 0);
+    return a[i - 1];
+  } else if (last == 1)
+    return 1;
+  else if (last == 2)
+    return x;
+  else
+    return -1;
+}
+
+ll f(int i, int left, int last) {
+  ll &res = dp[i][left][last];
+  if (res != -1) return res;
+  if (i == n && left == 0) return 0;
+  res = 1e18;
+  if (i < n) {  // go next
+    int add = last == 3 ? 0 : abs(a[i] - getLast(last, i));
+    ckmin(res, f(i + 1, left, 0) + add);
+  }
+  if (left & 1) {
+    int add = last == 3 ? 0 : abs(1 - getLast(last, i));
+    ckmin(res, f(i, left ^ 1, 1) + add);
+  }
+  if (left & 2) {
+    int add = last == 3 ? 0 : abs(x - getLast(last, i));
+    ckmin(res, f(i, left ^ 2, 2) + add);
+  }
+  return res;
+}
+
+ll solve() {
+  cin >> n >> x;
+  F0R(i, n) cin >> a[i];
+  F0R(i, n + 1) F0R(j, 4) F0R(k, 4) { dp[i][j][k] = -1; }
+  ll ans = f(0, 3, 3);
+  return ans;
+}
+
 int main() {
   ios_base::sync_with_stdio(false);
   cin.tie(NULL);
   int T;
   cin >> T;
   while (T--) {
-    int n;
-    cin >> n;
-    vector<vector<int>> adj(n);
-    REP(n - 1) {
-      int u, v;
-      cin >> u >> v;
-      u--;
-      v--;
-      adj[u].push_back(v);
-      adj[v].push_back(u);
-    }
-    vector<bool> color(n);
-    y_combinator([&](auto dfs, int i, int p, bool c) -> void {
-      color[i] = c;
-      for (int j : adj[i]) {
-        if (j != p) {
-          dfs(j, i, c ^ 1);
-        }
-      }
-    })(0, 0, 0);
-    F0R(i, n) {
-      cout << (sz(adj[i]) * (color[i] ? 1 : -1)) << " \n"[i == n - 1];
-    }
+    cout << solve() << '\n';
   }
 }
+

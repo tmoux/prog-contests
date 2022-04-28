@@ -59,34 +59,79 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
+using cd = complex<double>;
+const double PI = acos(-1);
+
+void fft(vector<cd> &a, bool invert) {
+  int n = sz(a);
+  if (n == 1) return;
+  vector<cd> a0(n / 2), a1(n / 2);
+  for (int i = 0; 2 * i < n; i++) {
+    a0[i] = a[2 * i];
+    a1[i] = a[2 * i + 1];
+  }
+  fft(a0, invert);
+  fft(a1, invert);
+
+  double ang = 2 * PI / n * (invert ? -1 : 1);
+
+  cd w(1), wn(cos(ang), sin(ang));
+  for (int i = 0; 2 * i < n; i++) {
+    a[i] = a0[i] + w * a1[i];
+    a[i + n / 2] = a0[i] - w * a1[i];
+    if (invert) {
+      a[i] /= 2;
+      a[i + n / 2] /= 2;
+    }
+    w *= wn;
+  }
+}
+
+vector<ll> multiply(const vector<ll> &a, const vector<ll> &b) {
+  vector<cd> fa(all(a)), fb(all(b));
+  int n = 1;
+  while (n < sz(a) + sz(b)) n *= 2;
+  fa.resize(n);
+  fb.resize(n);
+
+  fft(fa, false);
+  fft(fb, false);
+  F0R(i, n) fa[i] *= fb[i];
+  fft(fa, true);
+
+  vector<ll> result(n);
+  F0R(i, n) {
+    result[i] = round(fa[i].real());
+  }
+  return result;
+}
+
+void solve() {
+  int n;
+  cin >> n;
+  n++;
+  vector<ll> a(n), b(n);
+  F0R(i, n) cin >> a[i];
+  F0R(i, n) cin >> b[i];
+  reverse(all(a));
+  reverse(all(b));
+  auto c = multiply(a, b);
+  int N = 2 * (n - 1) + 1;
+  vector<ll> ans;
+  F0R(i, N) {
+    ans.push_back(c[i]);
+  }
+  reverse(all(ans));
+  F0R(i, N) {
+    cout << ans[i] << " \n"[i == N - 1];
+  }
+}
+
 int main() {
   ios_base::sync_with_stdio(false);
   cin.tie(NULL);
+
   int T;
   cin >> T;
-  while (T--) {
-    int n;
-    cin >> n;
-    vector<vector<int>> adj(n);
-    REP(n - 1) {
-      int u, v;
-      cin >> u >> v;
-      u--;
-      v--;
-      adj[u].push_back(v);
-      adj[v].push_back(u);
-    }
-    vector<bool> color(n);
-    y_combinator([&](auto dfs, int i, int p, bool c) -> void {
-      color[i] = c;
-      for (int j : adj[i]) {
-        if (j != p) {
-          dfs(j, i, c ^ 1);
-        }
-      }
-    })(0, 0, 0);
-    F0R(i, n) {
-      cout << (sz(adj[i]) * (color[i] ? 1 : -1)) << " \n"[i == n - 1];
-    }
-  }
+  while (T--) { solve(); }
 }

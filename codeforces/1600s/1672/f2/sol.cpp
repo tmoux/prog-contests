@@ -67,26 +67,67 @@ int main() {
   while (T--) {
     int n;
     cin >> n;
-    vector<vector<int>> adj(n);
-    REP(n - 1) {
-      int u, v;
-      cin >> u >> v;
-      u--;
-      v--;
-      adj[u].push_back(v);
-      adj[v].push_back(u);
-    }
-    vector<bool> color(n);
-    y_combinator([&](auto dfs, int i, int p, bool c) -> void {
-      color[i] = c;
-      for (int j : adj[i]) {
-        if (j != p) {
-          dfs(j, i, c ^ 1);
+    vector<int> a(n), b(n);
+
+    int num_cycles = 0;
+    // Get true answer {{{
+    {
+      for (auto &x : a) cin >> x;
+      for (auto &x : b) cin >> x;
+      map<int, vector<int>> mp;
+      F0R(i, n) { mp[a[i]].push_back(i); }
+      while (!mp.empty()) {
+        num_cycles++;
+        vector<int> rem;
+        vector<int> cyc;
+        for (auto &[x, vec] : mp) {
+          cyc.push_back(vec.back());
+          vec.pop_back();
+          if (vec.empty()) rem.push_back(x);
+        }
+        for (auto x : rem) mp.erase(x);
+      }
+    }  // }}}
+
+    auto calc = [&](const vector<int> &cyc) -> int {
+      int ans = 1;
+      map<int, int> cnt;
+      stack<int> st;
+      for (auto x: cyc) {
+        if (cnt[x] > 0) {
+          ans++;
+          while (st.top() != x) {
+            cnt[st.top()]--;
+            st.pop();
+          }
+        }
+        else {
+          st.push(x);
+          cnt[x]++;
         }
       }
-    })(0, 0, 0);
+      return ans;
+    };
+
+    map<int, vector<int>> pos;
+    F0R(i, n) pos[a[i]].push_back(i);
+    vector<bool> vis(n, false);
+    int total = 0;
     F0R(i, n) {
-      cout << (sz(adj[i]) * (color[i] ? 1 : -1)) << " \n"[i == n - 1];
+      if (!vis[i]) {
+        vector<int> cyc;
+        int j = i;
+        do {
+          vis[j] = true;
+          cyc.push_back(a[j]);
+          int x = b[j];
+          j = pos[x].back();
+          pos[x].pop_back();
+        } while (j != i);
+        total += calc(cyc);
+      }
     }
+    assert(total >= num_cycles);
+    cout << (total == num_cycles ? "AC" : "WA") << '\n';
   }
 }

@@ -42,6 +42,7 @@ decltype(auto) y_combinator(Fun&& fun) {
 }
 }  // namespace std
 
+#define DEBUG(x) cerr << #x << ": " << x << '\n'
 template <typename A, typename B>
 ostream& operator<<(ostream& os, const pair<A, B>& p) {
   return os << '(' << p.first << ", " << p.second << ')';
@@ -58,42 +59,48 @@ ostream& operator<<(ostream& os, const T_container& v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-void solve() {
-  int E, W;
-  cin >> E >> W;
-  vector<vector<int>> X(E, vector<int>(W));
-  F0R(i, E) F0R(j, W) cin >> X[i][j];
-  vector<vector<int>> dp(E, vector<int>(E));
-  vector<vector<int>> C(E, vector<int>(E));
-  F0R(i, E) {
-    vector<int> count(W, 2e9);
-    FOR(j, i, E) {
-      F0R(k, W) ckmin(count[k], X[j][k]);
-      C[i][j] = accumulate(all(count), 0);
-    }
-  }
+const int MOD = 998244353;
 
-  F0R(i, E) dp[i][i] = 2 * accumulate(all(X[i]), 0);
-  for (int l = 1; l < E; l++) {
-    for (int i = 0; i + l < E; i++) {
-      int j = i + l;
-      dp[i][j] = 2e9;
-      for (int k = i; k < j; k++) {
-        ckmin(dp[i][j], dp[i][k] + dp[k + 1][j] - 2 * C[i][j]);
-      }
-    }
-  }
-
-  cout << dp[0][E - 1] << '\n';
-}
+const int maxn = 1 << 18;
+int S[maxn], n, dp[maxn];
+vector<int> hashv[maxn];
 
 int main() {
   ios_base::sync_with_stdio(false);
   cin.tie(NULL);
-  int T;
-  cin >> T;
-  FOR(tt, 1, T + 1) {
-    cout << "Case #" << tt << ": ";
-    solve();
+  cin >> n;
+  n = (1 << n) - 1;
+  for (int i = 1; i <= n; i++) {
+    char c;
+    cin >> c;
+    S[i] = c == 'A' ? 0 : 1;
   }
+  for (int i = n; i >= 1; i--) {
+    if (i * 2 > n) {
+      hashv[i] = {S[i]};
+    } else {
+      int l = i * 2;
+      int r = i * 2 + 1;
+      if (hashv[l] > hashv[r]) swap(l, r);
+      hashv[i] = {S[i]};
+      hashv[i].insert(end(hashv[i]), all(hashv[l]));
+      hashv[i].insert(end(hashv[i]), all(hashv[r]));
+    }
+  }
+  for (int i = n; i >= 1; i--) {
+    if (i * 2 > n)
+      dp[i] = 1;
+    else {
+      int l = i * 2;
+      int r = i * 2 + 1;
+      bool equiv = hashv[l] == hashv[r];
+      if (!equiv) {
+        dp[i] = (2LL * dp[l] * dp[r]) % MOD;
+      } else {
+        dp[i] = (1LL * dp[l] * dp[r]) % MOD;
+      }
+    }
+  }
+  cout << dp[1] << '\n';
 }
+

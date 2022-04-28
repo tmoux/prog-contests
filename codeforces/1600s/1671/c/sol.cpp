@@ -13,11 +13,11 @@ using ll = long long;
 #define all(x) x.begin(), x.end()
 
 template <class T>
-bool ckmin(T& a, const T& b) {
+bool ckmin(T &a, const T &b) {
   return b < a ? a = b, 1 : 0;
 }
 template <class T>
-bool ckmax(T& a, const T& b) {
+bool ckmax(T &a, const T &b) {
   return a < b ? a = b, 1 : 0;
 }
 
@@ -28,63 +28,57 @@ class y_combinator_result {
 
   public:
   template <class T>
-  explicit y_combinator_result(T&& fun) : fun_(std::forward<T>(fun)) {}
+  explicit y_combinator_result(T &&fun) : fun_(std::forward<T>(fun)) {}
 
   template <class... Args>
-  decltype(auto) operator()(Args&&... args) {
+  decltype(auto) operator()(Args &&...args) {
     return fun_(std::ref(*this), std::forward<Args>(args)...);
   }
 };
 
 template <class Fun>
-decltype(auto) y_combinator(Fun&& fun) {
+decltype(auto) y_combinator(Fun &&fun) {
   return y_combinator_result<std::decay_t<Fun>>(std::forward<Fun>(fun));
 }
 }  // namespace std
 
+#define DEBUG(x) cerr << #x << ": " << x << '\n'
 template <typename A, typename B>
-ostream& operator<<(ostream& os, const pair<A, B>& p) {
+ostream &operator<<(ostream &os, const pair<A, B> &p) {
   return os << '(' << p.first << ", " << p.second << ')';
 }
 template <typename T_container, typename T = typename enable_if<
                                     !is_same<T_container, string>::value,
                                     typename T_container::value_type>::type>
-ostream& operator<<(ostream& os, const T_container& v) {
+ostream &operator<<(ostream &os, const T_container &v) {
   os << '[';
   string sep;
-  for (const T& x : v) os << sep << x, sep = ", ";
+  for (const T &x : v) os << sep << x, sep = ", ";
   return os << ']';
 }
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-void solve() {
-  int E, W;
-  cin >> E >> W;
-  vector<vector<int>> X(E, vector<int>(W));
-  F0R(i, E) F0R(j, W) cin >> X[i][j];
-  vector<vector<int>> dp(E, vector<int>(E));
-  vector<vector<int>> C(E, vector<int>(E));
-  F0R(i, E) {
-    vector<int> count(W, 2e9);
-    FOR(j, i, E) {
-      F0R(k, W) ckmin(count[k], X[j][k]);
-      C[i][j] = accumulate(all(count), 0);
-    }
-  }
-
-  F0R(i, E) dp[i][i] = 2 * accumulate(all(X[i]), 0);
-  for (int l = 1; l < E; l++) {
-    for (int i = 0; i + l < E; i++) {
-      int j = i + l;
-      dp[i][j] = 2e9;
-      for (int k = i; k < j; k++) {
-        ckmin(dp[i][j], dp[i][k] + dp[k + 1][j] - 2 * C[i][j]);
+ll solve() {
+  int n;
+  ll x;
+  cin >> n >> x;
+  vector<ll> a(n);
+  for (auto &x : a) cin >> x;
+  sort(all(a));
+  for (int i = 1; i < n; i++) a[i] += a[i - 1];
+  ll day = -1;
+  ll ans = 0;
+  for (int i = n - 1; i >= 0; i--) {
+    if (x - a[i] >= 0) {
+      ll nextDay = (x - a[i]) / (i + 1);
+      if (nextDay > day) {
+        ans += (nextDay - day) * (i + 1);
+        day = nextDay;
       }
     }
   }
-
-  cout << dp[0][E - 1] << '\n';
+  return ans;
 }
 
 int main() {
@@ -92,8 +86,6 @@ int main() {
   cin.tie(NULL);
   int T;
   cin >> T;
-  FOR(tt, 1, T + 1) {
-    cout << "Case #" << tt << ": ";
-    solve();
-  }
+  while (T--) cout << solve() << '\n';
 }
+
