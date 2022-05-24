@@ -59,10 +59,60 @@ template <typename T_container, typename T = typename enable_if<
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-int main() {
-  ios_base::sync_with_stdio(false); cin.tie(NULL);
-  while (true) {
-
+void solve() {
+  int R; cin >> R;
+  int missing = 0;
+  vector<vector<bool>> g(R+1, vector<bool>(R+1, false));
+  vector<vector<bool>> h(R+1, vector<bool>(R+1, false));
+  for (int x = 0; x <= R; x++) {
+    for (int y = 0; y <= R; y++) {
+      if (round(sqrt(x*x + y*y)) <= R) {
+        g[x][y] = true;
+      }
+    }
   }
+  for (int r = 0; r <= R; r++) {
+    for (int x = 0; x <= r; x++) {
+      int y = round(sqrt(r*r - x*x));
+      h[x][y] = h[y][x] = true;
+    }
+  }
+  for (int x = 0; x <= R; x++) {
+    for (int y = 0; y <= R; y++) {
+      if (g[x][y] && !h[x][y]) {
+        missing++;
+      }
+    }
+  }
+  missing *= 4;
+  cout << missing << '\n';
+  /*
+  for (int x = 0; x <= R; x++) {
+    int mxy = 0;
+    while (round(sqrt(x*x + mxy*mxy)) <= R) mxy++;
+    vector<bool> cnt(mxy, false);
+    for (int r = x; r <= R; r++) {
+      int y = round(sqrt(r*r - x*x));
+      cnt[y] = true;
+    }
+    cout << x << ": " << mxy-1 << endl;
+    for (int y = 0; y < mxy; y++) {
+      if (!cnt[y]) {
+        cout << x << ' ' << y << endl;
+        missing++;
+      }
+    }
+  }
+  missing *= 4;
+  cout << missing << '\n';
+  */
 }
 
+int main() {
+  ios_base::sync_with_stdio(false); cin.tie(NULL);
+  int T; cin >> T;
+  FOR(tt, 1, T+1) {
+    cout << "Case #" << tt << ": ";
+    solve();
+  }
+}

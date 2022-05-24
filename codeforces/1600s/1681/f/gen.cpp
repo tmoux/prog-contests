@@ -61,8 +61,11 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  while (true) {
-
+  int n; cin >> n;
+  cout << n << '\n';
+  for (int i = 2; i <= n; i++) {
+    int p = (rng() % (i-1)) + 1;
+    int c = rng() % n + 1;
+    cout << p << ' ' << i << ' ' << c << '\n';
   }
 }
-

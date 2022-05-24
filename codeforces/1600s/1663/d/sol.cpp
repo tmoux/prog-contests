@@ -56,12 +56,13 @@ int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
   string s; cin >> s;
   int X; cin >> X;
-  assert(sz(s) == 3);
-  assert(s == "ABC");
-
-  assert(X == 0);
-
-  REP(X) {
-    cout << "YES\n";
+  if (s == "ABC") {
+    cout << (X < 2000 ? "YES" : "NO") << '\n';
+  }
+  else if (s == "ARC") {
+    cout << (X < 2800 ? "YES" : "NO") << '\n';
+  }
+  else {
+    cout << (X >= 1200 ? "YES" : "NO") << '\n';
   }
 }

@@ -61,8 +61,14 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  while (true) {
-
+  int N = 1000;
+  int M = 1000;
+  cout << N << ' ' << M << '\n';
+  F0R(i, M) {
+    F0R(j, N) {
+      char c = (rng() % 7) + 'A';
+      cout << c;
+    }
+    cout << '\n';
   }
 }
-

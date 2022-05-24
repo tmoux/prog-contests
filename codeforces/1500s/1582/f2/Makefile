@@ -1,6 +1,6 @@
 CC = g++
 CFLAGS = -std=c++20 -Wall
-TARGET = f
+TARGET = sol
 
 all: $(TARGET)
 

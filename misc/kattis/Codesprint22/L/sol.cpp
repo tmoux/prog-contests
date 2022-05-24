@@ -59,10 +59,65 @@ template <typename T_container, typename T = typename enable_if<
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-int main() {
-  ios_base::sync_with_stdio(false); cin.tie(NULL);
-  while (true) {
+const int maxn = 1005;
+int N, M;
+string S[maxn];
 
+int z[maxn*maxn+maxn];
+void z_function(string s) {
+  int n = (int) s.length();
+  for (int i = 1, l = 0, r = 0; i < n; ++i) {
+    if (i <= r)
+      z[i] = min (r - i + 1, z[i - l]);
+    while (i + z[i] < n && s[z[i]] == s[i + z[i]])
+      ++z[i];
+    if (i + z[i] - 1 > r)
+      l = i, r = i + z[i] - 1;
   }
 }
 
+int longest[maxn];
+
+int main() {
+  ios_base::sync_with_stdio(false); cin.tie(NULL);
+  cin >> N >> M;
+  F0R(i, M) {
+    cin >> S[i];
+  }
+  string match;
+  FOR(i, 1, M) {
+    if (i > 1) match += '#';
+    match += S[i];
+  }
+  F0R(i, N) {
+    string t = S[0].substr(i);
+    string tt = t+"$"+match;
+    continue;
+    z_function(tt);
+    cout << i << endl;
+    continue;
+    for (int j = sz(t); j < sz(tt); j++) {
+      ckmax(longest[i], z[j]);
+    }
+  }
+  for (int i = 1; i < M; i++) {
+
+  }
+
+  /*
+  if (check(N)) {
+    int lo = 0, hi = N;
+    while (lo + 1 < hi) {
+      int mid = (lo+hi)/2;
+      if (check(mid)) {
+        hi = mid;
+      }
+      else lo = mid;
+    }
+    cout << hi << '\n';
+  }
+  else {
+    cout << -1 << '\n';
+  }
+  */
+}

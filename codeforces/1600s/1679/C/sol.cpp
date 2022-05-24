@@ -61,8 +61,48 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  while (true) {
+  int n, q; cin >> n >> q;
+  set<int> xs, ys;
+  map<int,int> cntX, cntY;
+  for (int i = 1; i <= n; i++) {
+    xs.insert(i);
+    ys.insert(i);
+  }
+  while (q--) {
+    int t; cin >> t;
+    if (t == 1) {
+      int x, y; cin >> x >> y;
+      if (cntX[x]++ == 0) {
+        xs.erase(x);
+      }
+      if (cntY[y]++ == 0) {
+        ys.erase(y);
+      }
+    }
+    else if (t == 2) {
+      int x, y; cin >> x >> y;
+      if (--cntX[x] == 0) {
+        xs.insert(x);
+      }
+      if (--cntY[y] == 0) {
+        ys.insert(y);
+      }
+    }
+    else {
+      int x1, y1, x2, y2; cin >> x1 >> y1 >> x2 >> y2;
+      bool poss1 = true;
+      auto it = xs.lower_bound(x1);
+      if (it != xs.end() && *it <= x2) poss1 = false;
+      it = xs.upper_bound(x2);
+      if (it != xs.begin() && *prev(it) >= x1) poss1 = false;
 
+      bool poss2 = true;
+      it = ys.lower_bound(y1);
+      if (it != ys.end() && *it <= y2) poss2 = false;
+      it = ys.upper_bound(y2);
+      if (it != ys.begin() && *prev(it) >= y1) poss2 = false;
+
+      cout << (poss1 || poss2 ? "Yes" : "No") << '\n';
+    }
   }
 }
-

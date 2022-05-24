@@ -59,10 +59,57 @@ template <typename T_container, typename T = typename enable_if<
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
+const int maxn = 3005;
+int N, M, Q;
+vector<int> adj[maxn];
+int dist[maxn][maxn];
+
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  while (true) {
+  cin >> N >> M;
+  for (int i = 1; i <= M; i++) {
+    int a, b; cin >> a >> b;
+    adj[a].push_back(b);
+    adj[b].push_back(a);
+  }
+  for (int i = 1; i <= N; i++) {
+    for (int j = 1; j <= N; j++) {
+      dist[i][j] = maxn;
+    }
+  }
+  for (int i = 1; i <= N; i++) {
+    queue<int> q;
+    dist[i][i] = 0;
+    q.push(i);
+    while (!q.empty()) {
+      int f = q.front(); q.pop();
+      for (int j: adj[f]) {
+        if (dist[i][j] > dist[i][f] + 1) {
+          dist[i][j] = dist[i][f] + 1;
+          q.push(j);
+        }
+      }
+    }
+  }
 
+  auto query = [&](int S, int T, int X, int U, int V, int Y) {
+    if (dist[S][T] <= X || dist[U][V] <= Y) {
+      return true;
+    }
+    else {
+      X--;
+      Y--;
+      return dist[S][U] + dist[T][V] <= X + Y;
+    }
+  };
+
+  cin >> Q;
+  REP(Q) {
+    int S, T, X, U, V, Y;
+    cin >> S >> T >> X >> U >> V >> Y;
+    bool poss = query(S, T, X, U, V, Y) 
+             || query(S, T, X, V, U, Y);
+    cout << (poss ? "YES" : "NO") << '\n';
   }
 }
 

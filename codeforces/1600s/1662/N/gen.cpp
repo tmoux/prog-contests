@@ -61,8 +61,15 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  while (true) {
-
+  int n = 1500;
+  cout << n << '\n';
+  vector<int> p;
+  for (int i = 1; i <= n*n; i++) {
+    p.push_back(i);
   }
+  shuffle(all(p), rng);
+  for (auto x: p) {
+    cout << x << ' ';
+  }
+  cout << '\n';
 }
-

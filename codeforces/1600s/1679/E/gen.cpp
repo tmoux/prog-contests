@@ -60,9 +60,32 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
 int main() {
-  ios_base::sync_with_stdio(false); cin.tie(NULL);
-  while (true) {
-
+  ios_base::sync_with_stdio(false);
+  cin.tie(NULL);
+  int n = 1000;
+  int q = 200000;
+  cout << n << '\n';
+  F0R(i, n) {
+    int r = rng() % 2;
+    if (r) {
+      int c = rng() % 17;
+      cout << (char)(c+'a');
+    }
+    else {
+      cout << '?';
+    }
+  }
+  cout << '\n';
+  cout << q << '\n';
+  REP(q) {
+    int r = (rng() % ((1<<17)-1)) + 1;
+    string s;
+    F0R(i, 17) {
+      if (r & (1<<i)) {
+        s += (char)(i+'a');
+      }
+    }
+    assert(!s.empty());
+    cout << s << '\n';
   }
 }
-
