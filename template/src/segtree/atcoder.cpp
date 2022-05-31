@@ -123,5 +123,5 @@ namespace Seg {
 
 int main() {
   vector<int> a(0, 2, 3, 0, 4);
-  segtree<int, Seg::op, Seg<<e> seg;
+  segtree<int, Seg::op, Seg::e> seg;
 }

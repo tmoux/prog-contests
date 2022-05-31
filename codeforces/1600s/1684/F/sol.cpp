@@ -176,119 +176,84 @@ namespace atcoder { //{{{
 } // namespace atcoder }}}
 using atcoder::segtree;
 
-const int maxn = 1e5+5;
-int N;
-pair<int,int> pos[maxn][2];
-
-int order(pair<int,int> p) {
-  auto [x, y] = p;
-  if (x >= y) return y;
-  else return y + (y - x);
+template <class Integer, class F>
+Integer find_first_false(Integer l, Integer r, F &&f) {
+  return *ranges::partition_point(ranges::views::iota(l, r), f);
 }
 
-int dist(pair<int,int> a, pair<int,int> b) {
-  assert(max(a.first, a.second) == max(b.first, b.second));
-  return abs(order(a) - order(b));
+namespace Max {
+  int op(int a, int b) { return max(a, b); }
+  int e() { return -2e9; }
+}
+namespace Min {
+  int op(int a, int b) { return min(a, b); }
+  int e() { return 2e9; }
 }
 
-pair<int,int> Up(pair<int,int> p) {
-  return {p.first + 1, p.second};
-};
-pair<int,int> Right(pair<int,int> p) {
-  return {p.first, p.second + 1};
-};
-
-namespace Seg {
-  struct Node { 
-    bool id;
-    pair<int,int> p[2][2];
-    ll d[2][2];
-    Node() {
-      id = true;
-      p[0][0] = p[1][0] = {-1, -1};
-      p[0][1] = p[1][1] = {-1, -1};
-    }
-
-    Node(int i) {
-      id = false;
-      p[0][0] = p[1][0] = pos[i][0];
-      p[0][1] = p[1][1] = pos[i][1];
-      d[0][0] = d[1][1] = 0;
-      d[0][1] = d[1][0] = dist(pos[i][0], pos[i][1]);
-    }
-  };
-  Node op(Node a, Node b) {
-    if (a.id) return b;
-    if (b.id) return a;
-    // assume a and b are contiguous intervals
-    Node ret;
-    ret.id = false;
-    ret.p[0][0] = a.p[0][0];
-    ret.p[0][1] = a.p[0][1];
-    ret.p[1][0] = b.p[1][0];
-    ret.p[1][1] = b.p[1][1];
-
-    int d00 = 1 + dist(   Up(a.p[1][0]), b.p[0][0]);
-    int d01 = 1 + dist(   Up(a.p[1][0]), b.p[0][1]);
-    int d10 = 1 + dist(Right(a.p[1][1]), b.p[0][0]);
-    int d11 = 1 + dist(Right(a.p[1][1]), b.p[0][1]);
-
-    F0R(i, 2) F0R(j, 2) {
-      vector<ll> v = {a.d[i][0] + d00 + b.d[0][j],
-                      a.d[i][0] + d01 + b.d[1][j],
-                      a.d[i][1] + d10 + b.d[0][j],
-                      a.d[i][1] + d11 + b.d[1][j]};
-      ret.d[i][j] = *min_element(all(v));
-    }
-
-    return ret;
+void solve() {
+  int n, m; cin >> n >> m;
+  vector<int> a(n);
+  map<int, vector<int>> mp;
+  F0R(i, n) {
+    cin >> a[i];
+    mp[a[i]].push_back(i);
   }
 
-  Node e() {
-    return Node();
+  vector<int> prev_idx(n);
+  vector<int> next_idx(n);
+  for (auto& [_, v]: mp) {
+    prev_idx[v[0]] = -1;
+    for (int i = 1; i < sz(v); i++) {
+      prev_idx[v[i]] = v[i-1];
+    }
+
+    next_idx[v.back()] = n;
+    for (int i = sz(v)-2; i >= 0; i--) {
+      next_idx[v[i]] = v[i+1];
+    }
   }
+  segtree<int, Max::op, Max::e> seg1(prev_idx);
+  segtree<int, Min::op, Min::e> seg2(next_idx);
+
+  int maxL = n-1;
+  vector<pair<int,int>> vs;
+  int R = -1;
+  F0R(i, m) {
+    int a, b; cin >> a >> b;
+    a--; b--;
+    vs.push_back({a, b});
+    if (seg2.prod(a, b) <= b) {
+      int r = find_first_false(a, b+1, [&](int nr) { return seg2.prod(a, nr) > nr; });
+      ckmin(maxL, r);
+    }
+    if (seg1.prod(a, b) >= a) {
+      int l = find_first_false(a, b+1, [&](int nl) { return seg1.prod(nl, b) >= nl; });
+      ckmax(R, l-1);
+    }
+  }
+
+  sort(all(vs));
+  int idx = 0;
+  int segR = -1;
+  int ans = R+1; 
+  for (int L = 0; L < maxL; L++) {
+    ckmax(R, L+1);
+    while (idx < sz(vs) && vs[idx].first == L) {
+      ckmax(segR, vs[idx++].second);
+    }
+    auto it = upper_bound(all(mp[a[L]]), segR);
+    if (it != mp[a[L]].begin()) {
+      ckmax(R, *prev(it));
+    }
+    ckmin(ans, R-L);
+  }
+  cout << ans << '\n';
 }
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  cin >> N;
-  vector<Seg::Node> v(N-1);
-  F0R(i, N-1) {
-    int x1, y1, x2, y2; cin >> x1 >> y1 >> x2 >> y2;
-    x1--; y1--; x2--; y2--;
-    pos[i][0] = {x1, y1};
-    pos[i][1] = {x2, y2};
-    v[i] = Seg::Node(i);
-  }
-
-  segtree<Seg::Node, Seg::op, Seg::e> seg(v);
-
-  int Q; cin >> Q;
-  REP(Q) {
-    int x1, y1, x2, y2; cin >> x1 >> y1 >> x2 >> y2;
-    x1--; y1--; x2--; y2--;
-    int i = max(x1, y1);
-    int j = max(x2, y2);
-    if (i > j) {
-      swap(i, j);
-      swap(x1, x2);
-      swap(y1, y2);
-    }
-    pair<int,int> a = {x1, y1};
-    pair<int,int> b = {x2, y2};
-    if (i == j) {
-      cout << dist(a, b) << '\n';
-    }
-    else {
-      j--;
-      auto node = seg.prod(i, j);
-
-      ll ans = 1e18;
-      F0R(x, 2) {
-        ckmin(ans, dist(a, pos[i][x]) + node.d[x][0] + 1 + dist(   Up(node.p[1][0]), b));
-        ckmin(ans, dist(a, pos[i][x]) + node.d[x][1] + 1 + dist(Right(node.p[1][1]), b));
-      }
-      cout << ans << '\n';
-    }
+  int T; cin >> T;
+  while (T--) {
+    solve();
   }
 }

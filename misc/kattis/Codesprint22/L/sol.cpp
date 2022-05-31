@@ -63,48 +63,99 @@ const int maxn = 1005;
 int N, M;
 string S[maxn];
 
-int z[maxn*maxn+maxn];
-void z_function(string s) {
-  int n = (int) s.length();
-  for (int i = 1, l = 0, r = 0; i < n; ++i) {
-    if (i <= r)
-      z[i] = min (r - i + 1, z[i - l]);
-    while (i + z[i] < n && s[z[i]] == s[i + z[i]])
-      ++z[i];
-    if (i + z[i] - 1 > r)
-      l = i, r = i + z[i] - 1;
-  }
-}
+namespace HH {
+  const int base = 29;
+  const int M1 = 1e9+9;
+  const int M2 = 1e9+21;
+  ll inverse1[maxn], inverse2[maxn];
+  int ctoi(char c) {return c-'A'+1;}
 
-int longest[maxn];
+  ll modexp(ll x, ll n, int M) {
+    if (n == 0) return 1;
+    if (n == 1) return x%M;
+    if (n%2==0) return modexp((x*x)%M,n/2,M);
+    return (x*modexp((x*x)%M,n/2,M))%M;
+  }
+
+  struct Hash
+  {
+    int len;
+    string str;
+    vector<ll> prefix1, prefix2;
+    Hash() {}
+    Hash(const string& s) {
+      len = s.size();
+      str = s;
+      prefix1.resize(maxn, 0);
+      prefix2.resize(maxn, 0);
+      prefix1[0] = 0;
+      prefix2[0] = 0;
+      ll mult1 = 1;
+      ll mult2 = 1;
+      for (int i = 0; i < sz(s); i++) {
+        prefix1[i+1] = (prefix1[i] + (ctoi(s[i])*mult1)%M1)%M1;  
+        mult1 = (mult1*base)%M1;
+
+        prefix2[i+1] = (prefix2[i] + (ctoi(s[i])*mult2)%M2)%M2;  
+        mult2 = (mult2*base)%M2;
+      }
+    }
+
+    pair<ll,ll> sub(int l, int r) { //returns hash of [l,r] inclusive, 1-indexed
+      return {((prefix1[r]-prefix1[l-1]+M1)*inverse1[l-1])%M1,
+        ((prefix2[r]-prefix2[l-1]+M2)*inverse2[l-1])%M2};
+    }
+  };
+
+  void init_inverse() {
+    inverse1[0] = 1;
+    inverse1[1] = modexp(base,M1-2,M1);
+    for (int i = 2; i < maxn; i++) {
+      inverse1[i] = (inverse1[i-1] * inverse1[1]) % M1;
+    }
+    inverse2[0] = 1;
+    inverse2[1] = modexp(base,M2-2,M2);
+    for (int i = 2; i < maxn; i++) {
+      inverse2[i] = (inverse2[i-1] * inverse2[1]) % M2;
+    }   
+  }
+};
+using namespace HH;
+
+Hash hashes[maxn];
+
+bool check(int K) {
+  using pll = pair<ll,ll>;
+  set<pll> t, s;
+  for (int i = 1; i <= N; i++) {
+    pll h = hashes[0].sub(i, min(N, i+K-1));
+    t.insert(h);
+  }
+
+  FOR(j, 1, M) {
+    for (int i = 1; i <= N; i++) {
+      pll h = hashes[j].sub(i, min(N, i+K-1));
+      if (t.count(h)) s.insert(h);
+    }
+  }
+
+  int num = 0;
+  for (int i = 1; i <= N; i++) {
+    pll h = hashes[0].sub(i, min(N, i+K-1));
+    if (!s.count(h)) num++;
+  }
+  return num * 2 >= N;
+}
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
+  init_inverse();
   cin >> N >> M;
   F0R(i, M) {
     cin >> S[i];
-  }
-  string match;
-  FOR(i, 1, M) {
-    if (i > 1) match += '#';
-    match += S[i];
-  }
-  F0R(i, N) {
-    string t = S[0].substr(i);
-    string tt = t+"$"+match;
-    continue;
-    z_function(tt);
-    cout << i << endl;
-    continue;
-    for (int j = sz(t); j < sz(tt); j++) {
-      ckmax(longest[i], z[j]);
-    }
-  }
-  for (int i = 1; i < M; i++) {
-
+    hashes[i] = Hash(S[i]);
   }
 
-  /*
   if (check(N)) {
     int lo = 0, hi = N;
     while (lo + 1 < hi) {
@@ -119,5 +170,4 @@ int main() {
   else {
     cout << -1 << '\n';
   }
-  */
 }
