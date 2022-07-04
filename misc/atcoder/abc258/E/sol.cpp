@@ -1,8 +1,4 @@
-#pragma GCC optimize("O3,unroll-loops")
-#pragma GCC target("avx2,bmi,bmi2,lzcnt,popcnt")
 #include <bits/stdc++.h>
-#include <ext/pb_ds/assoc_container.hpp>
-using namespace __gnu_pbds;
 using namespace std;
 using ll = long long;
 
@@ -63,77 +59,54 @@ template <typename T_container, typename T = typename enable_if<
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-const int maxn = 1e5+5;
-int N, M;
-pair<int, vector<int>> v[maxn];
-
-uint64_t splitmix64(uint64_t x) {
-  // http://xorshift.di.unimi.it/splitmix64.c
-  x += 0x9e3779b97f4a7c15;
-  x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9;
-  x = (x ^ (x >> 27)) * 0x94d049bb133111eb;
-  return x ^ (x >> 31);
-}
-const uint64_t FIXED_RANDOM = chrono::steady_clock::now().time_since_epoch().count();
-size_t hash_vec(const vector<int>& v) {
-  size_t r = 0;
-  for (auto& x: v) r ^= splitmix64(x + FIXED_RANDOM);
-  return r;
-}
-
-struct custom_hash {
-  size_t operator()(size_t x) const {
-    return splitmix64(x + FIXED_RANDOM);
-  }
-};
-
-vector<pair<size_t, bool>> subs[maxn];
-
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  cin >> N >> M;
+  int N, Q, X; cin >> N >> Q >> X;
+  vector<int> W(2*N);
+  ll total = 0;
   F0R(i, N) {
-    v[i].second.resize(M);
-    F0R(j, M) cin >> v[i].second[j];
-    cin >> v[i].first;
-    sort(all(v[i].second));
+    cin >> W[i];
+    W[i+N] = W[i];
+    total += W[i];
   }
-  sort(v, v+N);
-  F0R(i, N) {
-    for (int mask = 1; mask < (1<<M); mask++) {
-      vector<int> vec;
-      F0R(k, M) if (mask & (1<<k)) {
-        vec.push_back(v[i].second[k]);
-      }
-      subs[i].push_back({hash_vec(vec), sz(vec)%2});
-    }
-  }
-  unordered_map<size_t, int, custom_hash> mp;
-  stack<int> st;
 
-  auto upd = [&](int i, int del) -> void {
-    for (auto& [h, _]: subs[i]) mp[h] += del;
-  };
-  auto count_not_disjoint = [&](int i) -> int {
-    int cnt = 0;
-    for (int mask = 1; mask < (1<<M); mask++) {
-      const auto& [h, c] = subs[i][mask-1];
-      if (mp.find(h) != mp.end()) {
-        cnt += mp[h] * (c?1:-1);
+  vector<ll> num(N);
+  const int MX = 40;
+  vector<vector<int>> jmp(MX, vector<int>(N));
+  {
+    ll sum = 0;
+    int j = 0;
+    F0R(i, N) {
+      if (i > 0) sum -= W[i-1];
+      while (sum < (X % total)) {
+        sum += W[j++];
+      }
+      jmp[0][i] = j % N;
+
+      num[i] = 1LL * N * (X / total) + j-i;
+    }
+
+    /*
+    F0R(i, N) {
+      cout << i << ": " << jmp[0][i] << endl;
+    }
+    */
+
+    for (int k = 1; k < MX; k++) {
+      F0R(i, N) {
+        jmp[k][i] = jmp[k-1][jmp[k-1][i]];
       }
     }
-    return cnt;
-  };
-
-  int ans = 2e9+1;
-  F0R(i, N) {
-    while (count_not_disjoint(i) < sz(st)) {
-      ckmin(ans, v[i].first + v[st.top()].first);
-      upd(st.top(), -1);
-      st.pop();
-    }
-    upd(i, 1);
-    st.push(i);
   }
-  cout << (ans <= 2e9 ? ans : -1) << '\n';
+
+  REP(Q) {
+    ll K; cin >> K; K--;
+    int cur = 0;
+    F0Rd(i, MX) {
+      if (K & (1LL << i)) {
+        cur = jmp[i][cur];
+      }
+    }
+    cout << num[cur] << '\n';
+  }
 }
