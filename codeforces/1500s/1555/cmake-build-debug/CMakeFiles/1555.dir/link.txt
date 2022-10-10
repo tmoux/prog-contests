@@ -1,1 +1,0 @@
-/usr/bin/c++ -g CMakeFiles/1555.dir/c/c.cpp.o CMakeFiles/1555.dir/d/d.cpp.o CMakeFiles/1555.dir/e/e.cpp.o CMakeFiles/1555.dir/e/gen.cpp.o CMakeFiles/1555.dir/f/f.cpp.o -o 1555 

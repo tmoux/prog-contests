@@ -1,4 +1,0 @@
-/home/tmou/Downloads/CLion-2021.2/clion-2021.2/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_DEPENDS_USE_COMPILER=FALSE -G "CodeBlocks - Unix Makefiles" /home/tmou/cp/misc/kattis/NAC21/D
--- Configuring done
--- Generating done
--- Build files have been written to: /home/tmou/cp/misc/kattis/NAC21/D/cmake-build-debug

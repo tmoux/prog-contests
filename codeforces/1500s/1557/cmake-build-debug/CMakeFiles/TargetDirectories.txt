@@ -1,3 +1,0 @@
-/home/tmou/cp/codeforces/1500s/1557/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/tmou/cp/codeforces/1500s/1557/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/tmou/cp/codeforces/1500s/1557/cmake-build-debug/CMakeFiles/1557.dir
