@@ -1,3 +1,4 @@
+// Data structure for handling LCA queries and preorder traversals.
 struct Tree { // {{{
   int n, maxk;
   bool is_0_index;
@@ -62,10 +63,11 @@ struct Tree { // {{{
     return tin[lca] <= tin[a] && tin[a] <= tout[lca];
   }
 
-  int get_next_ancestor(int lc, int a) {
+  // Returns the child of lca whose subtree contains a.
+  int get_child_of(int lca, int a) {
     for (int k = maxk-1; k >= 0; k--) {
       int aa = par[k][a];
-      if (aa != -1 && depth[aa] > depth[lc]) a = aa;
+      if (aa != -1 && depth[aa] > depth[lca]) a = aa;
     }
     return a;
   }

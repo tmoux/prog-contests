@@ -59,47 +59,13 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-const int maxn = 505;
-int N, A[maxn];
-int sum[maxn];
-int dp[maxn][maxn];
-
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  cin >> N;
-  F0R(i, N) {
-    cin >> A[i];
-    sum[i] = A[i] + (i == 0 ? 0 : sum[i-1]);
+  int T; cin >> T;
+  while (T--) {
+    int N; cin >> N;
+    cout << 1 << ' ';
+    for (int i = 3; i <= N; i++) cout << i << ' ';
+    cout << 2 << '\n';
   }
-  const int INF = 2e9;
-  for (int i = 0; i <= N; i++) {
-    for (int j = 0; j <= N; j++) {
-      dp[i][j] = -INF;
-    }
-  }
-  dp[0][0] = 0;
-  for (int i = 0; i < N; i++) {
-    for (int j = 0; j < N; j++) {
-      // do nothing
-      ckmax(dp[i+1][i+1], dp[i][j] + A[j]);
-      // move current forward
-      ckmax(dp[i+1][j], dp[i][j] + A[j]);
-      // jump to next
-      for (int k = i + 1; k < N; k++) {
-        int p = (i + k) / 2;
-        int add = p == i ? 0 : sum[p-1] - sum[i] + A[j];
-
-        ckmax(dp[p][k], dp[i][j] + add);
-      }
-    }
-  }
-
-  F0R(i, N+1) {
-    for (int j = 0; j <= i; j++) {
-      cout << i << ' ' << j << ": " << dp[i][j] << endl;
-    }
-  }
-
-  int ans = *max_element(dp[N], dp[N] + N + 1);
-  cout << ans << '\n';
 }
