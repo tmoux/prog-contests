@@ -59,6 +59,15 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
+ll solve() {
+  int N; cin >> N;
+  vector<int> A(N);
+  for (auto& x: A) cin >> x;
+
+}
+
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
+  int T; cin >> T;
+  while (T--) cout << solve() << '\n';
 }

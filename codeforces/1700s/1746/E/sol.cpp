@@ -59,6 +59,60 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
+bool ask(const vector<int>& v) {
+  cout << "?";
+  cout << ' ' << sz(v);
+  for (auto x: v) {
+    cout << ' ' << x;
+  }
+  cout << endl;
+  string s; cin >> s;
+  return s == "YES";
+}
+
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
+  int N; cin >> N;
+  set<int> S;
+  for (int i = 1; i <= N; i++) {
+    S.insert(i); 
+  }
+
+  auto remove = [&](const vector<int>& v) {
+    for (auto x: v) S.erase(x);
+  };
+
+  while (sz(S) >= 3) {
+    vector<int> A[3];
+    int i = 0;
+    for (int x: S) {
+      A[i % 3].push_back(x);
+      i++;
+    }
+
+    if (ask(A[0])) {
+      if (ask(A[1])) {
+        remove(A[2]);
+      }
+      else {
+        remove(A[1]);
+      }
+    }
+    else if (ask(A[0])) {
+      if (ask(A[1])) {
+        remove(A[2]);
+      }
+      else {
+        remove(A[1]);
+      }
+    }
+    else remove(A[0]);
+  }
+
+  assert(!S.empty());
+  for (auto x: S) {
+    cout << "! " << x << endl;
+    string s; cin >> s;
+    if (s == ":)") return 0;
+  }
 }

@@ -67,7 +67,8 @@ int main() {
   cout << N << ' ' << K << '\n';
   F0R(i, N) {
     F0R(j, N) {
-      int x = rng() % N*N + 1;
+      // int x = rng() % N*N + 1;
+      int x = i * N + j + 1;
       cout << x << ' ';
     }
     cout << '\n';
