@@ -30,4 +30,4 @@ namespace ModCombinatorics { // {{{
   }
 }; 
 // }}}
-namespace MC = ModCombinatorics;:
+namespace MC = ModCombinatorics;

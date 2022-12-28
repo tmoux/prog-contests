@@ -1,0 +1,42 @@
+\documentclass[11pt]{scrartcl} 
+\usepackage[sexy]{evan} % Taken from https://github.com/vEnhance/dotfiles/blob/main/texmf/tex/latex/evan/evan.sty
+
+\begin{document}
+
+\title{Game Theory}
+\author{Timothy Mou}
+\maketitle
+
+\tableofcontents
+
+\begin{abstract}
+  These are some notes about the theory of impartial two-player games.
+  The main focus is the game of Nim and the Sprague-Grundy theorem.
+\end{abstract}
+
+\section{Combinatorial Games}
+
+\begin{definition}
+  For our purposes, a \vocab{game} can be characterized by a set of states and transitions between the states, with the following properties:
+  \begin{itemize}
+    \item There are two players, sometimes called \textit{Left} and \textit{Right}, who take turns making moves (making a valid transition from one state to the next).
+    Other than who moves first, the players are indistinguishable (i.e., they can make the same moves).
+      This is a property of \textit{impartial} games.
+   \item The players have perfect information, and the game is entirely deterministic.
+   \item If a player cannot make a move (i.e., there are no valid transitions out of the current state), they are declared the \textit{loser}, and the other player is the \textit{winner}.
+    \item The game must end after a finite sequence of moves.
+      There will always be a winner and a loser; there can be no draws.
+  \end{itemize}
+
+  As a consequence, the outcome of a game with optimal play is completely determined by the current state.
+  A state is winning if there is at least one transition to a losing state, and a state is losing if it has no transitions, or every transition is to a winning state.
+
+  Because every game is finite, the game states can be modeled as a DAG, with directed edges representing transitions between states.
+  We can use this run a simple DP starting from the sinks to compute whether a state is winning or losing.
+
+  \subsection{Summing Games}
+
+
+\end{definition}
+
+\end{document}
