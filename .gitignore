@@ -9,6 +9,9 @@ CMakeLists.txt
 **/t1
 **/t2
 **/t3
+**/out
+**/my
+**/sys
 
 **/*.aux
 **/*.lof
