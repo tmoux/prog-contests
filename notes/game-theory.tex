@@ -1,6 +1,7 @@
 \documentclass[11pt]{scrartcl} 
 \usepackage[sexy]{evan} % Taken from https://github.com/vEnhance/dotfiles/blob/main/texmf/tex/latex/evan/evan.sty
 
+\DeclareMathOperator{\mex}{mex}
 \begin{document}
 
 \title{Game Theory}
@@ -17,7 +18,7 @@
 \section{Combinatorial Games}
 
 \begin{definition}
-  For our purposes, a \vocab{game} can be characterized by a set of states and transitions between the states, with the following properties:
+  For our purposes, a \vocab{game} can be characterized by a tuple $(S, f)$: a set of states $S$ and a function $f : S \to 2^S$ characterizing valid transitions, with the following properties:
   \begin{itemize}
     \item There are two players, sometimes called \textit{Left} and \textit{Right}, who take turns making moves (making a valid transition from one state to the next).
     Other than who moves first, the players are indistinguishable (i.e., they can make the same moves).
@@ -32,10 +33,142 @@
   A state is winning if there is at least one transition to a losing state, and a state is losing if it has no transitions, or every transition is to a winning state.
 
   Because every game is finite, the game states can be modeled as a DAG, with directed edges representing transitions between states.
-  We can use this run a simple DP starting from the sinks to compute whether a state is winning or losing.
+  Thus we can run a simple DP starting from the sinks to compute whether a state is winning or losing.
+  If a state has any transition to a losing state, it is winning; otherwise, it is a losing state.
+
+  \begin{example}
+  Here are some simple examples of games that meet this definition:
+    \begin{itemize}
+  \item The game $0$ is the game with a single state a no transitions.
+    Whoever moves first loses.
+    \item The game $*$ is the game with two states, one of which has a single transition to the other.
+      Whoever moves first must take this transition and win, since the other player will have no moves.
+    \item More generally, the game of Nim is a game where there is a single pile of $k$ stones.
+      In one move, a player can take any positive number of stones from the pile.
+      If there is a positive number of stones, the first player can simply take all of them and win.
+    \end{itemize}
+
+    As a non-example, chess is not an impartial game, since at a given state, the players have entirely disjoint sets of moves.
+      Also, games can end in a draw.
+  \end{example}
 
   \subsection{Summing Games}
 
+  A \vocab{sum} of games is a way to combine multiple games into one.
+    Alternatively, we can \textit{decompose} a game into independent subgames, which can be easier to study.
+  \begin{definition}
+    Intuitively, we can think of a sum of games as playing on multiple boards, where on each turn, a player can choose to make a single move on any of the boards.
+    Let's define this as a binary operator $\oplus$ on two games $A = (S, f)$, $B = (T, g)$.
+    The sum $A \oplus B$ is a game with states $S \times T$ and transition function $h : S \times T \to 2^{S \times T}$, where if $s' \in f(s)$, then $f(s', t) \in h(s, t)$,
+    and similarly if $t' \in g(t)$, then $(s, t') \in h(s, t)$.
+  \end{definition}
+
+  \begin{lemma}
+  The binary sum of two games $\oplus$ is commutative and associative.
+  Thus it makes sense to speak of the sum of any finite number of games without ambiguity.
+  \end{lemma}
+
+  \begin{lemma}
+  The game $A \oplus A$ always has a winning strategy for the second player.
+  If the first player makes a move on the one board, the second player simply copies the move on the other board.
+  In some sense, adding two identical games has the same effect as adding the game $0$--we'll explore this idea later.
+  \end{lemma}
+
+  \begin{example}
+  The game of Nim becomes more interesting when we consider a sum of multiple nim games.
+    (Sometimes this game where we start with multiple piles is called Nim.)
+    For example, if we have games with $1$, $2$, or $3$ piles individually, they are all winning for the first player.
+    However, the game $1 \oplus 2 \oplus 3$ is winning for the second player.
+    (Exercise: write out the game tree and determine the optimal strategy for the second player.)
+  \end{example}
+
+  \section{Solving Nim}
+
+  As shown by the previous example, it's not always clear how to determine the outcome of a sum of games, even if we know the outcomes of each individual games.
+  It turns out that associating a game with its outcome is simply not enough information.
+  Instead, we can use what are called \vocab{nimbers} or \vocab{Grundy numbers}.
+  Before we jump to all impartial games, however, let's focus on one particular case first, Nim.
+
+  \begin{theorem}
+    Let $a_1 \oplus a_2 \oplus \dots \oplus a_n$ be a sum of $n$ games of Nim, where the $i$'th game has $a_i$ stones.
+    Then the game is winning for the first player if and only if the bitwise xor of $a_1, a_2, \dots, a_n$ is nonzero.
+  \end{theorem}
+  \begin{proof}
+    We use the following properties of xor (we denote its binary operator by $\oplus$):
+    \begin{itemize}
+        \item $\oplus$ is associative and commutative.
+        \item $a \oplus b = 0$ if and only if $a = b$.
+    \end{itemize}
+  Let's apply strong induction on the total number of stones in all $n$ games.
+  Suppose the total xor is $X = 0$.
+    We will show that \textit{any} move will cause the xor to be nonzero. By the inductive hypothesis, this state will be winning, and thus there is no winning move for the first player, since there is no transition to a losing state.
+    Suppose the move is to decrease pile $a_i$ to $a_i'$.
+    Then the total xor is now
+    \[
+      a_1 \oplus a_2 \dots \oplus a_{i-1} \oplus a_i' \oplus a_{i+1} \oplus a_n = X \oplus a_i \oplus a_i' = a_i \oplus a_i' \neq 0.
+    \]
+
+    Now suppose $X \neq 0$.
+    We will show that there exists a move that causes the xor to be zero.
+    Let $2^d$ be the greatest power of $2$ in $X$, and let $A = \max(a_i)$.
+    Then $2^d$ is in the binary representation of $A$.
+    The winning move is to reduce $A$ to $A \oplus X$.
+    Since $A \oplus X < 2^d \leq A$, this is a valid move.
+    The new xor is then
+    \[
+      a_1 \oplus a_2 \dots \oplus a_{i-1} \oplus (A \oplus X) \oplus a_{i+1} \oplus a_n = X \oplus A \oplus (A \oplus X) = (X \oplus X) \oplus (A \oplus A) = 0.
+    \]
+
+  \end{proof}
+
+  \section{Sprague-Grundy Theorem}
+
+  We now generalize this result to all impartial games.
+
+  \begin{definition}
+    The game \vocab{Nim-with-increases} is a game like Nim where in addition to taking away stones, one is also allowed to \textit{add} some number of stones in such a way that the game tree remains acyclic.
+    For instance, one example might be you are allowed to add $1 \leq k \leq 5$ stones, but you are only allowed to do so up to $5$ times in total.
+    We aren't particularly concerned with the precise rules--as we will see, this version of Nim is equivalent to regular Nim.
+  \end{definition}
+  \begin{lemma}
+   Nim-with-increases is equivalent to Nim. 
+  \end{lemma}
+  \begin{proof}
+    Suppose one player employed a strategy where she adds $k$ stones to a pile.
+    Then the other player could choose ``undo'' her move by removing $k$ stones, restoring the pile to its previous state.
+    However, since the game tree must be acyclic, at some point, the first player will no longer be able to add stones, at which point she will have to remove stones like in regular Nim.
+    Thus, adding stones is never needed in an optimal strategy.
+  \end{proof}
+  \begin{definition}
+  Let $s$ be a state with transitions to $s_1, s_2, \dots, s_n$.
+    We define the \vocab{Grundy value} or \vocab{nimber} of $s$, denoted $G(s)$, as
+    \[
+      G(s) = \mex(G(s_1), G(s_2), \dots, G(s_n)),
+    \]
+    where $\mex(S)$ of a set of natural numbers is the \textbf{minimum excluded} value $n$ that is not in $S$.
+  \end{definition}
+  \begin{theorem}
+    Let $s$ be a state with Grundy value $G(s)$.
+    Then $s$ is equivalent to a game of Nim with $G(s)$ stones.
+  \end{theorem}
+  \begin{proof}
+    We apply structural induction on the states (we can think of this as computing Grundy values starting from the sinks and processing states backwards).
+    Then if we are at state $s$, by our inductive hypothesis, our transitions are to a game of Nim with $G(s_1)$ stones, $G(s_2)$ stones, etc.
+    Let $M = \mex(G(s_1), G(s_2), \dots, G(s_n))$.
+    Then our state $s$ is equivalent to a game of Nim-with-increases with $M$ stones: we have transitions to any number of stones less than $M$, and possibly some transitions to games of Nim with $> M$ stones, but we don't have to worry about those by the previous lemma.
+    (Following the logic above, if we transitioned to state $s'$ with $G(s') > M$, then by the inductive hypothesis, $s'$ has a transition to state $s''$ with $G(s'') = M$, so we can ``undo'' each increase.)
+  \end{proof}
+  \begin{corollary}
+    A state $s$ in an impartial game is winning if and only if $G(s) \neq 0$.
+  \end{corollary}
+
+  \section{Applications}
+
+  ``Ksir'' from Moscow Camp Training Contest
+
+  https://dmoj.ca/problem/yac6p4--precompute Grundy values.
+
+  https://codeforces.com/contest/1536/problem/F--example of using SG to determine the optimal strategy.
 
 \end{definition}
 
