@@ -59,39 +59,27 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
+ll solve() {
+  int N; cin >> N;
+  string T; cin >> T;
+  ll ans = 0;
+  for (int i = 1; i <= N; i++) {
+    for (int j = i; j <= N; j += i) {
+      if (T[j-1] == '2') continue;
+      if (T[j-1] == '1') break;
+      else {
+        ans += i;
+        T[j-1] = '2';
+      }
+    }
+  }
+  return ans;
+}
+
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int N, Q; cin >> N >> Q;
-  cout << N << '\n';
-  const int B = 1e5;
-  const int D = 1e6;
-  vector<ll> A(N), K(N-1);
-  F0R(i, N) {
-    A[i] = rng() % B + (i == 0 ? 0 : A[i-1] + K[i-1]);
-    K[i] = rng() % (2 * D) - D;
-  }
-  F0R(i, N) {
-    cout << A[i] << ' ';
-  }
-  cout << '\n';
-  F0R(i, N-1) {
-    cout << K[i] << ' ';
-  }
-  cout << '\n';
-
-  cout << Q << '\n';
-  while (Q--) {
-    int r = rng() % 2;
-    if (r == 0) {
-      int i = rng() % N + 1;
-      int x = rng() % D;
-      cout << "+ " << i << ' ' << x << '\n';
-    }
-    else {
-      int l = rng() % N + 1;
-      int r = rng() % N + 1;
-      if (l > r) swap(l, r);
-      cout << "s " << l << ' ' << r << '\n';
-    }
+  int T; cin >> T;
+  while (T--) {
+    cout << solve() << '\n';
   }
 }

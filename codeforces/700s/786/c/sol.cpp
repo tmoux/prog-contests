@@ -59,39 +59,81 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
+const int maxn = 1e5+5;
+int N, A[maxn];
+struct Tracker {
+  int d = 0;
+  vector<int> cnt;
+  Tracker() { cnt.resize(N+1); }
+  inline bool canadd(int x, int K) { return (cnt[x] > 0 && d <= K) || d+1 <= K; }
+  inline void add(int x) { if (cnt[x]++ == 0) d++; }
+  inline void remove(int x) { if (--cnt[x] == 0) d--; }
+};
+
+int ans[maxn];
+
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int N, Q; cin >> N >> Q;
-  cout << N << '\n';
-  const int B = 1e5;
-  const int D = 1e6;
-  vector<ll> A(N), K(N-1);
+  cin >> N;
   F0R(i, N) {
-    A[i] = rng() % B + (i == 0 ? 0 : A[i-1] + K[i-1]);
-    K[i] = rng() % (2 * D) - D;
+    cin >> A[i];
   }
-  F0R(i, N) {
-    cout << A[i] << ' ';
-  }
-  cout << '\n';
-  F0R(i, N-1) {
-    cout << K[i] << ' ';
-  }
-  cout << '\n';
 
-  cout << Q << '\n';
-  while (Q--) {
-    int r = rng() % 2;
-    if (r == 0) {
-      int i = rng() % N + 1;
-      int x = rng() % D;
-      cout << "+ " << i << ' ' << x << '\n';
+  const int MAGIC = 1000;
+  FOR(k, 1, min(MAGIC, N)+1) {
+    Tracker tracker;
+    ans[k] = 1;
+    for (int i = 0, j = 0; i < N; i++) {
+      if (tracker.canadd(A[i], k)) {
+        tracker.add(A[i]);
+      }
+      else {
+        while (j < i) tracker.remove(A[j++]);
+        tracker.add(A[i]);
+        ans[k]++;
+      }
     }
-    else {
-      int l = rng() % N + 1;
-      int r = rng() % N + 1;
-      if (l > r) swap(l, r);
-      cout << "s " << l << ' ' << r << '\n';
+  }
+
+  list<tuple<int, int, Tracker>> ls;
+  {
+    // initialize ls
+    int l = 0, r = 0;
+    Tracker tracker;
+    while (r < N) {
+      if (tracker.canadd(A[r], MAGIC)) {
+        tracker.add(A[r++]);
+      }
+      else {
+        ls.push_back({l, r-1, tracker});
+        l = r;
+        tracker = Tracker();
+        tracker.add(A[r++]);
+      }
     }
+    ls.push_back({l, N-1, tracker});
+  }
+
+  FOR(k, MAGIC+1, N+1) {
+    int cur_r = -1;
+    for (auto it = ls.begin(); it != ls.end();) {
+      auto& [l, r, tracker] = *it;
+      if (r <= cur_r) {
+        it = ls.erase(it);
+      }
+      else {
+        while (l <= cur_r) tracker.remove(A[l++]);
+        while (r+1 < N && tracker.canadd(A[r+1], k)) {
+          tracker.add(A[++r]);
+        }
+        cur_r = r;
+        ++it;
+      }
+    }
+    ans[k] = sz(ls);
+  }
+
+  FOR(i, 1, N+1) {
+    cout << ans[i] << " \n"[i==N];
   }
 }

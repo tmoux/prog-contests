@@ -59,39 +59,42 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-int main() {
-  ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int N, Q; cin >> N >> Q;
-  cout << N << '\n';
-  const int B = 1e5;
-  const int D = 1e6;
-  vector<ll> A(N), K(N-1);
-  F0R(i, N) {
-    A[i] = rng() % B + (i == 0 ? 0 : A[i-1] + K[i-1]);
-    K[i] = rng() % (2 * D) - D;
-  }
-  F0R(i, N) {
-    cout << A[i] << ' ';
-  }
-  cout << '\n';
-  F0R(i, N-1) {
-    cout << K[i] << ' ';
-  }
-  cout << '\n';
+int get_tm_val(ll x) {
+  return __builtin_popcountll(x) & 1;
+}
 
-  cout << Q << '\n';
-  while (Q--) {
-    int r = rng() % 2;
-    if (r == 0) {
-      int i = rng() % N + 1;
-      int x = rng() % D;
-      cout << "+ " << i << ' ' << x << '\n';
+int dist(ll i, ll d) {
+  return get_tm_val(d-1) != get_tm_val(i+d-1);
+}
+
+map<pair<ll, ll>, ll> dp;
+
+ll f(ll i, ll d) {
+  if (dp.count({i, d})) return dp[{i, d}];
+  if (d == 0) return 0;
+  else if (d == 1) return dist(i, d);
+  ll ans = 0;
+  if (i % 2 == 0) {
+    ans = 2 * f(i/2, d/2) + (d&1 ? dist(i, d) : 0);
+  }
+  else {
+    if (d % 2 == 1) {
+      ans += d/2+1 - f(i/2, d/2+1);
+      ans += d/2   - f(i/2+1, d/2);
     }
     else {
-      int l = rng() % N + 1;
-      int r = rng() % N + 1;
-      if (l > r) swap(l, r);
-      cout << "s " << l << ' ' << r << '\n';
+      ans += d/2 - f(i/2, d/2);
+      ans += d/2 - f(i/2+1, d/2);
     }
+  }
+  return dp[{i, d}] = ans;
+}
+
+int main() {
+  ios_base::sync_with_stdio(false); cin.tie(NULL);
+  int T; cin >> T;
+  while (T--) {
+    ll N, M; cin >> N >> M;
+    cout << f(N, M) << '\n';
   }
 }

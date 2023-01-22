@@ -59,39 +59,77 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
+void solve() {
+  int n; cin >> n;
+  string s; cin >> s;
+  map<char, vector<int>> mp;
+  F0R(i, n) {
+    mp[s[i]].push_back(i);
+  }
+
+  pair<int, string> ans = {n, ""};
+  auto check = [&](int d) -> void {
+    if (n/d > 26) return;
+    vector<pair<int, char>> v;
+    for (auto [c, vec]: mp) {
+      v.push_back({max(0, d - sz(vec)), c});
+    }
+    sort(all(v));
+    vector<int> extras;
+    vector<bool> used(n, false);
+    F0R(i, min(n/d, sz(v))) {
+      int c = v[i].second;
+      F0R(j, min(sz(mp[c]), d)) used[mp[c][j]] = true;
+    }
+    F0R(i, n) if (!used[i]) extras.push_back(i);
+
+    set<char> ch_used;
+    for (auto [_, c]: v) ch_used.insert(c);
+    F0R(i, 26) {
+      char c = i + 'a';
+      if (!ch_used.count(c) && sz(v) < n/d) {
+        v.push_back({0, c});
+      }
+    }
+    // cout << ch_used << endl;
+    // DEBUG(n/d);
+    assert(sz(v) >= n/d);
+    string t(n, '#');
+    int diff = 0;
+    F0R(i, n/d) {
+      int cnt = 0;
+      char c = v[i].second;
+      for (int j: mp[c]) if (cnt < d) t[j] = c, cnt++;
+      while (cnt < d) {
+        assert(!extras.empty());
+        int j = extras.back(); extras.pop_back();
+        t[j] = c;
+        cnt++;
+        diff++;
+      }
+    }
+    int cnt = 0;
+    F0R(i, n) {
+      if (s[i] != t[i]) cnt++;
+    }
+    assert(extras.empty());
+    assert(cnt == diff);
+    ckmin(ans, {diff, t});
+  };
+
+  for (int d = 1; d*d <= n; d++) {
+    if (n % d == 0) {
+      check(d);
+      check(n/d);
+    }
+  }
+
+  cout << ans.first << '\n';
+  cout << ans.second << '\n';
+}
+
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int N, Q; cin >> N >> Q;
-  cout << N << '\n';
-  const int B = 1e5;
-  const int D = 1e6;
-  vector<ll> A(N), K(N-1);
-  F0R(i, N) {
-    A[i] = rng() % B + (i == 0 ? 0 : A[i-1] + K[i-1]);
-    K[i] = rng() % (2 * D) - D;
-  }
-  F0R(i, N) {
-    cout << A[i] << ' ';
-  }
-  cout << '\n';
-  F0R(i, N-1) {
-    cout << K[i] << ' ';
-  }
-  cout << '\n';
-
-  cout << Q << '\n';
-  while (Q--) {
-    int r = rng() % 2;
-    if (r == 0) {
-      int i = rng() % N + 1;
-      int x = rng() % D;
-      cout << "+ " << i << ' ' << x << '\n';
-    }
-    else {
-      int l = rng() % N + 1;
-      int r = rng() % N + 1;
-      if (l > r) swap(l, r);
-      cout << "s " << l << ' ' << r << '\n';
-    }
-  }
+  int T; cin >> T;
+  while (T--) solve();
 }

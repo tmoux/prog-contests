@@ -59,39 +59,87 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
+const int MX = 1e5+5;
+vector<int> v[MX];
+int A[MX];
+
+vector<int> get_divisors(int x) {
+  vector<int> d;
+  for (int i = 1; i*i <= x; i++) {
+    if (x % i == 0) {
+      d.push_back(i);
+      if (x / i > i) d.push_back(x / i);
+    }
+  }
+  sort(all(d));
+  return d;
+}
+
+int solve() {
+  int N, M; cin >> N >> M;
+
+  vector<int> V;
+  F0R(i, N) {
+    int ai; cin >> ai;
+    A[ai] = 1;
+    V.push_back(ai);
+  }
+  sort(all(V)); V.erase(unique(all(V)), V.end());
+
+  vector<pair<int, int>> updates;
+  multiset<int> ms;
+  for (int i: V) {
+    for (int d: get_divisors(i)) {
+      if (d <= M) {
+        v[d].push_back(i);
+        updates.push_back({i, d});
+      }
+    }
+  }
+  FOR(i, 1, M+1) {
+    // for (int j = i; j < MX; j += i) {
+    //   if (A[j]) {
+    //     v[i].push_back(j);
+    //     updates.push_back({j, i});
+    //   }
+    // }
+    v[i].push_back(1e9);
+    sort(all(v[i]));
+    reverse(all(v[i]));
+    ms.insert(v[i].back());
+    // cout << v[i] << endl;
+  }
+  sort(all(updates)); reverse(all(updates));
+
+  // cout << *ms.rbegin() << endl;
+
+  int ans = 1e9;
+  for (int i: V) {
+    while (!updates.empty() && updates.back().first < i) {
+      auto [_, j] = updates.back(); updates.pop_back();
+      int t = v[j].back(); v[j].pop_back();
+      // cout << i << " updating " << j << endl;
+      assert(!v[j].empty());
+      auto it = ms.find(t);
+      assert(it != ms.end());
+      ms.erase(it);
+      ms.insert(v[j].back());
+    }
+
+    int d = *ms.rbegin() - i;
+    ckmin(ans, d);
+  }
+
+  FOR(i, 1, M+1) {
+    v[i].clear();
+  }
+  for (int i: V) A[i] = 0;
+
+  return ans < 1e8 ? ans : -1;
+}
+
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int N, Q; cin >> N >> Q;
-  cout << N << '\n';
-  const int B = 1e5;
-  const int D = 1e6;
-  vector<ll> A(N), K(N-1);
-  F0R(i, N) {
-    A[i] = rng() % B + (i == 0 ? 0 : A[i-1] + K[i-1]);
-    K[i] = rng() % (2 * D) - D;
-  }
-  F0R(i, N) {
-    cout << A[i] << ' ';
-  }
-  cout << '\n';
-  F0R(i, N-1) {
-    cout << K[i] << ' ';
-  }
-  cout << '\n';
-
-  cout << Q << '\n';
-  while (Q--) {
-    int r = rng() % 2;
-    if (r == 0) {
-      int i = rng() % N + 1;
-      int x = rng() % D;
-      cout << "+ " << i << ' ' << x << '\n';
-    }
-    else {
-      int l = rng() % N + 1;
-      int r = rng() % N + 1;
-      if (l > r) swap(l, r);
-      cout << "s " << l << ' ' << r << '\n';
-    }
-  }
+  int T; cin >> T;
+  while (T--) cout << solve() << '\n';
 }

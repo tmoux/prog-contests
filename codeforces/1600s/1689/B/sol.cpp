@@ -59,39 +59,43 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
+void solve() {
+  int N; cin >> N;
+  vector<int> P(N);
+  F0R(i, N) cin >> P[i];
+  if (N == 1) {
+    cout << -1 << '\n';
+  }
+  else {
+    vector<int> used(N+1, false);
+    vector<int> ans;
+    F0R(i, N) {
+      int x = -1;
+      for (int j = 1; j <= N; j++) {
+        if (!used[j] && j != P[i]) {
+          x = j;
+          break;
+        }
+      }
+      if (x != -1) {
+        ans.push_back(x);
+        used[x] = true;
+      }
+      else {
+        ans.push_back(P[N-1]);
+        swap(ans[N-1], ans[N-2]);
+      }
+    }
+
+    for (auto x: ans) {
+      cout << x << ' ';
+    }
+    cout << '\n';
+  }
+}
+
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int N, Q; cin >> N >> Q;
-  cout << N << '\n';
-  const int B = 1e5;
-  const int D = 1e6;
-  vector<ll> A(N), K(N-1);
-  F0R(i, N) {
-    A[i] = rng() % B + (i == 0 ? 0 : A[i-1] + K[i-1]);
-    K[i] = rng() % (2 * D) - D;
-  }
-  F0R(i, N) {
-    cout << A[i] << ' ';
-  }
-  cout << '\n';
-  F0R(i, N-1) {
-    cout << K[i] << ' ';
-  }
-  cout << '\n';
-
-  cout << Q << '\n';
-  while (Q--) {
-    int r = rng() % 2;
-    if (r == 0) {
-      int i = rng() % N + 1;
-      int x = rng() % D;
-      cout << "+ " << i << ' ' << x << '\n';
-    }
-    else {
-      int l = rng() % N + 1;
-      int r = rng() % N + 1;
-      if (l > r) swap(l, r);
-      cout << "s " << l << ' ' << r << '\n';
-    }
-  }
+  int T; cin >> T;
+  while (T--) solve();
 }

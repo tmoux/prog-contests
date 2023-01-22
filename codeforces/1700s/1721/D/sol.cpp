@@ -59,39 +59,64 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-int main() {
-  ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int N, Q; cin >> N >> Q;
-  cout << N << '\n';
-  const int B = 1e5;
-  const int D = 1e6;
-  vector<ll> A(N), K(N-1);
-  F0R(i, N) {
-    A[i] = rng() % B + (i == 0 ? 0 : A[i-1] + K[i-1]);
-    K[i] = rng() % (2 * D) - D;
-  }
-  F0R(i, N) {
-    cout << A[i] << ' ';
-  }
-  cout << '\n';
-  F0R(i, N-1) {
-    cout << K[i] << ' ';
-  }
-  cout << '\n';
+int solve() {
+  int N; cin >> N;
+  vector<int> A(N), B(N);
+  F0R(i, N) cin >> A[i];
+  F0R(i, N) cin >> B[i];
+  using vi = vector<int>;
+  vector<pair<vi, vi>> groups = {{A, B}};
 
-  cout << Q << '\n';
-  while (Q--) {
-    int r = rng() % 2;
-    if (r == 0) {
-      int i = rng() % N + 1;
-      int x = rng() % D;
-      cout << "+ " << i << ' ' << x << '\n';
+  auto check = [&](const pair<vi, vi>& p, int d) -> std::optional<array<pair<vi, vi>, 2>> {
+    auto& [v1, v2] = p;
+    vi X[2], Y[2];
+    for (auto x: v1) {
+      X[(x >> d) & 1].push_back(x);
+    }
+    for (auto x: v2) {
+      Y[(x >> d) & 1].push_back(x);
+    }
+    if (sz(X[0]) == sz(Y[1])) {
+      array<pair<vi, vi>, 2> ret;
+      ret[0] = {X[0], Y[1]};
+      ret[1] = {X[1], Y[0]};
+      return ret;
+      // = {{X[0], Y[1]}, {X[1], Y[0]}};
+      // return ret;
     }
     else {
-      int l = rng() % N + 1;
-      int r = rng() % N + 1;
-      if (l > r) swap(l, r);
-      cout << "s " << l << ' ' << r << '\n';
+      return std::nullopt;
     }
+  };
+  int ans = 0;
+  F0Rd(d, 30) {
+    vector<pair<vi, vi>> ng;
+    bool poss = true;
+    for (auto& p: groups) {
+      auto r = check(p, d);
+      if (r) {
+        auto [nv1, nv2] = *r;
+        if (!nv1.first.empty()) ng.push_back(nv1);
+        if (!nv2.first.empty()) ng.push_back(nv2);
+      }
+      else {
+        poss = false;
+        break;
+      }
+    }
+
+    if (poss) {
+      ans += 1 << d;
+      groups = ng;
+    }
+  }
+  return ans;
+}
+
+int main() {
+  ios_base::sync_with_stdio(false); cin.tie(NULL);
+  int T; cin >> T;
+  while (T--) {
+    cout << solve() << '\n';
   }
 }

@@ -59,39 +59,46 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
+void solve() {
+  int n; cin >> n;
+  vector<ll> a(n);
+  F0R(i, n) cin >> a[i];
+  int ans = 1;
+  auto issqr = [](ll x) -> bool {
+    ll s = max(0LL, (ll)sqrt(x) - 3);
+    while (1LL * (s+1)*(s+1) <= x) s++;
+    return s*s == x;
+  };
+
+  F0R(i, n) {
+    FOR(j, i+1, n) {
+      // cout << i << ' ' << j << endl;
+      ll diff = a[j] - a[i];
+      for (ll d = 1; d*d <= diff; d++) {
+        // cout << d << endl;
+        if (diff % d == 0) {
+          ll A = d, B = diff / d;
+          if ((A + B) % 2 == 0) {
+            ll x = (B - A) / 2, y = (A + B) / 2;
+            if (a[i] <= x * x && a[j] <= y*y) {
+              ll k = x * x - a[i];
+              assert(k == y*y-a[j]);
+              int cnt = 0;
+              for (int idx = 0; idx < n; idx++) {
+                if (issqr(a[idx] + k)) cnt++;
+              }
+              ckmax(ans, cnt);
+            }
+          }
+        }
+      }
+    }
+  }
+  cout << ans << '\n';
+}
+
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int N, Q; cin >> N >> Q;
-  cout << N << '\n';
-  const int B = 1e5;
-  const int D = 1e6;
-  vector<ll> A(N), K(N-1);
-  F0R(i, N) {
-    A[i] = rng() % B + (i == 0 ? 0 : A[i-1] + K[i-1]);
-    K[i] = rng() % (2 * D) - D;
-  }
-  F0R(i, N) {
-    cout << A[i] << ' ';
-  }
-  cout << '\n';
-  F0R(i, N-1) {
-    cout << K[i] << ' ';
-  }
-  cout << '\n';
-
-  cout << Q << '\n';
-  while (Q--) {
-    int r = rng() % 2;
-    if (r == 0) {
-      int i = rng() % N + 1;
-      int x = rng() % D;
-      cout << "+ " << i << ' ' << x << '\n';
-    }
-    else {
-      int l = rng() % N + 1;
-      int r = rng() % N + 1;
-      if (l > r) swap(l, r);
-      cout << "s " << l << ' ' << r << '\n';
-    }
-  }
+  int T; cin >> T;
+  while (T--) solve();
 }

@@ -61,37 +61,30 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int N, Q; cin >> N >> Q;
-  cout << N << '\n';
-  const int B = 1e5;
-  const int D = 1e6;
-  vector<ll> A(N), K(N-1);
-  F0R(i, N) {
-    A[i] = rng() % B + (i == 0 ? 0 : A[i-1] + K[i-1]);
-    K[i] = rng() % (2 * D) - D;
-  }
-  F0R(i, N) {
-    cout << A[i] << ' ';
-  }
-  cout << '\n';
-  F0R(i, N-1) {
-    cout << K[i] << ' ';
-  }
-  cout << '\n';
-
-  cout << Q << '\n';
-  while (Q--) {
-    int r = rng() % 2;
-    if (r == 0) {
-      int i = rng() % N + 1;
-      int x = rng() % D;
-      cout << "+ " << i << ' ' << x << '\n';
+  int N; cin >> N;
+  string S, T; cin >> S >> T;
+  auto check = [&](int x) -> bool {
+    // cout << "checking " << x << endl;
+    map<char, int> mp;
+    for (int i = 0; i < x; i++) mp[S[i]]++;
+    int j = x;
+    for (char c: T) {
+      if (j < N && c == S[j]) j++;
+      else if (mp[c] > 0) {
+        mp[c]--;
+      }
+      else return false;
     }
-    else {
-      int l = rng() % N + 1;
-      int r = rng() % N + 1;
-      if (l > r) swap(l, r);
-      cout << "s " << l << ' ' << r << '\n';
-    }
+    return true;
+  };
+  if (!check(N)) {
+    cout << -1 << '\n';
+    return 0;
   }
+  int lo = -1, hi = N;
+  while (lo + 1 < hi) {
+    int mid = (lo+hi)/2;
+    (check(mid) ? hi : lo) = mid;
+  }
+  cout << hi << '\n';
 }

@@ -59,39 +59,53 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
+const int maxn = 1e5+5;
+int N, A[maxn];
+struct Tracker {
+  int d = 0;
+  vector<int> cnt;
+  Tracker() {
+    cnt.resize(N+1);
+  }
+  bool canadd(int x, int K) {
+    return (cnt[x] > 0 && d <= K) || d+1 <= K;
+  }
+
+  void add(int x) {
+    if (cnt[x] == 0) d++;
+    cnt[x]++;
+  }
+  void remove(int x) {
+    if (cnt[x] == 1) d--;
+    cnt[x]--;
+  }
+};
+
+int ans[maxn];
+
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int N, Q; cin >> N >> Q;
-  cout << N << '\n';
-  const int B = 1e5;
-  const int D = 1e6;
-  vector<ll> A(N), K(N-1);
+  cin >> N;
   F0R(i, N) {
-    A[i] = rng() % B + (i == 0 ? 0 : A[i-1] + K[i-1]);
-    K[i] = rng() % (2 * D) - D;
+    cin >> A[i];
   }
-  F0R(i, N) {
-    cout << A[i] << ' ';
-  }
-  cout << '\n';
-  F0R(i, N-1) {
-    cout << K[i] << ' ';
-  }
-  cout << '\n';
 
-  cout << Q << '\n';
-  while (Q--) {
-    int r = rng() % 2;
-    if (r == 0) {
-      int i = rng() % N + 1;
-      int x = rng() % D;
-      cout << "+ " << i << ' ' << x << '\n';
+  FOR(k, 1, N+1) {
+    Tracker tracker;
+    ans[k] = 1;
+    for (int i = 0, j = 0; i < N; i++) {
+      if (tracker.canadd(A[i], k)) {
+        tracker.add(A[i]);
+      }
+      else {
+        while (j < i) tracker.remove(A[j++]);
+        tracker.add(A[i]);
+        ans[k]++;
+      }
     }
-    else {
-      int l = rng() % N + 1;
-      int r = rng() % N + 1;
-      if (l > r) swap(l, r);
-      cout << "s " << l << ' ' << r << '\n';
-    }
+  }
+
+  FOR(i, 1, N+1) {
+    cout << ans[i] << " \n"[i==N];
   }
 }

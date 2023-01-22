@@ -1,8 +1,65 @@
 #include <bits/stdc++.h>
- 
 using namespace std;
+using ll = long long;
 
-namespace ModInt {
+// Template {{{
+#define REP(n) for (int _ = 0; _ < (n); _++)
+#define FOR(i, a, b) for (int i = a; i < (b); i++)
+#define F0R(i, a) for (int i = 0; i < (a); i++)
+#define FORd(i, a, b) for (int i = (b)-1; i >= a; i--)
+#define F0Rd(i, a) for (int i = (a)-1; i >= 0; i--)
+
+#define sz(x) (int)(x).size()
+#define all(x) x.begin(), x.end()
+
+template <class T>
+bool ckmin(T &a, const T &b) {
+  return b < a ? a = b, 1 : 0;
+}
+template <class T>
+bool ckmax(T &a, const T &b) {
+  return a < b ? a = b, 1 : 0;
+}
+
+namespace std {
+template <class Fun>
+class y_combinator_result {
+  Fun fun_;
+
+  public:
+  template <class T>
+  explicit y_combinator_result(T &&fun) : fun_(std::forward<T>(fun)) {}
+
+  template <class... Args>
+  decltype(auto) operator()(Args &&...args) {
+    return fun_(std::ref(*this), std::forward<Args>(args)...);
+  }
+};
+
+template <class Fun>
+decltype(auto) y_combinator(Fun &&fun) {
+  return y_combinator_result<std::decay_t<Fun>>(std::forward<Fun>(fun));
+}
+}  // namespace std
+
+#define DEBUG(x) cerr << #x << ": " << x << '\n'
+template <typename A, typename B>
+ostream &operator<<(ostream &os, const pair<A, B> &p) {
+  return os << '(' << p.first << ", " << p.second << ')';
+}
+template <typename T_container, typename T = typename enable_if<
+                                    !is_same<T_container, string>::value,
+                                    typename T_container::value_type>::type>
+ostream &operator<<(ostream &os, const T_container &v) {
+  os << '[';
+  string sep;
+  for (const T &x : v) os << sep << x, sep = ", ";
+  return os << ']';
+}
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+// }}}
+
+namespace ModInt { //{{{
   template<int MOD>
   struct mod_int {
     int val;
@@ -19,7 +76,7 @@ namespace ModInt {
     }
     mod_int inverse() const {
       assert(val != 0);
-      return *this ^ (MOD - 2);
+      return *this ^ ((ll)MOD - 2);
     }
 
     mod_int& operator+=(const mod_int& b) {
@@ -94,7 +151,7 @@ namespace ModInt {
       return mod_int(a) / b;
     }
 
-    friend mod_int operator^(mod_int a, int b) {
+    friend mod_int operator^(mod_int a, ll b) {
       mod_int res(1);
       while (b > 0) {
         if (b&1) res *= a;
@@ -111,23 +168,40 @@ namespace ModInt {
       return i >> x.val;
     }
   };
-}
+} //}}}
 const int MOD = 998244353;
 using mint = ModInt::mod_int<MOD>;
 
+const int maxn = 505;
+int N;
+mint P;
+
+mint prob_gap[maxn][maxn], dp[maxn][maxn<<1];
+
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
+  cin >> N;
+  int q; cin >> q;
+  P = mint(q) / 10000;
 
-  using mint = ModInt::mod_int<11>;
-  mint x(5), y(7);
-  x += y;
-  y -= x;
-  x += 12;
-  cout << "my int " << x << ' ' << y << endl;
-  cout << (x+y) << ' ' << (x-y) << endl;
-  x *= 3;
-  cout << x << ' ' << (x * 3) << ' ' << (3 * x) << endl;
-  cout << "inverse of " << x << ": " << x.inverse() << '\n';
-  cout << x << ' ' << y << ": " << (x ^ y) << endl;
-  cout << x << ' ' << y << ": " << (x / y) << endl;
+  prob_gap[1][0] = 1;
+  for (int n = 1; n <= N; n++) {
+    mint denom = mint(1) / (2*n + 1);
+    for (int k = 0; k < n; k++) {
+      prob_gap[n+1][0] += 1 * denom * prob_gap[n][k];
+      prob_gap[n+1][k+1] += (2*k+1) * denom * prob_gap[n][k];
+      prob_gap[n+1][k] += (2*n+1-(2*k+2)) * denom * prob_gap[n][k];
+    }
+  }
+
+  for (int s = -N; s <= 0; s++) dp[0][s+maxn] = 1;
+  for (int n = 1; n <= N; n++) {
+    for (int s = -N; s <= N; s++) {
+      for (int k = 0; k < n; k++) {
+        dp[n][s+maxn] += prob_gap[n][k] * dp[n-k-1][s+maxn] * (P * dp[k][s-1+maxn] + (1 - P) * dp[k][s+1+maxn]);
+      }
+    }
+  }
+
+  cout << dp[N][0+maxn] << '\n';
 }
