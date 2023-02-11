@@ -59,6 +59,53 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
+bool ask(int i, int j, int k) {
+  printf("? %d %d %d\n", i+1, j+1, k+1); fflush(stdout);
+  string s; cin >> s;
+  return s == "Yes";
+}
+
+void answer(vector<int> v) {
+  cout << "! ";
+  for (auto x: v) cout << x << ' ';
+  cout << endl;
+}
+
 int main() {
-  ios_base::sync_with_stdio(false); cin.tie(NULL);
+  int N; cin >> N;
+  int idx = 0;
+  FOR(i, 1, N) {
+    if (ask(idx, idx, i)) {
+      idx = i;
+    }
+  }
+
+  auto lt = [&](int i, int j) {
+    return ask(j, idx, i);
+  };
+
+  auto sort_indices = y_combinator([&](auto sort, vector<int>& v) -> void {
+      if (sz(v) == 1) return;
+      vector<int> l, r;
+      F0R(i, sz(v)/2) l.push_back(v[i]);
+      FOR(i, sz(v)/2, sz(v)) r.push_back(v[i]);
+      sort(l);
+      sort(r);
+      v.clear();
+      for (int i = 0, j = 0; i < sz(l) || j < sz(r);) {
+        if (j == sz(r)) v.push_back(l[i++]);
+        else if (i == sz(l)) v.push_back(r[j++]);
+        else if (lt(l[i], r[j])) v.push_back(l[i++]);
+        else v.push_back(r[j++]);
+      }
+  });
+
+  vector<int> v(N); iota(all(v), 0);
+  sort_indices(v);
+
+  vector<int> perm(N);
+  F0R(i, N) {
+    perm[v[i]] = i+1;
+  }
+  answer(perm);
 }

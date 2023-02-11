@@ -59,6 +59,93 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
+namespace Trie {
+  struct Node {
+    Node *ch[2];
+    Node() {
+      ch[0] = ch[1] = nullptr;
+    }
+  };
+
+  const int MX = 3e6+6;
+  Node nodes[MX];
+  int cur = 0;
+  Node* reset() {
+    cur = 0;
+    nodes[cur] = Node();
+    return &nodes[cur];
+  }
+
+  Node* newNode() {
+    nodes[++cur] = Node();
+    return &nodes[cur];
+  }
+
+  void insert(Node *root, int x) {
+    F0Rd(i, 30) {
+      int c = (x >> i) & 1;
+      if (!root->ch[c]) root->ch[c] = newNode();
+      root = root->ch[c];
+    }
+  }
+
+  int get_max_xor(Node* root, int x) {
+    int res = 0;
+    F0Rd(i, 30) {
+      int c = (x >> i) & 1;
+      if (root->ch[c^1]) {
+        res |= 1 << i;
+        root = root->ch[c^1];
+      }
+      else root = root->ch[c];
+    }
+    return res;
+  }
+};
+
+int solve() {
+  int N; cin >> N;
+  vector<int> A(N);
+  for (auto& x: A) cin >> x;
+
+  auto f = y_combinator([&](auto f, int l, int r) -> int {
+    if (l >= r) return 0;
+    int m = (l+r)>>1;
+    int ans = 0;
+    ckmax(ans, f(l, m));
+    ckmax(ans, f(m+1, r));
+
+    Trie::Node* root = Trie::reset(); Trie::insert(root, 0);
+    for (int i = m, mx = 0, j = i+1, cur_xor = 0, cur_xor2 = 0; i >= l; i--) {
+      ckmax(mx, A[i]);
+      cur_xor ^= A[i];
+      while (j <= r && A[j] <= mx) {
+        cur_xor2 ^= A[j++];
+        Trie::insert(root, cur_xor2);
+      }
+      ckmax(ans, Trie::get_max_xor(root, cur_xor ^ mx));
+    }
+
+    root = Trie::reset(); Trie::insert(root, 0);
+    for (int i = m+1, mx = 0, j = i-1, cur_xor = 0, cur_xor2 = 0; i <= r; i++) {
+      ckmax(mx, A[i]);
+      cur_xor ^= A[i];
+      while (j >= l && A[j] <= mx) {
+        cur_xor2 ^= A[j--];
+        Trie::insert(root, cur_xor2);
+      }
+      ckmax(ans, Trie::get_max_xor(root, cur_xor ^ mx));
+    }
+    return ans;
+  });
+
+  return f(0, N-1);
+}
+
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
+  int T; cin >> T;
+  while (T--) {
+    cout << solve() << '\n';
+  }
 }

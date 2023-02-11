@@ -38,7 +38,7 @@ struct Tree { // {{{
   void init() {
     int root = is_0_index ? 0 : 1;
     int t = 0;
-    dfs(root, -1, t);
+    dfs(root, root, t);
   }
 
   int lca(int a, int b) {
