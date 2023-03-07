@@ -59,115 +59,136 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-namespace ModInt { //{{{
+namespace ModInt {
   template<int MOD>
-    struct mod_int {
-      int val;
+  struct mod_int {
+    int val;
 
-      mod_int() : val(0) {}
-      mod_int(int _val) : val(_val % MOD) {}
+    operator int() const { return val; }
+    mod_int() : val(0) {}
+    mod_int(int _val) : val(_val % MOD) {}
 
-      mod_int operator+() const {
-        return mod_int(val); 
-      }
-      mod_int operator-() const {
-        return mod_int(MOD-val); 
-      }
-      mod_int inverse() const {
-        assert(val != 0);
-        return *this ^ (MOD - 2);
-      }
+    mod_int operator+() const {
+      return mod_int(val);
+    }
+    mod_int operator-() const {
+      return mod_int(MOD-val);
+    }
+    mod_int inverse() const {
+      assert(val != 0);
+      return *this ^ (MOD - 2);
+    }
 
-      bool operator==(const mod_int& b) const {
-        return val == b.val;
-      }
+    mod_int& operator+=(const mod_int& b) {
+      val += b.val;
+      if (val >= MOD) val -= MOD;
+      return *this;
+    }
+    mod_int& operator-=(const mod_int& b) {
+      return *this += -b;
+    }
+    mod_int& operator*=(const mod_int& b) {
+      val = (1LL*val*b.val) % MOD;
+      return *this;
+    }
+    mod_int& operator/=(const mod_int& b) {
+      val = (1LL*val*b.inverse().val) % MOD;
+      return *this;
+    }
 
-      bool operator!=(const mod_int& b) const {
-        return !(*this == b);
-      }
+    mod_int& operator+=(int b) {
+      return *this += mod_int(b);
+    }
+    mod_int& operator-=(int b) {
+      return *this -= mod_int(b);
+    }
+    mod_int& operator*=(int b) {
+      return *this *= mod_int(b);
+    }
+    mod_int& operator/=(int b) {
+      return *this /= mod_int(b);
+    }
 
-      mod_int& operator+=(const mod_int& b) {
-        val += b.val;
-        if (val >= MOD) val -= MOD;
-        return *this;
-      }
-      mod_int& operator-=(const mod_int& b) {
-        return *this += -b;
-      }
-      mod_int& operator*=(const mod_int& b) {
-        val = (1LL*val*b.val) % MOD;
-        return *this;
-      }
-      mod_int& operator/=(const mod_int& b) {
-        val = (1LL*val*b.inverse().val) % MOD;
-        return *this;
-      }
+    friend mod_int operator+(const mod_int& a, const mod_int& b) {
+      mod_int c = a; c += b;
+      return c;
+    }
+    friend mod_int operator-(const mod_int& a, const mod_int& b) {
+      mod_int c = a; c -= b;
+      return c;
+    }
+    friend mod_int operator*(const mod_int& a, const mod_int& b) {
+      mod_int c = a; c *= b;
+      return c;
+    }
+    friend mod_int operator/(const mod_int& a, const mod_int& b) {
+      mod_int c = a; c /= b;
+      return c;
+    }
 
-      mod_int& operator++(int) {
-        return *this += 1;
-      }
+    friend mod_int operator+(const mod_int& a, int b) {
+      return a + mod_int(b);
+    }
+    friend mod_int operator-(const mod_int& a, int b) {
+      return a - mod_int(b);
+    }
+    friend mod_int operator*(const mod_int& a, int b) {
+      return a * mod_int(b);
+    }
+    friend mod_int operator/(const mod_int& a, int b) {
+      return a / mod_int(b);
+    }
+    friend mod_int operator+(int a, const mod_int& b) {
+      return mod_int(a) + b;
+    }
+    friend mod_int operator-(int a, const mod_int& b) {
+      return mod_int(a) - b;
+    }
+    friend mod_int operator*(int a, const mod_int& b) {
+      return mod_int(a) * b;
+    }
+    friend mod_int operator/(int a, const mod_int& b) {
+      return mod_int(a) / b;
+    }
 
-      mod_int& operator--(int) {
-        return *this -= 1;
+    friend mod_int operator^(mod_int a, int b) {
+      mod_int res(1);
+      while (b > 0) {
+        if (b&1) res *= a;
+        a *= a;
+        b >>= 1;
       }
+      return res;
+    }
 
-      friend mod_int operator+(const mod_int& a, const mod_int& b) {
-        mod_int c = a; c += b;
-        return c;
-      }
-      friend mod_int operator-(const mod_int& a, const mod_int& b) {
-        mod_int c = a; c -= b;
-        return c;
-      }
-      friend mod_int operator*(const mod_int& a, const mod_int& b) {
-        mod_int c = a; c *= b;
-        return c;
-      }
-      friend mod_int operator/(const mod_int& a, const mod_int& b) {
-        mod_int c = a; c /= b;
-        return c;
-      }
-
-      friend mod_int operator^(mod_int a, int b) {
-        mod_int res(1);
-        while (b > 0) {
-          if (b&1) res *= a;
-          a *= a;
-          b >>= 1;
-        }
-        return res;
-      }
-
-      friend ostream& operator<<(ostream& o, const mod_int& x) {
-        return o << x.val;
-      };
-      friend istream& operator>>(istream& i, mod_int& x) {
-        i >> x.val; x.val %= MOD;
-        return i;
-      }
+    friend ostream& operator<<(ostream& o, const mod_int& x) {
+      return o << x.val;
     };
-} 
-//}}}
+    friend istream& operator>>(istream& i, mod_int& x) {
+      return i >> x.val;
+    }
+  };
+}
 const int MOD = 1e9+7;
 using mint = ModInt::mod_int<MOD>;
 
 namespace ModCombinatorics { // {{{
   vector<int> inv, _fac, _ifac;
   template<size_t N, int MOD>
-    void init() {
-      inv.resize(N);
-      _fac.resize(N);
-      _ifac.resize(N);
-      inv[0] = inv[1] = 1;
-      for (size_t i = 2; i < N; i++) {
-        inv[i] = (MOD - (1LL * (MOD/i) * inv[MOD%i]) % MOD) % MOD;
-      }
-      _fac[0] = _ifac[0] = 1;
-      for (size_t i = 1; i < N; i++) {
-        _fac[i] = (1LL * i * _fac[i-1]) % MOD;
-        _ifac[i] = (1LL * _ifac[i-1] * inv[i]) % MOD;
-      }
+  void init() {
+    inv.resize(N);
+    _fac.resize(N);
+    _ifac.resize(N);
+    inv[0] = inv[1] = 1;
+    for (size_t i = 2; i < N; i++) {
+      inv[i] = (MOD - (1LL * (MOD/i) * inv[MOD%i]) % MOD) % MOD;
     }
+    _fac[0] = _ifac[0] = 1;
+    for (size_t i = 1; i < N; i++) {
+      _fac[i] = (1LL * i * _fac[i-1]) % MOD;
+      _ifac[i] = (1LL * _ifac[i-1] * inv[i]) % MOD;
+    }
+  }
 
   mint choose(int n, int k) {
     if (n < k || k < 0) return 0;
@@ -181,143 +202,111 @@ namespace ModCombinatorics { // {{{
   mint ifac(int n) {
     return mint(_ifac[n]);
   }
-}; 
+};
 // }}}
 namespace MC = ModCombinatorics;
 
 const int maxn = 3e5+5;
-int N, K;
+int N, K, C[maxn];
+vector<int> adj[maxn], g[maxn];
 
-int A[maxn];
-vector<int> adj[maxn];
-
-mint count_ways(const vector<mint>& v, const vector<int> sizes) {
-  int t = 0;
-  for (int s: sizes) t += s;
-  mint ans = MC::fac(t);
-  for (int s: sizes) ans *= MC::ifac(s);
-  for (mint x: v) ans *= x;
-  return ans;
+using T = pair<mint, int>;
+T merge(T a, T b) {
+  mint z = a.first * b.first * MC::choose(a.second + b.second, a.second);
+  return {z, a.second + b.second};
 }
 
-mint ways[maxn]; // # ways to destroy this subtree
-int sub_size[maxn];
-vector<int> cur[maxn];
-vector<int> roots[maxn];
-int need[maxn];
-void dfs(int i, int p) {
-  vector<mint> v;
-  vector<int> sizes;
-  sub_size[i] = 1;
-  ways[i] = 1;
+T dp[maxn];
+vector<T> dp2[maxn];
 
-  bool isroot = false;
-  if (cur[A[i]].empty()) {
-    roots[A[i]].push_back(i);
-    isroot = true;
+void dfs1(int i, int p) {
+  dp[i] = {1, 0};
+  for (int j: adj[i]) {
+    if (j == p) continue;
+    g[i].push_back(j);
+    dfs1(j, i);
+    dp[i] = merge(dp[i], dp[j]);
   }
-  cur[A[i]].push_back(i);
-
-  for (int j: adj[i]) if (j != p) {
-    dfs(j, i);
-    sub_size[i] += sub_size[j];
-    v.push_back(ways[j]);
-    sizes.push_back(sub_size[j]);
-  }
-
-  if (isroot) need[A[i]] += sub_size[i];
-
-  ways[i] = count_ways(v, sizes);
-  
-  cur[A[i]].pop_back();
+  dp[i].second++;
 }
 
-pair<int, mint> ans[maxn][maxn];
-
-struct DSU {
-  int n;
-  vector<int> par;
-  DSU(int _n) {
-    n = _n;
-    par.resize(n+1, -1);
+void dfs2(int i, T cur) {
+  int K = sz(g[i]);
+  vector<T> pref(K), suff(K);
+  dp2[i].resize(K);
+  F0R(k, K) {
+    int j = g[i][k];
+    pref[k] = k == 0 ? dp[j] : merge(pref[k-1], dp[j]);
+  }
+  F0Rd(k, K) {
+    int j = g[i][k];
+    suff[k] = k + 1 == K ? dp[j] : merge(suff[k+1], dp[j]);
   }
 
-  int Find(int i) {
-    return par[i] < 0 ? i : par[i] = Find(par[i]);
-  }
+  F0R(k, K) {
+    int j = g[i][k];
+    dp2[i][k] = cur;
+    if (k > 0)     dp2[i][k] = merge(dp2[i][k], pref[k-1]);
+    if (k + 1 < K) dp2[i][k] = merge(dp2[i][k], suff[k+1]);
+    dp2[i][k].second++;
 
-  bool Union(int x, int y) { // returns true if x and y were not connected
-    x = Find(x);
-    y = Find(y);
-    if (x == y) return false;
-    if (par[x] > par[y]) swap(x, y);
-    par[x] += par[y];
-    par[y] = x;
-    return true;
+    dfs2(j, dp2[i][k]);
   }
-};
+}
+
+T R[2*maxn];
+vector<int> ids[maxn];
+vector<int> cur_id[maxn];
+int curt = 0;
+
+void dfs3(int i) {
+  int id = cur_id[C[i]].back();
+  R[id] = merge(R[id], dp[i]);
+  F0R(k, sz(g[i])) {
+    int j = g[i][k];
+    R[curt] = dp2[i][k];
+    ids[C[i]].push_back(curt);
+    cur_id[C[i]].push_back(curt++);
+    dfs3(j);
+    cur_id[C[i]].pop_back();
+  }
+}
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  MC::init<300005, MOD>();
+  MC::init<maxn, MOD>();
   cin >> N >> K;
-  FOR(i, 1, N+1) {
-    cin >> A[i];
-  }
-  
-  REP(N-1) {
+  F0R(i, N) cin >> C[i];
+  F0R(i, N-1) {
     int a, b; cin >> a >> b;
+    a--, b--;
     adj[a].push_back(b);
     adj[b].push_back(a);
   }
 
-  for (int rt = 1; rt <= N; rt++) {
-    for (int i = 1; i <= N; i++) {
-      need[i] = 0;
-      roots[i].clear();
-      cur[i].clear();
-    }
-    dfs(rt, rt);
-    for (int i = 1; i <= K; i++) {
-      if (roots[i].empty()) {
-        ans[rt][i] = {0, 0};
-      }
-      else {
-        vector<mint> v;
-        vector<int> sizes;
-        for (auto r: roots[i]) {
-          v.push_back(ways[r]);
-          sizes.push_back(sub_size[r]);
-        }
-
-        ans[rt][i] = {need[i], count_ways(v, sizes)};
-      }
-    }
-  }
+  dfs1(0, 0);
+  dfs2(0, {1, 0});
 
   for (int c = 1; c <= K; c++) {
-    DSU dsu(N);
-    for (int i = 1; i <= N; i++) {
-      for (int j: adj[i]) {
-        if (A[i] != c && A[j] != c) dsu.Union(i, j);
-      }
-    }
-    int best = N + 1;
-    for (int i = 1; i <= N; i++) {
-      ckmin(best, ans[i][c].first);
-    }
-    mint total = 0;
-    for (int i = 1; i <= N; i++) {
-      if (dsu.Find(i) == i && ans[i][c].first == best) {
-        total += ans[i][c].second;
-      }
-    }
+    R[curt] = {1, 0};
+    ids[c].push_back(curt);
+    cur_id[c].push_back(curt++);
+  }
+  dfs3(0);
 
-    if (best == N) {
-      cout << 0 << '\n';
+  for (int c = 1; c <= K; c++) {
+    int numRemove = N;
+    mint ways = 0;
+    for (int id: ids[c]) {
+      auto [cnt, rem] = R[id];
+      if (numRemove > rem) {
+        numRemove = rem;
+        ways = cnt;
+      }
+      else if (numRemove == rem) {
+        ways += cnt;
+      }
     }
-    else {
-      cout << total << '\n';
-    }
+    cout << (0 < numRemove && numRemove < N ? ways : mint(0)) << '\n';
   }
 }

@@ -59,43 +59,58 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-// If x people can be satisfied with k books, x people can be satisfied with k-1 books as well (we can just merge two groups together.)
-// Thus it is equivalent to compute for each x, the maximum number of groups that can be formed such that x people are satisfied.
-// Furthermore, if we are picking x people, we might as well pick the x least neediest people, since they are strictly easier to satisfy.
-// The remaining (n - x) people can each form the own group, OR they can join another group to add to how many people are in the group (not everyone in a group has to be satisfied.)
-// We want to make all x people satisfied, then the rest should form their own groups.
+const int maxn = 305;
+int N, H;
+int x[maxn];
 
-const int maxn = 3e5+5;
-int N, Q, A[maxn];
-int dp[maxn];
+int height(int l, int r) {
+  return max(0, (x[r] - x[l] - 1) / 2);
+}
 
-int ans[maxn];
+ll dp[maxn][maxn];
+ll f(int l, int r) {
+  ll& res = dp[l][r];
+  if (res != -1) return res;
+  int curh = height(l, r);
+  if (curh == 0) return res = 0;
+  res = 1e18;
+  for (int i = l; i < r; i++) {
+    int hl = height(l, i);
+    int hr = height(i+1, r);
+    if (hl < curh && hr < curh) {
+      ll t = (curh - hl) + f(l, i) + (curh - hr) + f(i+1, r);
+      ckmin(res, t);
+    }
+  }
+  return res;
+}
+
+ll ans[maxn];
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  cin >> N;
-  FOR(i, 1, N+1) {
-    cin >> A[i];
-  }
-  sort(A+1, A+N+1);
-  FOR(i, 1, N+1) {
-    if (i - A[i] >= 0) {
-      dp[i] = dp[i - A[i]] + 1;
-      ckmax(ans[dp[i] + N - i], i);
-    }
-    else {
-      ckmax(ans[N - A[i] + 1], i);
-    }
-    ckmax(dp[i], dp[i-1]);
+  memset(dp, -1, sizeof dp);
+  cin >> N >> H;
+  F0R(i, N) {
+    cin >> x[i];
   }
 
-  for (int i = N-1; i >= 2; i--) {
-    ckmax(ans[i], ans[i+1]);
+  for (int i = N-1; i >= 0; i--) {
+    ans[i] = 1e18;
+    for (int j = i; j < N; j++) {
+      int h = height(i, j);
+      if (h <= H) {
+        ckmin(ans[i], (H - h) + f(i, j) + ans[j+1]);
+      }
+    }
   }
 
-  cin >> Q;
-  F0R(i, Q) {
-    int k; cin >> k;
-    cout << ans[k] << '\n';
+  cout << ans[0] << '\n';
+
+  for (int i = 0; i < N; i++) {
+      for (int j = i; j < N; j++) {
+          cout << f(i, j) << ' ';
+      }
+      cout << '\n';
   }
 }

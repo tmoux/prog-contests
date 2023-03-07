@@ -59,43 +59,42 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-// If x people can be satisfied with k books, x people can be satisfied with k-1 books as well (we can just merge two groups together.)
-// Thus it is equivalent to compute for each x, the maximum number of groups that can be formed such that x people are satisfied.
-// Furthermore, if we are picking x people, we might as well pick the x least neediest people, since they are strictly easier to satisfy.
-// The remaining (n - x) people can each form the own group, OR they can join another group to add to how many people are in the group (not everyone in a group has to be satisfied.)
-// We want to make all x people satisfied, then the rest should form their own groups.
-
-const int maxn = 3e5+5;
-int N, Q, A[maxn];
-int dp[maxn];
-
-int ans[maxn];
-
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  cin >> N;
-  FOR(i, 1, N+1) {
-    cin >> A[i];
+  int q; cin >> q;
+  vector<ll> queries(q);
+  map<ll, ll> mp;
+  map<ll, vector<ll>> s;
+  F0R(i, q) {
+    char c; cin >> c;
+    ll x; cin >> x;
+    if (c == '+') queries[i] = x;
+    else {
+      queries[i] = -x;
+      if (!mp.count(x)) {
+        mp[x] = x;
+        s[x].push_back(x);
+      }
+    }
   }
-  sort(A+1, A+N+1);
-  FOR(i, 1, N+1) {
-    if (i - A[i] >= 0) {
-      dp[i] = dp[i - A[i]] + 1;
-      ckmax(ans[dp[i] + N - i], i);
+
+  set<ll> used;
+  for (auto x: queries) {
+    if (x > 0) {
+      used.insert(x);
+      while (!s[x].empty()) {
+        auto y = s[x].back(); s[x].pop_back();
+        ll nx = x;
+        while (used.count(nx)) {
+          nx += y;
+        }
+        s[nx].push_back(y);
+        mp[y] = nx;
+      }
     }
     else {
-      ckmax(ans[N - A[i] + 1], i);
+      x = -x;
+      cout << mp[x] << '\n';
     }
-    ckmax(dp[i], dp[i-1]);
-  }
-
-  for (int i = N-1; i >= 2; i--) {
-    ckmax(ans[i], ans[i+1]);
-  }
-
-  cin >> Q;
-  F0R(i, Q) {
-    int k; cin >> k;
-    cout << ans[k] << '\n';
   }
 }

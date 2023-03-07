@@ -59,43 +59,67 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-// If x people can be satisfied with k books, x people can be satisfied with k-1 books as well (we can just merge two groups together.)
-// Thus it is equivalent to compute for each x, the maximum number of groups that can be formed such that x people are satisfied.
-// Furthermore, if we are picking x people, we might as well pick the x least neediest people, since they are strictly easier to satisfy.
-// The remaining (n - x) people can each form the own group, OR they can join another group to add to how many people are in the group (not everyone in a group has to be satisfied.)
-// We want to make all x people satisfied, then the rest should form their own groups.
+// Can also just use a (lazy) segtree to perform updates.
+struct DP {
+  vector<ll> dp;
+  multiset<ll> ms;
+  ll aux = 0;
+  const ll INF = 1e18;
 
-const int maxn = 3e5+5;
-int N, Q, A[maxn];
-int dp[maxn];
+  DP(int K) {
+    dp.resize(K+1, INF);
+    for (int i = 0; i <= K; i++) ms.insert(INF);
+  }
 
-int ans[maxn];
+  void set(int i, ll x) {
+    auto it = ms.find(dp[i]); ms.erase(it);
+    dp[i] = x - aux;
+    ms.insert(dp[i]);
+  }
+
+  ll get(int i) {
+    return dp[i] + aux;
+  }
+
+  void add_all(int i, ll x) {
+    set(i, get(i) - x);
+    aux += x;
+  }
+
+  ll get_min() {
+    return *ms.begin() + aux;
+  }
+};
+
+void solve() {
+  int N, K; cin >> N >> K;
+  vector<int> A(N);
+  F0R(i, N) {
+    cin >> A[i];
+  }
+  vector<int> cold(K+1), hot(K+1);
+  for (int i = 1; i <= K; i++) {
+    cin >> cold[i];
+  }
+  for (int i = 1; i <= K; i++) {
+    cin >> hot[i];
+  }
+
+  DP dp(K);
+  dp.set(0, cold[A[0]]);
+
+  for (int i = 0; i+1 < N; i++) {
+    ll ndp = dp.get(A[i+1]) + hot[A[i+1]];
+    ckmin(ndp, dp.get_min() + cold[A[i+1]]);
+    dp.set(A[i], ndp);
+    dp.add_all(A[i], A[i] == A[i+1] ? hot[A[i+1]] : cold[A[i+1]]);
+  }
+
+  cout << dp.get_min() << '\n';
+}
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  cin >> N;
-  FOR(i, 1, N+1) {
-    cin >> A[i];
-  }
-  sort(A+1, A+N+1);
-  FOR(i, 1, N+1) {
-    if (i - A[i] >= 0) {
-      dp[i] = dp[i - A[i]] + 1;
-      ckmax(ans[dp[i] + N - i], i);
-    }
-    else {
-      ckmax(ans[N - A[i] + 1], i);
-    }
-    ckmax(dp[i], dp[i-1]);
-  }
-
-  for (int i = N-1; i >= 2; i--) {
-    ckmax(ans[i], ans[i+1]);
-  }
-
-  cin >> Q;
-  F0R(i, Q) {
-    int k; cin >> k;
-    cout << ans[k] << '\n';
-  }
+  int T; cin >> T;
+  while (T--) solve();
 }

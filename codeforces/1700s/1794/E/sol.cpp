@@ -59,43 +59,119 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-// If x people can be satisfied with k books, x people can be satisfied with k-1 books as well (we can just merge two groups together.)
-// Thus it is equivalent to compute for each x, the maximum number of groups that can be formed such that x people are satisfied.
-// Furthermore, if we are picking x people, we might as well pick the x least neediest people, since they are strictly easier to satisfy.
-// The remaining (n - x) people can each form the own group, OR they can join another group to add to how many people are in the group (not everyone in a group has to be satisfied.)
-// We want to make all x people satisfied, then the rest should form their own groups.
+const int maxn = 2e5+5;
+int N, A[maxn];
+vector<int> adj[maxn];
 
-const int maxn = 3e5+5;
-int N, Q, A[maxn];
-int dp[maxn];
+const int MOD = 1e9+7;
 
-int ans[maxn];
+void madd(int& a, int b) {
+  a += b;
+  if (a >= MOD) a -= MOD;
+}
+int mult(int a, int b) {
+  return (1LL * a * b) % MOD;
+}
+int modexp(int a, int b) {
+  int r = 1;
+  while (b) {
+    if (b&1) r = mult(r, a);
+    a = mult(a, a);
+    b >>= 1;
+  }
+  return r;
+}
+
+const int K = 3;
+int B[K];
+void initHash() {
+  std::uniform_int_distribution<> gen(2, 100); // ???
+  F0R(i, K) {
+    B[i] = gen(rng);
+  }
+}
+using T = array<int, K>;
+set<T> good_hashes;
+
+T ones() {
+  T a;
+  F0R(i, K) a[i] = 1;
+  return a;
+}
+
+T merge(T a, T b) {
+  F0R(i, K) madd(a[i], b[i]);
+  return a;
+}
+
+T diff(T a, T b) {
+  F0R(i, K) madd(a[i], MOD-b[i]);
+  return a;
+}
+
+T shift(T a) {
+  F0R(i, K) a[i] = mult(a[i], B[i]);
+  return a;
+}
+
+T sub_hash[maxn];
+void dfs1(int i, int p) {
+  sub_hash[i] = ones();
+  for (int j: adj[i]) {
+    if (j == p) continue;
+    dfs1(j, i);
+    T s = shift(sub_hash[j]);
+    sub_hash[i] = merge(sub_hash[i], s);
+  }
+}
+
+vector<int> ans;
+void dfs2(int i, int p, T cur) {
+  T c = merge(sub_hash[i], cur);
+  if (good_hashes.count(c)) {
+    ans.push_back(i);
+  }
+  for (int j: adj[i]) {
+    if (j == p) continue;
+    T ncur = shift(diff(c, shift(sub_hash[j])));
+    dfs2(j, i, ncur);
+  }
+}
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
+  initHash();
   cin >> N;
-  FOR(i, 1, N+1) {
+  map<int, int> mp;
+  F0R(i, N-1) {
     cin >> A[i];
+    mp[A[i]]++;
   }
-  sort(A+1, A+N+1);
-  FOR(i, 1, N+1) {
-    if (i - A[i] >= 0) {
-      dp[i] = dp[i - A[i]] + 1;
-      ckmax(ans[dp[i] + N - i], i);
-    }
-    else {
-      ckmax(ans[N - A[i] + 1], i);
-    }
-    ckmax(dp[i], dp[i-1]);
+  F0R(i, N-1) {
+    int a, b; cin >> a >> b;
+    adj[a].push_back(b);
+    adj[b].push_back(a);
   }
 
-  for (int i = N-1; i >= 2; i--) {
-    ckmax(ans[i], ans[i+1]);
+  T total = {0};
+  for (int i = 0; i < N; i++) {
+    F0R(j, K) {
+      madd(total[j], mult(modexp(B[j], i), mp[i]));
+    }
+  }
+  F0R(i, N) {
+    T ntotal = total;
+    F0R(j, K) madd(ntotal[j], modexp(B[j], i));
+    good_hashes.insert(ntotal);
   }
 
-  cin >> Q;
-  F0R(i, Q) {
-    int k; cin >> k;
-    cout << ans[k] << '\n';
+  dfs1(1, 1);
+  dfs2(1, 1, {0});
+
+  sort(all(ans));
+  cout << sz(ans) << '\n';
+  for (auto x: ans) {
+    cout << x << ' ';
   }
+  cout << '\n';
 }

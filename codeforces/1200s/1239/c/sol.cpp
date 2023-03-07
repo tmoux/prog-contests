@@ -59,43 +59,84 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-// If x people can be satisfied with k books, x people can be satisfied with k-1 books as well (we can just merge two groups together.)
-// Thus it is equivalent to compute for each x, the maximum number of groups that can be formed such that x people are satisfied.
-// Furthermore, if we are picking x people, we might as well pick the x least neediest people, since they are strictly easier to satisfy.
-// The remaining (n - x) people can each form the own group, OR they can join another group to add to how many people are in the group (not everyone in a group has to be satisfied.)
-// We want to make all x people satisfied, then the rest should form their own groups.
+const int maxn = 1e5+5;
+int N, P;
+ll T[maxn], ans[maxn];
 
-const int maxn = 3e5+5;
-int N, Q, A[maxn];
-int dp[maxn];
-
-int ans[maxn];
+set<int> line, waiting;
+queue<pair<ll, int>> q;
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  cin >> N;
-  FOR(i, 1, N+1) {
-    cin >> A[i];
+  cin >> N >> P;
+  vector<pair<ll, int>> v;
+  F0R(i, N) {
+    cin >> T[i];
+    v.emplace_back(T[i], i);
   }
-  sort(A+1, A+N+1);
-  FOR(i, 1, N+1) {
-    if (i - A[i] >= 0) {
-      dp[i] = dp[i - A[i]] + 1;
-      ckmax(ans[dp[i] + N - i], i);
+  sort(all(v), greater());
+
+  auto can_add_queue = [&](int i) {
+    return line.empty() || i < *line.begin();
+  };
+  auto add_to_queue = [&](int i) {
+    line.insert(i);
+    q.emplace(P, i);
+  };
+  auto add_to_waiting = [&](int i) {
+    waiting.insert(i);
+  };
+  ll curt = 0;
+  auto rem_from_queue = [&]() {
+    auto [t, i] = q.front(); q.pop();
+    curt += t;
+    ans[i] = curt;
+    line.erase(i);
+  };
+  while (!v.empty() || !q.empty()) {
+    if (v.empty()) {
+      rem_from_queue();
     }
     else {
-      ckmax(ans[N - A[i] + 1], i);
+      auto [t, i] = v.back();
+      if (q.empty()) {
+        v.pop_back();
+        ll d = t - curt;
+        curt += d;
+        add_to_queue(i);
+      }
+      else {
+        auto& [p, j] = q.front();
+        if (curt + p < t) {
+          rem_from_queue();
+        }
+        else {
+          v.pop_back();
+          ll d = t - curt;
+          curt += d;
+          p -= d;
+          // if i can go directly onto the queue, do that
+          if (can_add_queue(i)) {
+            add_to_queue(i);
+          }
+          else {
+            add_to_waiting(i);
+          }
+        }
+      }
     }
-    ckmax(dp[i], dp[i-1]);
+
+    // check if we can add someone from waiting
+    if (!waiting.empty()) {
+      int i = *waiting.begin();
+      if (can_add_queue(i)) {
+        waiting.erase(i);
+        add_to_queue(i);
+      }
+    }
   }
 
-  for (int i = N-1; i >= 2; i--) {
-    ckmax(ans[i], ans[i+1]);
-  }
-
-  cin >> Q;
-  F0R(i, Q) {
-    int k; cin >> k;
-    cout << ans[k] << '\n';
+  for (int i = 0; i < N; i++) {
+    cout << ans[i] << " \n"[i == N-1];
   }
 }

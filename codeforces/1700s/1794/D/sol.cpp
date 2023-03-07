@@ -169,35 +169,111 @@ namespace ModInt {
     }
   };
 }
-const int MOD = 1e9+7;
+const int MOD = 998244353;
 using mint = ModInt::mod_int<MOD>;
 
-const int maxn = 1e5+5;
-int totient[maxn];
-vector<int> divisors[maxn];
+namespace ModCombinatorics { // {{{
+  vector<int> inv, _fac, _ifac;
+  template<size_t N, int MOD>
+  void init() {
+    inv.resize(N);
+    _fac.resize(N);
+    _ifac.resize(N);
+    inv[0] = inv[1] = 1;
+    for (size_t i = 2; i < N; i++) {
+      inv[i] = (MOD - (1LL * (MOD/i) * inv[MOD%i]) % MOD) % MOD;
+    }
+    _fac[0] = _ifac[0] = 1;
+    for (size_t i = 1; i < N; i++) {
+      _fac[i] = (1LL * i * _fac[i-1]) % MOD;
+      _ifac[i] = (1LL * _ifac[i-1] * inv[i]) % MOD;
+    }
+  }
+
+  mint choose(int n, int k) {
+    if (n < k || k < 0) return 0;
+    return mint(1) * _fac[n] * _ifac[k] * _ifac[n-k];
+  }
+
+  mint fac(int n) {
+    return mint(_fac[n]);
+  }
+
+  mint ifac(int n) {
+    return mint(_ifac[n]);
+  }
+};
+// }}}
+namespace MC = ModCombinatorics;
+
+const int maxn = 1e6+6;
+int spf[maxn];
+
+void init_spf() {
+  spf[1] = 1;
+  for (int i = 2; i < maxn; i++) if (!spf[i]) {
+      for (int j = i; j < maxn; j += i) {
+        if (!spf[j]) spf[j] = i;
+      }
+    }
+}
+
+const int maxp = 5000;
+int dp[maxp][maxp];
+int N;
+int P;
+int C[maxp];
+
+mint X;
+
+mint f(int i, int j) { // i'th prime, select j so far
+  int& res = dp[i][j];
+  if (res != -1) return res;
+  if (i == P) {
+    if (j == N) {
+      return res = X.val;
+    }
+    else return res = 0;
+  }
+  mint ans = 0;
+  ans += f(i+1, j) * MC::ifac(C[i]); // don't pick
+  if (j < N) ans += f(i+1, j+1) * MC::ifac(C[i] - 1); // do pick
+
+  return res = ans.val;
+}
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int N; cin >> N;
-  for (int i = 2; i <= N; i++) {
-    totient[i] += i-1;
-    for (int j = 2*i; j <= N; j += i) {
-      totient[j] -= totient[i];
+  MC::init<maxp, MOD>();
+  init_spf();
+  cin >> N;
+  vector<int> A(2*N);
+  vector<int> primes;
+  map<int, int> ps;
+  map<int, int> nonprimes;
+  F0R(i, 2*N) {
+    cin >> A[i];
+    if (A[i] > 1 && A[i] == spf[A[i]]) {
+      primes.push_back(A[i]);
+      ps[A[i]]++;
+    }
+    else {
+      nonprimes[A[i]]++;
     }
   }
-  for (int i = 1; i <= N; i++) {
-    for (int j = i; j <= N; j += i) {
-      divisors[j].push_back(i);
-    }
+  sort(all(primes)); primes.erase(unique(all(primes)), primes.end());
+  P = sz(primes);
+  F0R(i, P) {
+    C[i] = ps[primes[i]];
   }
 
-  mint ans = 0;
-  for (int c = 1; c < N; c++) {
-    for (int d: divisors[N - c]) {
-      ll lcm = std::lcm((ll)c, d);
-      mint add = mint(lcm % MOD) * totient[(N - c) / d];
-      ans += add;
-    }
+  X = MC::fac(N);
+  for (auto [_, c]: nonprimes) {
+    X *= MC::ifac(c);
   }
+
+  memset(dp, -1, sizeof dp);
+
+  int ans = f(0, 0);
   cout << ans << '\n';
 }

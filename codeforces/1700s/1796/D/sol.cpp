@@ -59,43 +59,70 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-// If x people can be satisfied with k books, x people can be satisfied with k-1 books as well (we can just merge two groups together.)
-// Thus it is equivalent to compute for each x, the maximum number of groups that can be formed such that x people are satisfied.
-// Furthermore, if we are picking x people, we might as well pick the x least neediest people, since they are strictly easier to satisfy.
-// The remaining (n - x) people can each form the own group, OR they can join another group to add to how many people are in the group (not everyone in a group has to be satisfied.)
-// We want to make all x people satisfied, then the rest should form their own groups.
-
-const int maxn = 3e5+5;
-int N, Q, A[maxn];
-int dp[maxn];
-
-int ans[maxn];
-
-int main() {
-  ios_base::sync_with_stdio(false); cin.tie(NULL);
-  cin >> N;
+ll solve(int tc) {
+  int N, K, x; cin >> N >> K >> x;
+  vector<ll> A(N+1), p(N+1);
   FOR(i, 1, N+1) {
     cin >> A[i];
   }
-  sort(A+1, A+N+1);
-  FOR(i, 1, N+1) {
-    if (i - A[i] >= 0) {
-      dp[i] = dp[i - A[i]] + 1;
-      ckmax(ans[dp[i] + N - i], i);
+  if (x >= 0) {
+    vector<ll> pfx(N+1);
+    FOR(i, 1, N+1) {
+      pfx[i] = A[i] + pfx[i-1];
     }
-    else {
-      ckmax(ans[N - A[i] + 1], i);
+    p[0] = -x;
+    FOR(i, 1, N+1) {
+      p[i] = A[i] + p[i-1] - x;
     }
-    ckmax(dp[i], dp[i-1]);
+    ll ans = 0;
+    ll mnPrefix = p[0];
+    for (int i = 1; i <= N; i++) {
+      for (int k = 1; k <= K && i-k >= 0; k++) {
+        ckmax(ans, pfx[i] - pfx[i-k] + 1LL * k * x);
+      }
+      if (i-K >= 0) {
+        ckmin(mnPrefix, p[i-K]);
+        ckmax(ans, (p[i] + 2LL * K * x - mnPrefix));
+      }
+    }
+    return ans;
   }
-
-  for (int i = N-1; i >= 2; i--) {
-    ckmax(ans[i], ans[i+1]);
+  else {
+    vector<ll> pfx(N+1);
+    FOR(i, 1, N+1) {
+      pfx[i] = A[i] + pfx[i-1];
+    }
+    p[0] = -x;
+    FOR(i, 1, N+1) {
+      p[i] = A[i] + p[i-1] - x;
+    }
+    ll ans = 0;
+    ll mnPrefix = p[0];
+    for (int i = 1; N-i >= K; i++) {
+      ckmax(ans, p[i] - mnPrefix);
+      ckmin(mnPrefix, p[i]);
+    }
+    for (int i = N-K+1; i <= N; i++) {
+      for (int j = 1; j <= i; j++) {
+        int len = i - j + 1;
+        if (N - len >= K) {
+          ckmax(ans, pfx[i] - pfx[j-1] - 1LL * len * x);
+        }
+        else {
+          int a = len - (N - K);
+          int b = N - K;
+          ckmax(ans, pfx[i] - pfx[j-1] + 1LL * a * x - 1LL * b * x);
+        }
+      }
+    }
+    return ans;
   }
+}
 
-  cin >> Q;
-  F0R(i, Q) {
-    int k; cin >> k;
-    cout << ans[k] << '\n';
+int main() {
+  ios_base::sync_with_stdio(false); cin.tie(NULL);
+  int T; cin >> T;
+  for (int t = 1; t <= T; t++) {
+    cout << solve(t) << '\n';
   }
 }

@@ -59,14 +59,15 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-const int ALPHA = 12;
+const int ALPHA = 26;
 struct AhoCorasick {
   struct Node {
     int next[ALPHA], trans[ALPHA];
-    int cost = 0;
     int link;
+    int term;
+    int next_term;
 
-    Node() : cost(0), link(-1) {
+    Node() : link(-1), term(-1), next_term(-1) {
       F0R(i, ALPHA) next[i] = trans[i] = -1;
     }
   };
@@ -78,19 +79,19 @@ struct AhoCorasick {
     return sz(nodes) - 1;
   }
 
-  void insert(int i, const string& s, int co) {
+  void insert(int i, const string& s, int idx) {
     for (char ch: s) {
       int c = ch - 'a';
       if (nodes[i].next[c] == -1) nodes[i].next[c] = newNode();
       i = nodes[i].next[c];
     }
-    nodes[i].cost += co;
+    nodes[i].term = idx;
   }
 
-  AhoCorasick(const vector<string>& vs, const vector<int>& cs) {
+  AhoCorasick(const vector<string>& vs) {
     int root = newNode();
     F0R(i, sz(vs)) {
-      insert(root, vs[i], cs[i]);
+      insert(root, vs[i], i);
     }
 
     queue<int> q;
@@ -101,7 +102,6 @@ struct AhoCorasick {
     }
     while (!q.empty()) {
       int i = q.front(); q.pop();
-      nodes[i].cost += nodes[nodes[i].link].cost;
       F0R(ch, ALPHA) {
         if (nodes[i].next[ch] != -1) {
           int j = nodes[i].next[ch];
@@ -111,12 +111,14 @@ struct AhoCorasick {
           else {
             nodes[j].link = nodes[nodes[i].link].trans[ch];
           }
+          int suf = nodes[j].link;
+          nodes[j].next_term = nodes[suf].term != -1 ? suf : nodes[suf].next_term;
           F0R(c, ALPHA) {
             if (nodes[j].next[c] != -1) {
               nodes[j].trans[c] = nodes[j].next[c];
             }
             else {
-              nodes[j].trans[c] = nodes[nodes[j].link].trans[c];
+              nodes[j].trans[c] = nodes[suf].trans[c];
             }
           }
           q.push(j);
@@ -128,78 +130,58 @@ struct AhoCorasick {
   int go(int i, int c) {
     return nodes[i].trans[c];
   }
+
+  vector<int> get_matches(int i) {
+    vector<int> r;
+    while (i != -1) {
+      if (nodes[i].term != -1) r.push_back(nodes[i].term);
+      i = nodes[i].next_term;
+    }
+    return r;
+  }
 };
 
+const int ALPHA = 26;
+
+// to answer a query:
+// Associate each index in s with a state in the AC automaton.
+// Identify all matches, and find the subarray with min distance.
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int N; cin >> N;
+  string s; cin >> s;
+  int Q; cin >> Q;
+
   vector<string> vs;
-  vector<int> cs;
+  vector<int> ks;
+  F0R(i, Q) {
+    int k; cin >> k;
+    string t; cin >> t;
+    ks.push_back(k);
+    vs.push_back(t);
+  }
 
-  auto get_string = [&](string s) -> std::optional<string> {
-    deque<char> deq = {s[0]};
-    int idx = 0;
-    set<char> S = {s[0]};
-    FOR(i, 1, sz(s)) {
-      if (idx + 1 < sz(deq) && deq[idx+1] == s[i]) idx++;
-      else if (idx - 1 >= 0 && deq[idx-1] == s[i]) idx--;
-      else if (idx + 1 == sz(deq) && !S.count(s[i])) {
-        S.insert(s[i]);
-        deq.push_back(s[i]), idx++;
-      }
-      else if (idx == 0 && !S.count(s[i])) {
-        S.insert(s[i]);
-        deq.push_front(s[i]);
-      }
-      else return std::nullopt;
+  auto min_dist = [&](int i, const vector<int>& v) {
+    if (ks[i] > sz(v)) return -1;
+    int ans = 1e9;
+    for (int j = 0; j + ks[i] - 1 < sz(v); j++) {
+      ckmin(ans, v[j + ks[i] - 1] - (v[j] - sz(vs[i])));
     }
-    string t;
-    for (char c: deq) t += c;
-    return t;
+    return ans;
   };
-  F0R(i, N) {
-    int c; cin >> c;
-    string s; cin >> s;
 
-    auto mt = get_string(s);
-    if (mt) {
-      string t = *mt;
-      vs.push_back(t);
-      cs.push_back(c);
-      reverse(all(t));
-      vs.push_back(t);
-      cs.push_back(c);
+  AhoCorasick AC(vs);
+  int idx = 0;
+  vector<vector<int>> V(Q);
+  F0R(i, sz(s)) {
+    char c = s[i];
+    idx = AC.go(idx, c-'a');
+    for (auto j: AC.get_matches(idx)) {
+      V[j].push_back(i);
     }
   }
 
-  AhoCorasick AC(vs, cs);
-  vector<vector<int>> dp(1 << ALPHA, vector<int>(4005, -1));
-  vector<vector<pair<int, int>>> recon(1 << ALPHA, vector<pair<int, int>>(4005));
-  auto f = y_combinator([&](auto f, int mask, int s) -> int {
-    int& res = dp[mask][s];
-    if (res != -1) return res;
-    if (mask == (1 << ALPHA) - 1) return res = 0;
-    F0R(i, ALPHA) {
-      if (!(mask & (1 << i))) {
-        int nmask = mask | (1 << i);
-        int ns = AC.go(s, i);
-        if (ckmax(res, f(nmask, ns) + AC.nodes[ns].cost)) {
-          recon[mask][s] = {nmask, ns};
-        }
-      }
-    }
-    return res;
-  });
-
-  f(0, 0);
-  int mask = 0, s = 0;
-  string ans;
-  while (__builtin_popcount(mask) < ALPHA) {
-    auto [nmask, ns] = recon[mask][s];
-    int c = 31 - __builtin_clz(mask ^ nmask);
-    ans += 'a' + c;
-    std::tie(mask, s) = {nmask, ns};
+  F0R(i, Q) {
+    cout << min_dist(i, V[i]) << '\n';
   }
-  cout << ans << '\n';
 }

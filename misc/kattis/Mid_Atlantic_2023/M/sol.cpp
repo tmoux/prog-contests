@@ -59,43 +59,62 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-// If x people can be satisfied with k books, x people can be satisfied with k-1 books as well (we can just merge two groups together.)
-// Thus it is equivalent to compute for each x, the maximum number of groups that can be formed such that x people are satisfied.
-// Furthermore, if we are picking x people, we might as well pick the x least neediest people, since they are strictly easier to satisfy.
-// The remaining (n - x) people can each form the own group, OR they can join another group to add to how many people are in the group (not everyone in a group has to be satisfied.)
-// We want to make all x people satisfied, then the rest should form their own groups.
+int N;
+string S;
 
-const int maxn = 3e5+5;
-int N, Q, A[maxn];
-int dp[maxn];
+const int maxn = 105;
+int dp[maxn][26][26];
+int D[maxn];
 
-int ans[maxn];
+int f(int l, int r, int L, int R) {
+  int& res = dp[l][L][R];
+  if (res != -1) return res;
+  if (l == r) {
+    return res = 0;
+  }
+  else if (l + 1 == r) {
+    if (L == R) return res = 0;
+    else return res = 1;
+  }
+  else {
+    res = 1e9;
+    if (L == R) {
+      ckmin(res, f(l+1, r-1, D[l+1], D[r-1]));
+    }
+    if (L != R) {
+      F0R(LL, 26) {
+        if (LL != D[l+1]) {
+          ckmin(res, f(l+1, r-1, LL, D[r-1]) + 1);
+        }
+      }
+      F0R(RR, 26) {
+        if (RR != D[r-1]) {
+          ckmin(res, f(l+1, r-1, D[l+1], RR) + 1);
+          F0R(RR, 26) {
+            if (RR != D[r-1]) {
+              ckmin(res, f(l+1, r-1, D[l+1], RR) + 1);
+            }
+          }
+        }
+      }
+    }
+    F0R(LL, 26) {
+      F0R(RR, 26) {
+        if (LL != D[l+1] && RR != D[r-1])
+          ckmin(res, f(l+1, r-1, LL, RR) + 2);
+      }
+    }
+    return res;
+  }
+}
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  cin >> N;
-  FOR(i, 1, N+1) {
-    cin >> A[i];
-  }
-  sort(A+1, A+N+1);
-  FOR(i, 1, N+1) {
-    if (i - A[i] >= 0) {
-      dp[i] = dp[i - A[i]] + 1;
-      ckmax(ans[dp[i] + N - i], i);
-    }
-    else {
-      ckmax(ans[N - A[i] + 1], i);
-    }
-    ckmax(dp[i], dp[i-1]);
-  }
+  memset(dp, -1, sizeof dp);
+  cin >> S;
+  N = sz(S);
+  F0R(i, N) D[i] = S[i] - 'a';
 
-  for (int i = N-1; i >= 2; i--) {
-    ckmax(ans[i], ans[i+1]);
-  }
-
-  cin >> Q;
-  F0R(i, Q) {
-    int k; cin >> k;
-    cout << ans[k] << '\n';
-  }
+  int ans = f(0, N-1, D[0], D[N-1]);
+  cout << ans << '\n';
 }

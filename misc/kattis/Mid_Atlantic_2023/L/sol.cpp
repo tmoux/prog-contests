@@ -59,43 +59,74 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-// If x people can be satisfied with k books, x people can be satisfied with k-1 books as well (we can just merge two groups together.)
-// Thus it is equivalent to compute for each x, the maximum number of groups that can be formed such that x people are satisfied.
-// Furthermore, if we are picking x people, we might as well pick the x least neediest people, since they are strictly easier to satisfy.
-// The remaining (n - x) people can each form the own group, OR they can join another group to add to how many people are in the group (not everyone in a group has to be satisfied.)
-// We want to make all x people satisfied, then the rest should form their own groups.
+const int maxn = 2e5+5;
+int N, M;
+int par[maxn];
+vector<int> adj[maxn];
 
-const int maxn = 3e5+5;
-int N, Q, A[maxn];
-int dp[maxn];
-
-int ans[maxn];
+vector<int> V;
+int S[maxn];
+bool blocked[maxn];
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  cin >> N;
-  FOR(i, 1, N+1) {
-    cin >> A[i];
+  cin >> N >> M;
+  REP(N-1) {
+    int a, b; cin >> a >> b;
+    adj[a].push_back(b);
+    par[b] = a;
   }
-  sort(A+1, A+N+1);
-  FOR(i, 1, N+1) {
-    if (i - A[i] >= 0) {
-      dp[i] = dp[i - A[i]] + 1;
-      ckmax(ans[dp[i] + N - i], i);
+  FOR(i, 1, N+1) sort(all(adj[i]), greater());
+
+  auto extend = [&]() -> void {
+    while (true) {
+      int i = V.back();
+      if (!adj[i].empty()) {
+        int j = adj[i].back();
+        V.push_back(j);
+        S[j] = 1;
+      }
+      else break;
     }
+  };
+  // initialize V, S
+  V.push_back(1);
+  S[1] = 1;
+  extend();
+
+  int ans = 0;
+  REP(M) {
+    int d; cin >> d;
+    if (S[d]) ans++;
     else {
-      ckmax(ans[N - A[i] + 1], i);
+      vector<int> v;
+      while (!S[d]) {
+        if (blocked[d]) {
+          cout << ans << '\n';
+          return 0;
+        }
+        v.push_back(d);
+        int nd = par[d];
+        while (adj[nd].back() < d) {
+          blocked[adj[nd].back()] = true;
+          adj[nd].pop_back();
+        }
+        d = nd;
+      }
+      while (V.back() != d) {
+        S[V.back()] = 0;
+        V.pop_back();
+      }
+      reverse(all(v));
+      for (auto i: v) {
+        V.push_back(i);
+        S[i] = 1;
+      }
+      extend();
+
+      ans++;
     }
-    ckmax(dp[i], dp[i-1]);
   }
 
-  for (int i = N-1; i >= 2; i--) {
-    ckmax(ans[i], ans[i+1]);
-  }
-
-  cin >> Q;
-  F0R(i, Q) {
-    int k; cin >> k;
-    cout << ans[k] << '\n';
-  }
+  cout << ans << '\n';
 }

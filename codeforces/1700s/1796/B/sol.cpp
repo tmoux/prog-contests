@@ -59,43 +59,31 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-// If x people can be satisfied with k books, x people can be satisfied with k-1 books as well (we can just merge two groups together.)
-// Thus it is equivalent to compute for each x, the maximum number of groups that can be formed such that x people are satisfied.
-// Furthermore, if we are picking x people, we might as well pick the x least neediest people, since they are strictly easier to satisfy.
-// The remaining (n - x) people can each form the own group, OR they can join another group to add to how many people are in the group (not everyone in a group has to be satisfied.)
-// We want to make all x people satisfied, then the rest should form their own groups.
-
-const int maxn = 3e5+5;
-int N, Q, A[maxn];
-int dp[maxn];
-
-int ans[maxn];
+void solve() {
+  string a, b; cin >> a >> b;
+  if (a[0] == b[0]) {
+    cout << "YES\n";
+    cout << a[0] << '*' << '\n';
+  }
+  else if (a.back() == b.back()) {
+    cout << "YES\n";
+    cout << '*' << a.back() << '\n';
+  }
+  else {
+    for (int i = 0; i + 1 < sz(a); i++) {
+      string t = a.substr(i, 2);
+      if (b.find(t) != string::npos) {
+        cout << "YES\n";
+        cout << '*' << t << '*' << '\n';
+        return;
+      }
+    }
+    cout << "NO\n";
+  }
+}
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  cin >> N;
-  FOR(i, 1, N+1) {
-    cin >> A[i];
-  }
-  sort(A+1, A+N+1);
-  FOR(i, 1, N+1) {
-    if (i - A[i] >= 0) {
-      dp[i] = dp[i - A[i]] + 1;
-      ckmax(ans[dp[i] + N - i], i);
-    }
-    else {
-      ckmax(ans[N - A[i] + 1], i);
-    }
-    ckmax(dp[i], dp[i-1]);
-  }
-
-  for (int i = N-1; i >= 2; i--) {
-    ckmax(ans[i], ans[i+1]);
-  }
-
-  cin >> Q;
-  F0R(i, Q) {
-    int k; cin >> k;
-    cout << ans[k] << '\n';
-  }
+  int T; cin >> T;
+  while (T--) solve();
 }

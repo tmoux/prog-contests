@@ -59,43 +59,56 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-// If x people can be satisfied with k books, x people can be satisfied with k-1 books as well (we can just merge two groups together.)
-// Thus it is equivalent to compute for each x, the maximum number of groups that can be formed such that x people are satisfied.
-// Furthermore, if we are picking x people, we might as well pick the x least neediest people, since they are strictly easier to satisfy.
-// The remaining (n - x) people can each form the own group, OR they can join another group to add to how many people are in the group (not everyone in a group has to be satisfied.)
-// We want to make all x people satisfied, then the rest should form their own groups.
-
-const int maxn = 3e5+5;
-int N, Q, A[maxn];
-int dp[maxn];
-
-int ans[maxn];
-
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  cin >> N;
-  FOR(i, 1, N+1) {
-    cin >> A[i];
-  }
-  sort(A+1, A+N+1);
-  FOR(i, 1, N+1) {
-    if (i - A[i] >= 0) {
-      dp[i] = dp[i - A[i]] + 1;
-      ckmax(ans[dp[i] + N - i], i);
-    }
-    else {
-      ckmax(ans[N - A[i] + 1], i);
-    }
-    ckmax(dp[i], dp[i-1]);
+  int N, M; cin >> N >> M;
+  vector<string> g(N);
+  F0R(i, N) {
+    cin >> g[i];
   }
 
-  for (int i = N-1; i >= 2; i--) {
-    ckmax(ans[i], ans[i+1]);
+  vector<vector<int>> dist(N, vector<int>(M, 1e9));
+  queue<pair<int, int>> q;
+
+  auto valid = [&](int i, int j) {
+    return 0 <= i && i < N && 0 <= j && j < M;
+  };
+
+  const int dx[] = {0, 1, 0, -1};
+  const int dy[] = {1, 0, -1, 0};
+  F0R(i, N) {
+    F0R(j, M) {
+      if (g[i][j] == '-') continue;
+      bool ok = false;
+      F0R(k, 4) {
+        int ni = i + dx[k];
+        int nj = j + dy[k];
+        if (!valid(ni, nj) || g[ni][nj] == '-') ok = true;
+      }
+      if (ok) {
+        q.push({i, j});
+        dist[i][j] = 1;
+      }
+    }
   }
 
-  cin >> Q;
-  F0R(i, Q) {
-    int k; cin >> k;
-    cout << ans[k] << '\n';
+  if (q.empty()) {
+    cout << 0 << '\n';
+  }
+  else {
+    int ans = 0;
+    while (!q.empty()) {
+      auto [i, j] = q.front(); q.pop();
+      ckmax(ans, dist[i][j]);
+      F0R(k, 4) {
+        int ni = i + dx[k];
+        int nj = j + dy[k];
+        if (valid(ni, nj) && g[ni][nj] == 'X' && dist[ni][nj] > dist[i][j] + 1) {
+          q.push({ni, nj});
+          dist[ni][nj] = dist[i][j] + 1;
+        }
+      }
+    }
+    cout << ans << '\n';
   }
 }

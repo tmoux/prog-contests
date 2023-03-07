@@ -29,3 +29,4 @@ CMakeLists.txt
 **/*.lyx~
 
 **/*.ccls-cache
+topics.org
