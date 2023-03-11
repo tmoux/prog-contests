@@ -59,84 +59,61 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-struct LeftTracker {
-  ll total = 0;
-  vector<int> v;
-  int cur = 0;
-
-  void insert(int x, int d) {
-    if (d == 1) total++;
-    v.push_back(x);
-    if (sz(v) == 1) {
-      cur = 0;
-    }
-    else if (sz(v) % 2 == 0) {
-      total += x - v[cur];
-    }
-    else {
-      total += x - v[cur];
-      total -= v[cur+1] - v[cur];
-      cur++;
-    }
+void solve() {
+  int N, M, P; cin >> N >> M >> P;
+  vector<ll> W(N);
+  F0R(i, N) {
+    cin >> W[i];
   }
-};
-
-struct RightTracker {
-  ll total = 0;
-  vector<array<int, 2>> v;
-  int cur = 0;
-  int size = 0;
-
-  RightTracker(vector<array<int, 2>> _v) {
-    v = _v;
-    cur = sz(v) / 2;
-    for (auto [x, d]: v) {
-      if (d == 0) total++;
-      total += abs(v[cur][0] - x);
-    }
-    size = sz(v);
+  vector<vector<pair<int, int>>> adj(N);
+  F0R(i, M) {
+    int a, b, w; cin >> a >> b >> w;
+    a--, b--;
+    adj[a].push_back({b, w});
   }
 
-  void del(int x, int d) {
-    if (d == 0) total--;
-    total -= v[cur][0] - x;
-    size--;
-    if (size % 2 == 0) cur++;
+  auto cv = [&](int i, int j) {
+    return i * N + j;
+  };
+  auto ceil = [](ll a, ll b) -> ll {
+    return (a + b - 1) / b;
+  };
+
+  using T = pair<ll, ll>;
+  using U = pair<T, int>;
+  vector<T> dist(N*N, {1e18, 1e18});
+
+  priority_queue<U, vector<U>, greater<U>> pq;
+  dist[cv(0, 0)] = {0, -P};
+  pq.push({dist[cv(0, 0)], cv(0, 0)});
+
+  while (!pq.empty()) {
+    auto [q, I] = pq.top(); pq.pop();
+    auto [d, p] = q;
+    int i = I / N, ii = I % N;
+    p = -p;
+    for (auto [j, s]: adj[i]) {
+      ll days = s <= p ? 0 : ceil(s - p, W[ii]);
+      ll np = p + W[ii] * days - s;
+      int nii = W[j] > W[ii] ? j : ii;
+
+      T cost = {d + days, -np};
+      if (dist[cv(j, nii)] > cost) {
+        dist[cv(j, nii)] = cost;
+        pq.push({dist[cv(j, nii)], cv(j, nii)});
+      }
+    }
   }
-};
+
+  ll ans = 1e18;
+  F0R(i, N) {
+    ckmin(ans, dist[cv(N-1, i)].first);
+  }
+  cout << (ans < 1e18 ? ans : -1) << '\n';
+}
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int N; cin >> N;
-  vector<array<int, 2>> Xs(N), Ys(N);
-  F0R(i, N) {
-    int x, y, v; cin >> x >> y >> v;
-    Xs[i][0] = x;
-    Xs[i][1] = !(v == 0 || v == 1);
-    Ys[i][0] = y;
-    Ys[i][1] = !(v == 0 || v == 3);
-  }
-
-  auto solve = [&](vector<array<int, 2>> v) -> ll {
-    sort(all(v));
-    LeftTracker lt;
-    RightTracker rt(v);
-
-    ll ans = 0;
-    int t = v[sz(v) / 2][0];
-    for (auto [x, d]: v) {
-      ans += abs(x - t);
-    }
-
-    for (auto [x, d]: v) {
-      lt.insert(x, d);
-      rt.del(x, d);
-
-      ckmin(ans, lt.total + rt.total);
-    }
-    return ans;
-  };
-
-  ll ans = solve(Xs) + solve(Ys);
-  cout << ans << '\n';
+  int T; cin >> T;
+  while (T--) solve();
 }

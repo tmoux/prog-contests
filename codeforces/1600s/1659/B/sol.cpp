@@ -59,84 +59,37 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-struct LeftTracker {
-  ll total = 0;
-  vector<int> v;
-  int cur = 0;
-
-  void insert(int x, int d) {
-    if (d == 1) total++;
-    v.push_back(x);
-    if (sz(v) == 1) {
-      cur = 0;
-    }
-    else if (sz(v) % 2 == 0) {
-      total += x - v[cur];
-    }
-    else {
-      total += x - v[cur];
-      total -= v[cur+1] - v[cur];
-      cur++;
+void solve() {
+  int N, K; cin >> N >> K;
+  int oK = K;
+  string s; cin >> s;
+  vector<int> cnt(N);
+  F0R(i, N) {
+    int cost = 1 ^ (oK&1) ^ (s[i] - '0');
+    if (cost && K > 0) {
+      cnt[i]++;
+      K--;
     }
   }
-};
-
-struct RightTracker {
-  ll total = 0;
-  vector<array<int, 2>> v;
-  int cur = 0;
-  int size = 0;
-
-  RightTracker(vector<array<int, 2>> _v) {
-    v = _v;
-    cur = sz(v) / 2;
-    for (auto [x, d]: v) {
-      if (d == 0) total++;
-      total += abs(v[cur][0] - x);
-    }
-    size = sz(v);
+  if (K % 2 == 0) {
+    cnt[0] += K;
   }
-
-  void del(int x, int d) {
-    if (d == 0) total--;
-    total -= v[cur][0] - x;
-    size--;
-    if (size % 2 == 0) cur++;
+  else {
+    cnt[N-1] += K;
   }
-};
+  F0R(i, N) {
+    if ((oK - cnt[i])&1)
+      s[i] = s[i] == '0' ? '1' : '0';
+  }
+  cout << s << '\n';
+  F0R(i, N) {
+    cout << cnt[i] << ' ';
+  }
+  cout << '\n';
+}
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int N; cin >> N;
-  vector<array<int, 2>> Xs(N), Ys(N);
-  F0R(i, N) {
-    int x, y, v; cin >> x >> y >> v;
-    Xs[i][0] = x;
-    Xs[i][1] = !(v == 0 || v == 1);
-    Ys[i][0] = y;
-    Ys[i][1] = !(v == 0 || v == 3);
-  }
-
-  auto solve = [&](vector<array<int, 2>> v) -> ll {
-    sort(all(v));
-    LeftTracker lt;
-    RightTracker rt(v);
-
-    ll ans = 0;
-    int t = v[sz(v) / 2][0];
-    for (auto [x, d]: v) {
-      ans += abs(x - t);
-    }
-
-    for (auto [x, d]: v) {
-      lt.insert(x, d);
-      rt.del(x, d);
-
-      ckmin(ans, lt.total + rt.total);
-    }
-    return ans;
-  };
-
-  ll ans = solve(Xs) + solve(Ys);
-  cout << ans << '\n';
+  int T; cin >> T;
+  while (T--) solve();
 }

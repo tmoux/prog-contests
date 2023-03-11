@@ -59,84 +59,90 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-struct LeftTracker {
-  ll total = 0;
-  vector<int> v;
-  int cur = 0;
+// Let's split up vertices into "small" and "big" vertices, which have degree < K and >= K, respectively.
+// For small vertices, let's just manually update all of their edges.
+// For big vertices, there are only up to M / K of them, so let's process each one in O(Q) amortized.
+// Keep track of the last time the big vertex has been updated, and update all of the adjacent vertices that have been updated since then.
 
-  void insert(int x, int d) {
-    if (d == 1) total++;
-    v.push_back(x);
-    if (sz(v) == 1) {
-      cur = 0;
-    }
-    else if (sz(v) % 2 == 0) {
-      total += x - v[cur];
-    }
-    else {
-      total += x - v[cur];
-      total -= v[cur+1] - v[cur];
-      cur++;
-    }
+const int maxn = 1e5+5;
+int N, M, A[maxn];
+vector<int> adj[maxn];
+
+int in[maxn], out[maxn];
+ll ans = 0;
+
+ll cnt(int i) {
+  return 1LL * in[i] * out[i];
+}
+
+void fix(int i, int j) {
+  if (A[i] < A[j]) {
+    ans -= cnt(i);
+    ans -= cnt(j);
+
+    in[i]--, out[i]++;
+    out[j]--, in[j]++;
+
+    ans += cnt(i);
+    ans += cnt(j);
   }
-};
+}
 
-struct RightTracker {
-  ll total = 0;
-  vector<array<int, 2>> v;
-  int cur = 0;
-  int size = 0;
+int last[maxn];
+int q[maxn];
 
-  RightTracker(vector<array<int, 2>> _v) {
-    v = _v;
-    cur = sz(v) / 2;
-    for (auto [x, d]: v) {
-      if (d == 0) total++;
-      total += abs(v[cur][0] - x);
-    }
-    size = sz(v);
-  }
-
-  void del(int x, int d) {
-    if (d == 0) total--;
-    total -= v[cur][0] - x;
-    size--;
-    if (size % 2 == 0) cur++;
-  }
-};
+vector<bool> isadj[maxn];
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int N; cin >> N;
-  vector<array<int, 2>> Xs(N), Ys(N);
-  F0R(i, N) {
-    int x, y, v; cin >> x >> y >> v;
-    Xs[i][0] = x;
-    Xs[i][1] = !(v == 0 || v == 1);
-    Ys[i][0] = y;
-    Ys[i][1] = !(v == 0 || v == 3);
+  cin >> N >> M;
+  FOR(i, 1, N+1) A[i] = i;
+  F0R(i, M) {
+    int a, b; cin >> a >> b;
+    adj[a].push_back(b);
+    adj[b].push_back(a);
+  }
+  FOR(i, 1, N+1) {
+    for (int j: adj[i]) {
+      if (A[i] > A[j]) out[i]++;
+      else in[i]++;
+    }
+    ans += cnt(i);
   }
 
-  auto solve = [&](vector<array<int, 2>> v) -> ll {
-    sort(all(v));
-    LeftTracker lt;
-    RightTracker rt(v);
-
-    ll ans = 0;
-    int t = v[sz(v) / 2][0];
-    for (auto [x, d]: v) {
-      ans += abs(x - t);
-    }
-
-    for (auto [x, d]: v) {
-      lt.insert(x, d);
-      rt.del(x, d);
-
-      ckmin(ans, lt.total + rt.total);
-    }
-    return ans;
-  };
-
-  ll ans = solve(Xs) + solve(Ys);
   cout << ans << '\n';
+  memset(last, -1, sizeof last);
+  const int K = 500;
+  FOR(i, 1, N+1) {
+    if (sz(adj[i]) >= K) {
+      isadj[i].resize(N+1, 0);
+      for (int j: adj[i]) isadj[i][j] = 1;
+    }
+  }
+  int Q; cin >> Q;
+  vector<bool> seen(N+1, 0);
+  F0R(i, Q) {
+    int v; cin >> v;
+    q[i] = v;
+    if (sz(adj[v]) < K || last[v] == -1) {
+      for (int j: adj[v]) {
+        fix(v, j);
+      }
+    }
+    else {
+      for (int t = last[v]+1; t < i; t++) {
+        int j = q[t];
+        if (!seen[j] && isadj[v][j]) {
+          seen[j] = 1;
+          fix(v, j);
+        }
+      }
+      for (int t = last[v]+1; t < i; t++) {
+        seen[q[t]] = 0;
+      }
+    }
+    last[v] = i;
+    A[v] = N + 1 + i;
+    cout << ans << '\n';
+  }
 }
