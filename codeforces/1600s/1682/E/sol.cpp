@@ -59,25 +59,73 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-ll solve() {
-  vector<int> X(3);
-  ll sum = 0;
-  F0R(i, 3) {
-    cin >> X[i];
-    sum += X[i];
-  }
-  if (sum % 3 != 0) return -1;
-  ll m = sum / 3;
-  ll ans = 0;
-  F0R(i, 3) {
-    if (abs(m - X[i]) % 2 != 0) return -1;
-    ans += abs(m - X[i]) / 2;
-  }
-  return ans % 2 == 0 ? ans / 2 : -1;
-}
-
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int T; cin >> T;
-  while (T--) cout << solve() << '\n';
+  int N, M; cin >> N >> M;
+  vector<int> P(N);
+  F0R(i, N) {
+    cin >> P[i];
+    P[i]--;
+  }
+
+  vector<vector<int>> adj(N);
+  map<pair<int, int>, int> id;
+  F0R(i, M) {
+    int a, b; cin >> a >> b;
+    a--, b--;
+    adj[a].push_back(b);
+    adj[b].push_back(a);
+    id[{a, b}] = id[{b, a}] = i;
+  }
+
+  vector<bool> vis(N, false);
+  auto dfs = y_combinator([&](auto dfs, int i, vector<int>& cyc) -> void {
+    vis[i] = 1;
+    cyc.push_back(i);
+    if (!vis[P[i]]) dfs(P[i], cyc);
+  });
+
+  vector<int> order(N);
+  vector<vector<int>> g(M);
+  vector<int> indegree(M);
+  F0R(i, N) {
+    if (!vis[i]) {
+      vector<int> cyc;
+      dfs(i, cyc);
+      F0R(j, sz(cyc)) order[cyc[j]] = j;
+
+      vector<int> v;
+      for (auto j: cyc) {
+        sort(all(adj[j]), [&](int a, int b) {
+          a = order[a], b = order[b];
+          if (a < order[j]) a += N;
+          if (b < order[j]) b += N;
+          return a < b;
+        });
+        for (auto a: adj[j]) v.push_back(id[{j, a}]);
+        for (int k = 0; k + 1 < sz(adj[j]); k++) {
+          int a = id[{j, adj[j][k]}];
+          int b = id[{j, adj[j][k+1]}];
+          g[a].push_back(b);
+          indegree[b]++;
+        }
+      }
+
+      sort(all(v)); v.erase(unique(all(v)), v.end());
+      queue<int> q;
+      for (auto j: v) {
+        if (!indegree[j]) q.push(j);
+      }
+      while (!q.empty()) {
+        int f = q.front(); q.pop();
+        cout << (f+1) << ' ';
+        for (auto j: g[f]) {
+          if (--indegree[j] == 0) {
+            q.push(j);
+          }
+        }
+      }
+    }
+  }
+  cout << '\n';
 }

@@ -59,25 +59,39 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-ll solve() {
-  vector<int> X(3);
-  ll sum = 0;
-  F0R(i, 3) {
-    cin >> X[i];
-    sum += X[i];
+void solve() {
+  int N, M; cin >> N >> M;
+  vector<int> A(N);
+  map<int, vector<int>> B;
+  F0R(i, N) {
+    cin >> A[i];
+    B[A[i]].push_back(0);
   }
-  if (sum % 3 != 0) return -1;
-  ll m = sum / 3;
+  FOR(t, 1, M+1) {
+    int i, x; cin >> i >> x;
+    i--;
+    B[A[i]].push_back(t);
+    A[i] = x;
+    B[A[i]].push_back(t);
+  }
+
   ll ans = 0;
-  F0R(i, 3) {
-    if (abs(m - X[i]) % 2 != 0) return -1;
-    ans += abs(m - X[i]) / 2;
+  for (auto [x, v]: B) {
+    v.push_back(M+1);
+    // cout << x << ": " << v << endl;
+
+    ans += 1LL * M * (M + 1) / 2;
+    int n = 0;
+    for (int i = 0; i < sz(v); i += 2) {
+      n += v[i] - (i == 0 ? 0 : v[i-1]);
+    }
+    ans -= 1LL * n * (n - 1) / 2;
   }
-  return ans % 2 == 0 ? ans / 2 : -1;
+  cout << ans << '\n';
 }
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
   int T; cin >> T;
-  while (T--) cout << solve() << '\n';
+  while (T--) solve();
 }

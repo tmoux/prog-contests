@@ -61,4 +61,38 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
+  int N; cin >> N;
+  vector<ll> A(N);
+  ll sum = 0;
+  auto digitsum = [](ll x) {
+    int res = 0;
+    while (x) {
+      res += x % 10;
+      x /= 10;
+    }
+    return res;
+  };
+
+  F0R(i, N) {
+    cin >> A[i];
+    sum += 2LL * N * digitsum(A[i]);
+  }
+
+  ll carries = 0;
+  ll mult = 1;
+  F0R(i, 15) {
+    mult *= 10;
+    vector<ll> v;
+    F0R(j, N) {
+      v.push_back(A[j] % mult);
+    }
+    sort(all(v));
+    for (auto x: v) {
+      auto it = lower_bound(all(v), mult - x);
+      carries += std::distance(it, v.end());
+    }
+  }
+
+  sum -= 9 * carries;
+  cout << sum << '\n';
 }

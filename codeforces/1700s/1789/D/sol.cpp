@@ -59,25 +59,79 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-ll solve() {
-  vector<int> X(3);
-  ll sum = 0;
-  F0R(i, 3) {
-    cin >> X[i];
-    sum += X[i];
+void solve() {
+  int N; cin >> N;
+  const int mx = 2000;
+  bitset<mx> all;
+  F0R(i, N) all[i] = 1;
+  bitset<mx> A, B;
+  cin >> A >> B;
+
+  if (A == 0 && B == 0) {
+    cout << 0 << '\n';
   }
-  if (sum % 3 != 0) return -1;
-  ll m = sum / 3;
-  ll ans = 0;
-  F0R(i, 3) {
-    if (abs(m - X[i]) % 2 != 0) return -1;
-    ans += abs(m - X[i]) / 2;
+  else if (A != 0 && B != 0) {
+    vector<int> moves;
+    auto add_move = [&](int k) {
+      moves.push_back(-k);
+      if (k < 0) A = (A ^ (A << (-k))) & all;
+      else A = (A ^ (A >> k)) & all;
+    };
+    int i = -1, j = -1;
+    for (int k = N-1; k >= 0; k--) {
+      if (A[k]) {
+        i = k;
+        break;
+      }
+    }
+    for (int k = 0; k < N; k++) {
+      if (B[k]) {
+        j = k;
+        break;
+      }
+    }
+    if (i < j) {
+      add_move(i - j);
+      i = j;
+    }
+    for (int k = j-1; k >= 0; k--) {
+      if (A[k]) {
+        // zero out
+        add_move(i - k);
+      }
+    }
+
+
+    int idx = -1;
+    for (int k = 0; k < N; k++) {
+      if (A[k]) {
+        idx = k;
+        break;
+      }
+    }
+    if (idx > j) add_move(idx - j);
+    for (int k = j+1; k < N; k++) {
+      if (A[k] != B[k]) {
+        add_move(j - k);
+      }
+    }
+    // cout << A << '\n';
+    // cout << B << endl;
+
+    assert(A == B);
+    cout << sz(moves) << '\n';
+    for (auto k: moves) {
+      cout << k << ' ';
+    }
+    cout << '\n';
   }
-  return ans % 2 == 0 ? ans / 2 : -1;
+  else {
+    cout << -1 << '\n';
+  }
 }
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
   int T; cin >> T;
-  while (T--) cout << solve() << '\n';
+  while (T--) solve();
 }

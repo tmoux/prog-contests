@@ -61,4 +61,27 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
+  int N; cin >> N;
+  vector<double> A(N);
+  F0R(i, N) {
+    cin >> A[i];
+  }
+  sort(all(A), [](double x, double y) {
+    return 1 / x < 1 / y;
+  });
+  vector<double> v;
+  F0R(i, 3) v.push_back(A[i]);
+  for (int i = max(3, sz(A)-3); i < sz(A); i++) v.push_back(A[i]);
+
+  double mn = 1e18, mx = -1e18;
+  F0R(i, sz(v)) {
+    FOR(j, i+1, sz(v)) {
+      FOR(k, j+1, sz(v)) {
+        double x = (v[i] + v[j] + v[k]) / (v[i] * v[j] * v[k]);
+        ckmin(mn, x);
+        ckmax(mx, x);
+      }
+    }
+  }
+  cout << fixed << setprecision(20) << mn << ' ' << mx << '\n';
 }

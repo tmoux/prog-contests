@@ -244,17 +244,18 @@ struct lazy_segtree {
 };
 
 namespace Seg {
-  const int INF = 1e9;
+  const ll INF = 1e18;
   struct S {
-    int x, mx, size;
+    ll sum, mx;
+    int size;
   };
-  using F = int;
-  S op(S a, S b) { return {a.x + b.x, max(a.mx, b.mx), a.size + b.size}; }
+  using F = ll;
+  S op(S a, S b) { return {a.sum + b.sum, max(a.mx, b.mx), a.size + b.size}; }
   S e() { return {0, -INF, 1}; }
 
   S mapping(F l, S r) {
     if (r.mx == -INF) return {l * r.size, l, r.size};
-    return {r.x + l * r.size, r.mx + l, r.size};
+    return {r.sum + l * r.size, r.mx + l, r.size};
   }
   F composition(F a, F b) {
     return a + b;
@@ -263,128 +264,26 @@ namespace Seg {
 }
 using segtree = lazy_segtree<Seg::S, Seg::op, Seg::e, Seg::F, Seg::mapping, Seg::composition, Seg::id>;
 
-segtree seg;
-
-// Invariant on ranges: for each [l, r], r+1 is always unoccupied.
-// This ensures we can always "extend" ranges to the right.
-
-const int maxn = 4e5+5;
-int N, A[maxn];
-set<pair<int, int>> S;
-
-vector<pair<int, int>> adds[maxn], removes[maxn];
-int T = 0;
-
-void remove(set<pair<int, int>>::iterator it) {
-  removes[T].push_back(*it);
-  S.erase(it);
-}
-
-// perform deletions, not insertions
-pair<int, int> merge(pair<int, int> p) {
-  auto it = S.upper_bound({p.second, 1e9});
-  if (it == S.end() || it->first > p.second + 1) return p;
-  else {
-    p.second = it->second;
-    remove(it);
-    return merge(p);
-  }
-}
-
-void insert(pair<int, int> p) {
-  p = merge(p);
-  adds[T].push_back(p);
-  auto [it, f] = S.insert(p);
-  assert(f);
-}
-
-pair<int, int> extend(pair<int, int> p) {
-  auto it = S.upper_bound({p.second, 1e9});
-  if (it == S.end() || it->first > p.second + 1) {
-    p.second++;
-    p = merge(p);
-    return p;
-  }
-  else {
-    p.second = it->second;
-    remove(it);
-    return extend(p);
-  }
-}
-
-int find_cut(int i, int r) {
-  int t = seg.prod(i-1, i-1).x;
-  int lo = i-1, hi = r;
-  while (lo + 1 < hi) {
-    int mid = (lo + hi) / 2;
-    if (seg.prod(mid, r).mx < t) {
-      hi = mid;
-    }
-    else lo = mid;
-  }
-  return hi;
-}
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  seg = segtree(maxn+1);
-  cin >> N;
-
-  for (int i = 1; i <= maxn; i++) {
-    seg.apply(i, maxn, -1);
+  int N, Q; cin >> N >> Q;
+  vector<ll> A(N);
+  segtree seg(N);
+  F0R(i, N) {
+    cin >> A[i];
+    seg.set(i, {A[i], A[i], 1});
   }
-  for (T = 0; T < N; T++) {
-    int i; cin >> i;
-    if (A[i] == 0) {
-      // add
-      A[i] = 1;
-      seg.apply(i, maxn, 2);
-      auto it = S.upper_bound({i, 1e9});
-      if (it != S.begin() && i <= prev(it)->second) {
-        // currently in range
-        --it;
-        auto p = *it;
-        remove(it);
-        p = extend(extend(p));
-        insert(p);
-      }
-      else {
-        pair<int, int> p = {i, i};
-        if (it != S.begin() && prev(it)->second + 1 == i) {
-          --it;
-          p.first = it->first;
-          remove(it);
-        }
-        p = extend(p);
-        insert(p);
-      }
+  F0R(i, Q) {
+    int t; cin >> t;
+    if (t == 0) {
+      int p, x; cin >> p >> x;
+      seg.apply(p, x);
     }
     else {
-      // remove
-      A[i] = 0;
-      seg.apply(i, maxn, -2);
-      auto it = S.upper_bound({i, 1e9});
-      assert(it != S.begin());
-      --it;
-      auto [l, r] = *it;
-      assert(l <= i && i <= r);
-      remove(it);
-      // need to remove 2 0's somewhere
-      int r1 = find_cut(l, r);
-      if (r1 > l) insert({l, r1-1});
-      int r2 = find_cut(r1+1, r);
-      if (r2 > r1 + 1) insert({r1+1, r2-1});
-      if (r > r2) insert({r2+1, r});
-    }
-
-    // output
-    cout << sz(removes[T]) << '\n';
-    for (auto [l, r]: removes[T]) {
-      cout << l << ' ' << r << '\n';
-    }
-    cout << sz(adds[T]) << '\n';
-    for (auto [l, r]: adds[T]) {
-      cout << l << ' ' << r << '\n';
+      int l, r; cin >> l >> r;
+      r--;
+      cout << seg.prod(l, r).sum << '\n';
     }
   }
 }

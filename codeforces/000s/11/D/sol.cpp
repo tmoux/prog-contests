@@ -59,25 +59,51 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-ll solve() {
-  vector<int> X(3);
-  ll sum = 0;
-  F0R(i, 3) {
-    cin >> X[i];
-    sum += X[i];
-  }
-  if (sum % 3 != 0) return -1;
-  ll m = sum / 3;
-  ll ans = 0;
-  F0R(i, 3) {
-    if (abs(m - X[i]) % 2 != 0) return -1;
-    ans += abs(m - X[i]) / 2;
-  }
-  return ans % 2 == 0 ? ans / 2 : -1;
-}
+const int maxn = 19;
+int N, M;
+int adj[maxn][maxn];
+ll dp[maxn][1 << maxn];
+int start[1 << maxn];
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int T; cin >> T;
-  while (T--) cout << solve() << '\n';
+  cin >> N >> M;
+  F0R(i, M) {
+    int a, b; cin >> a >> b;
+    a--, b--;
+    adj[a][b] = adj[b][a] = 1;
+  }
+  vector<vector<int>> masks(N+1);
+  F0R(mask, 1 << N) {
+    masks[__builtin_popcount(mask)].push_back(mask);
+    F0R(i, N) {
+      if (mask & (1 << i)) {
+        start[mask] = i;
+        break;
+      }
+    }
+  }
+
+  F0R(i, N) {
+    dp[i][1 << i] = 1;
+  }
+  ll ans = 0;
+  FOR(l, 1, N+1) {
+    F0R(i, N) {
+      for (auto mask: masks[l]) {
+        int s = start[mask];
+        if (__builtin_popcount(mask) >= 3 && adj[i][s]) {
+          ans += dp[i][mask];
+        }
+
+        FOR(j, s+1, N) {
+          if (!(mask & (1 << j)) && adj[i][j]) {
+            dp[j][mask | (1 << j)] += dp[i][mask];
+          }
+        }
+      }
+    }
+  }
+
+  cout << ans / 2 << endl;
 }

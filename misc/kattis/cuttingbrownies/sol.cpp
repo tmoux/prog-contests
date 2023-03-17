@@ -59,25 +59,54 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-ll solve() {
-  vector<int> X(3);
-  ll sum = 0;
-  F0R(i, 3) {
-    cin >> X[i];
-    sum += X[i];
+const int maxn = 505;
+int dp[maxn][maxn][2];
+
+int f(int n, int m, int p) {
+  int& res = dp[n][m][p];
+  if (res != -1) return res;
+  if (n == 1 && m == 1) return 0;
+  if (p) {
+    for (int i = 1; i < m; i++) {
+      if (f(n, i, p^1)) {
+        if (f(n, m-i, p)) return res = 1;
+      }
+      else {
+        if (!f(n, m-i, p^1)) return res = 1;
+      }
+    }
   }
-  if (sum % 3 != 0) return -1;
-  ll m = sum / 3;
-  ll ans = 0;
-  F0R(i, 3) {
-    if (abs(m - X[i]) % 2 != 0) return -1;
-    ans += abs(m - X[i]) / 2;
+  else {
+    for (int i = 1; i < n; i++) {
+      if (f(i, m, p^1)) {
+        if (f(n-i, m, p)) return res = 1;
+      }
+      else {
+        if (!f(n-i, m, p^1)) return res = 1;
+      }
+    }
   }
-  return ans % 2 == 0 ? ans / 2 : -1;
+  return res = 0;
+}
+
+void solve() {
+  int N, M; cin >> N >> M;
+  string s; cin >> s;
+  int w = f(N, M, s == "Harry");
+  cout << s << (w ? " can " : " cannot ") << "win\n";
 }
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
+  memset(dp, -1, sizeof dp);
+  int N = 20;
+  F0R(i, N) {
+    F0R(j, N) {
+      cout << f(i, j, 0) << ' ';
+    }
+    cout << '\n';
+  }
+  return 0;
   int T; cin >> T;
-  while (T--) cout << solve() << '\n';
+  while (T--) solve();
 }

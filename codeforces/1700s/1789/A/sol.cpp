@@ -59,25 +59,24 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-ll solve() {
-  vector<int> X(3);
-  ll sum = 0;
-  F0R(i, 3) {
-    cin >> X[i];
-    sum += X[i];
+void solve() {
+  int N; cin >> N;
+  vector<int> A(N);
+  F0R(i, N) {
+    cin >> A[i];
   }
-  if (sum % 3 != 0) return -1;
-  ll m = sum / 3;
-  ll ans = 0;
-  F0R(i, 3) {
-    if (abs(m - X[i]) % 2 != 0) return -1;
-    ans += abs(m - X[i]) / 2;
+  int g = 1e9;
+  F0R(i, N) {
+    FOR(j, i+1, N) {
+      ckmin(g, __gcd(A[i], A[j]));
+    }
   }
-  return ans % 2 == 0 ? ans / 2 : -1;
+
+  cout << (g <= 2 ? "Yes" : "No") << '\n';
 }
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
   int T; cin >> T;
-  while (T--) cout << solve() << '\n';
+  while (T--) solve();
 }

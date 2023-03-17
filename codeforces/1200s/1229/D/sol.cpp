@@ -59,9 +59,88 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-// If we fix L, only at most ~5 possible distinct R positions
-// Given a set of permutations, find the size of the subgroup it generates, in O(1) or O(log n)
+const int maxn = 2e5+5;
+int N, K;
+vector<int> PP[maxn];
+using perm = vector<int>;
+using group = vector<perm>;
+
+perm operator*(perm a, perm b) {
+  perm r(K);
+  F0R(i, K) {
+    r[i] = b[a[i]];
+  }
+  return r;
+}
+
+map<perm, int> mp;
+const int MX = 120;
+int T[MX][MX];
+int P = 0;
+
+bitset<MX> closure(vector<int> g) {
+  bitset<MX> r; r[0] = 1;
+  queue<int> q; q.push(0);
+  while (!q.empty()) {
+    int c = q.front(); q.pop();
+    for (int p: g) {
+      int nc = T[p][c];
+      if (!r[nc]) {
+        r[nc] = 1;
+        q.push(nc);
+      }
+    }
+  }
+  return r;
+}
+
+bool containedIn(vector<int> g, int i) {
+  return g[i];
+}
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
+  cin >> N >> K;
+  F0R(i, N) {
+    PP[i].resize(K);
+    F0R(j, K) {
+      cin >> PP[i][j];
+      PP[i][j]--;
+    }
+  }
+
+  vector<int> p(K); iota(all(p), 0);
+  vector<vector<int>> perms;
+  do {
+    mp[p] = P++;
+    perms.push_back(p);
+  } while (next_permutation(all(p)));
+  F0R(i, P) {
+    F0R(j, P) {
+      T[i][j] = mp[perms[i] * perms[j]];
+    }
+  }
+
+  ll ans = 0;
+  vector<pair<int, bitset<MX>>> groups;
+  F0R(r, N) {
+    vector<int> generators = {mp[PP[r]]};
+    bitset<MX> curGroup = closure(generators);
+
+    vector<pair<int, bitset<MX>>> ngroups = {{r, curGroup}};
+    for (auto [i, g]: groups) {
+      int idx = mp[PP[i]];
+      if (!curGroup[idx]) {
+        generators.push_back(idx);
+        curGroup = closure(generators);
+        ngroups.push_back({i, curGroup});
+      }
+    }
+    groups = ngroups;
+    F0R(i, sz(groups)) {
+      int len = groups[i].first - (i + 1 < sz(groups) ? groups[i+1].first : -1);
+      ans += groups[i].second.count() * len;
+    }
+  }
+  cout << ans << '\n';
 }
