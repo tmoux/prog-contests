@@ -12,7 +12,7 @@ struct Fenwick
             bit[i] += x;
     }
 
-    T sum(T i) {
+    T sum(int i) {
         T r = 0;
         for (; i; i -= i & (-i)) {
             r += bit[i];
