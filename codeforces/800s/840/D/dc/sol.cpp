@@ -59,6 +59,10 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
+const int maxn = 3e5+5;
+int N, Q;
+
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
+  cin >> N >> Q;
 }

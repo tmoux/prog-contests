@@ -59,12 +59,79 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-void solve() {
+const int maxn = 3e5+5;
+int freq[maxn];
 
+void update(int x, int d) {
+  freq[x] += d;
 }
+
+struct Query
+{
+  int bucket, l, r, k, id;
+
+  bool operator<(const Query& rhs) const {
+    if (bucket != rhs.bucket) {
+      return bucket < rhs.bucket;
+    }
+    else return r < rhs.r;
+  }
+};
+
+int N, Q, A[maxn];
+vector<int> v[maxn];
+int ans[maxn];
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int T; cin >> T;
-  while (T--) solve();
+  cin >> N >> Q;
+  FOR(i, 1, N+1) {
+    cin >> A[i];
+  }
+
+  vector<Query> queries;
+  int size = (int)(sqrt(Q) + 1);
+  F0R(i, Q) {
+    ans[i] = 1e9;
+    int l, r, k;
+    cin >> l >> r >> k;
+    queries.push_back({l/size, l, r, k, i});
+  }
+  sort(all(queries));
+
+  int L = 1, R = 1;
+  for (Query q: queries) {
+    while (L <= q.l) {
+      update(A[L], -1);
+      L++;
+    }
+
+    while (L > q.l) {
+      update(A[L-1], 1);
+      L--;
+    }
+
+    while (R <= q.r) {
+      update(A[R], 1);
+      R++;
+    }
+
+    while (R > q.r + 1) {
+      update(A[R-1], -1);
+      R--;
+    }
+    const int B = 100;
+    uniform_int_distribution<int> dist(q.l, q.r);
+    int target = (q.r - q.l + 1) / q.k + 1;
+    REP(B) {
+      int i = dist(rng);
+      if (freq[A[i]] >= target) {
+        ckmin(ans[q.id], A[i]);
+      }
+    }
+  }
+
+  F0R(i, Q) {
+    cout << (ans[i] < 1e9 ? ans[i] : -1) << '\n';
+  }
 }
