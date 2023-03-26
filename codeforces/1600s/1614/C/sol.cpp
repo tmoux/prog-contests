@@ -59,23 +59,6 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-vector<int> value(vector<int> p) {
-  vector<int> v(sz(p));
-  for (int i = 0; i < sz(p); i++) {
-    for (int j = 0; j < i; j++) {
-      if (p[j] > p[i]) v[i]++;
-    }
-  }
-  return v;
-}
-
-vector<int> iter(vector<int> p) {
-  for (int i = 0; i < sz(p)-1; i++) {
-    if (p[i] > p[i+1]) swap(p[i], p[i+1]);
-  }
-  return p;
-}
-
 namespace ModInt {
   template<int MOD>
   struct mod_int {
@@ -186,22 +169,23 @@ namespace ModInt {
     }
   };
 }
-const int MOD = 998244353;
+const int MOD = 1e9+7;
 using mint = ModInt::mod_int<MOD>;
 
 mint solve() {
-  int N, K; cin >> N >> K;
-  vector<int> A(N+1);
-  FOR(i, 1, N+1) {
-    cin >> A[i];
+  int N, M; cin >> N >> M;
+  int have = 0;
+  F0R(i, M) {
+    int l, r, x; cin >> l >> r >> x;
+    have |= x;
   }
-  mint ans = 1;
-  FOR(i, 1, N+1) {
-    if (i <= K) ans *= i;
-    else if (A[i-K] == -1) ans *= i;
-    else if (A[i-K] == 0) ans *= K + 1;
-    if (i >= N - K + 1 && A[i] > 0) {
-      return 0;
+
+  mint ans = 0;
+  mint mult = mint(2) ^ (N - 1);
+  F0R(k, 30) {
+    if (have & (1 << k)) {
+      mint add = mint(1 << k) * mult;
+      ans += add;
     }
   }
   return ans;
@@ -211,17 +195,4 @@ int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
   int T; cin >> T;
   while (T--) cout << solve() << '\n';
-
-  /*
-  int N; cin >> N;
-  vector<int> p(N); iota(all(p), 0);
-  do {
-    auto np = p;
-    REP(N) {
-      cout << np << ": " << value(np) << endl;
-      np = iter(np);
-    }
-    cout << endl;
-  } while (next_permutation(all(p)));
-  */
 }

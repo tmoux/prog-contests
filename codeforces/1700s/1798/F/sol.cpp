@@ -59,64 +59,85 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-const int maxn = 5005;
-ll dp[maxn];
+const int maxn = 205;
+int N, K;
+vector<int> A;
 
-int P1, P2;
-ll T1, T2;
-int H, s;
-
+int dp[maxn][maxn][maxn];
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  cin >> P1 >> T1;
-  cin >> P2 >> T2;
-  cin >> H >> s;
+  cin >> N >> K;
+  F0R(i, N) {
+    int x; cin >> x;
+    A.push_back(x);
+  }
+  vector<pair<int, int>> classes(K);
+  F0R(i, K) {
+    int s; cin >> s;
+    classes[i] = {s, i};
+  }
+  sort(all(classes));
 
-  int P = P1 + P2 - s;
-  P1 -= s;
-  P2 -= s;
-
-  ll ans = 1e18;
-  FOR(i, 1, H+1) dp[i] = 1e18;
-  FOR(i, 0, H+1) {
-    FOR(j, 1, H) {
-      ll t = T1 * j;
-      if (t >= max(T1, T2)) {
-        ll c1 = j - 1;
-        ll c2 = t / T2 - 1;
-        ckmin(dp[i], dp[max(0LL, i - P1 * c1 - P2 * c2 - P)] + t);
+  vector<vector<int>> ans(K);
+  int item;
+  F0R(idx, sz(classes)) {
+    auto [s, id] = classes[idx];
+    if (idx + 1 < sz(classes)) {
+      vector dp(2*s, vector(s+2, vector(s, -1)));
+      dp[0][0][0] = 0;
+      assert(sz(A) >= 2*s-1);
+      F0R(i, 2*s-1) {
+        F0R(j, s+1) {
+          F0R(sum, s) {
+            if (dp[i][j][sum] != -1) {
+              dp[i+1][j][sum] = 0;
+              dp[i+1][j+1][(sum+A[i])%s] = 1;
+            }
+          }
+        }
       }
+      assert(dp[2*s-1][s][0] != -1);
+      int cj = s, csum = 0;
+      vector<int> remove(sz(A));
+      for (int i = 2*s-1; i > 0; i--) {
+        assert(dp[i][cj][csum] != -1);
+        if (dp[i][cj][csum] == 1) {
+          cj--;
+          csum = (csum + s - (A[i-1] % s)) % s;
+          remove[i-1] = 1;
+        }
+      }
+      assert(cj == 0 && csum == 0);
+      vector<int> nA;
+      F0R(i, sz(A)) {
+        if (!remove[i]) {
+          nA.push_back(A[i]);
+        }
+        else {
+          ans[id].push_back(A[i]);
+        }
+      }
+      A = nA;
     }
-
-    FOR(j, 1, H) {
-      ll t = T2 * j;
-      if (t >= max(T1, T2)) {
-        ll c1 = t / T1 - 1;
-        ll c2 = j - 1;
-        ckmin(dp[i], dp[max(0LL, i - P1 * c1 - P2 * c2 - P)] + t);
+    else {
+      int total = 0;
+      assert(sz(A) == s-1);
+      for (auto x: A) {
+        ans[id].push_back(x);
+        total = (total + x) % s;
       }
-    }
-
-    FOR(j, 1, H+1) {
-      ll t = T1 * j;
-      ll c1 = j;
-      ll c2 = t / T2;
-      if (i + P1 * c1 + P2 * c2 >= H) {
-        ckmin(ans, dp[i] + t);
-      }
-    }
-
-    FOR(j, 1, H+1) {
-      ll t = T2 * j;
-      ll c1 = t / T1;
-      ll c2 = j;
-      if (i + P1 * c1 + P2 * c2 >= H) {
-        ckmin(ans, dp[i] + t);
-      }
+      item = (s - total) + s;
+      ans[id].push_back(item);
     }
   }
-  ckmin(ans, dp[H]);
 
-  cout << ans << '\n';
+  cout << item << '\n';
+  F0R(i, K) {
+    assert(accumulate(all(ans[i]), 0) % sz(ans[i]) == 0);
+    for (auto x: ans[i]) {
+      cout << x << ' ';
+    }
+    cout << '\n';
+  }
 }

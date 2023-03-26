@@ -59,64 +59,55 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-const int maxn = 5005;
-ll dp[maxn];
-
-int P1, P2;
-ll T1, T2;
-int H, s;
-
-
-int main() {
-  ios_base::sync_with_stdio(false); cin.tie(NULL);
-  cin >> P1 >> T1;
-  cin >> P2 >> T2;
-  cin >> H >> s;
-
-  int P = P1 + P2 - s;
-  P1 -= s;
-  P2 -= s;
-
-  ll ans = 1e18;
-  FOR(i, 1, H+1) dp[i] = 1e18;
-  FOR(i, 0, H+1) {
-    FOR(j, 1, H) {
-      ll t = T1 * j;
-      if (t >= max(T1, T2)) {
-        ll c1 = j - 1;
-        ll c2 = t / T2 - 1;
-        ckmin(dp[i], dp[max(0LL, i - P1 * c1 - P2 * c2 - P)] + t);
-      }
+void solve() {
+  int N; cin >> N;
+  vector<int> A(N);
+  F0R(i, N) {
+    cin >> A[i];
+  }
+  vector<int> S(N+1, -1); // -1 if invalid
+  S[N] = 0;
+  F0Rd(i, N) {
+    if (i+A[i]+1 > N || S[i+A[i]+1] == -1) S[i] = -1;
+    else S[i] = S[i+A[i]+1] + 1;
+  }
+  // cout << S << endl;
+  vector<int> range(N+1); // 1 to range[i]
+  vector<int> ans(N-1);
+  int mxS = 0;
+  for (int i = N-1; i >= 0; i--) {
+    range[i] = mxS + 1;
+    if (i+A[i]+1 < N) {
+      ckmax(range[i], range[i+A[i]+1] + 1);
     }
 
-    FOR(j, 1, H) {
-      ll t = T2 * j;
-      if (t >= max(T1, T2)) {
-        ll c1 = t / T1 - 1;
-        ll c2 = j - 1;
-        ckmin(dp[i], dp[max(0LL, i - P1 * c1 - P2 * c2 - P)] + t);
-      }
-    }
+    ckmax(mxS, S[i]);
 
-    FOR(j, 1, H+1) {
-      ll t = T1 * j;
-      ll c1 = j;
-      ll c2 = t / T2;
-      if (i + P1 * c1 + P2 * c2 >= H) {
-        ckmin(ans, dp[i] + t);
+    if (i < N-1) {
+      if (A[i] == S[i+1]) {
+        // 0
+        ans[i] = 0;
       }
-    }
-
-    FOR(j, 1, H+1) {
-      ll t = T2 * j;
-      ll c1 = t / T1;
-      ll c2 = j;
-      if (i + P1 * c1 + P2 * c2 >= H) {
-        ckmin(ans, dp[i] + t);
+      else if (S[i+1] != -1) {
+        ans[i] = 1;
+      }
+      else if (A[i] <= range[i+1]) {
+        ans[i] = 1;
+      }
+      else {
+        ans[i] = 2;
       }
     }
   }
-  ckmin(ans, dp[H]);
 
-  cout << ans << '\n';
+  for (auto x: ans) {
+    cout << x << ' ';
+  }
+  cout << '\n';
+}
+
+int main() {
+  ios_base::sync_with_stdio(false); cin.tie(NULL);
+  int T; cin >> T;
+  while (T--) solve();
 }

@@ -59,64 +59,71 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-const int maxn = 5005;
-ll dp[maxn];
+void solve() {
+  int N; cin >> N;
+  int A, B; cin >> A >> B;
+  vector<vector<int>> ans(A+1, vector<int>(B+1, 0));
 
-int P1, P2;
-ll T1, T2;
-int H, s;
+  vector<int> v(N);
+  F0R(i, N) cin >> v[i];
 
+  for (int s = 0; s <= A + B; s++) {
+    int minA = max(0, s - B);
+    int maxA = min(A, s);
+
+    int L = minA, R = maxA;
+    int l = minA, r = maxA;
+
+    for (auto x: v) {
+      if (x > 0) {
+        // decrease
+        l -= x, r -= x;
+        if (r <= minA) {
+          L = R = minA;
+          l = r = minA;
+        }
+        else {
+          int excess = max(0, minA - l);
+          ckmax(l, minA);
+          L += excess;
+        }
+      }
+      else {
+        x = abs(x);
+        // increase
+        l += x, r += x;
+        if (l >= maxA) {
+          L = R = maxA;
+          l = r = maxA;
+        }
+        else {
+          int excess = max(0, r - maxA);
+          ckmin(r, maxA);
+          R -= excess;
+        }
+      }
+    }
+
+    for (int i = minA; i <= L; i++) {
+      ans[i][s-i] = l;
+    }
+    for (int i = L + 1; i < R; i++) {
+      ans[i][s-i] = l + (i - L);
+    }
+    for (int i = R; i <= maxA; i++) {
+      ans[i][s-i] = r;
+    }
+  }
+
+  F0R(i, A+1) {
+    F0R(j, B+1) {
+      cout << ans[i][j] << ' ';
+    }
+    cout << '\n';
+  }
+}
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  cin >> P1 >> T1;
-  cin >> P2 >> T2;
-  cin >> H >> s;
-
-  int P = P1 + P2 - s;
-  P1 -= s;
-  P2 -= s;
-
-  ll ans = 1e18;
-  FOR(i, 1, H+1) dp[i] = 1e18;
-  FOR(i, 0, H+1) {
-    FOR(j, 1, H) {
-      ll t = T1 * j;
-      if (t >= max(T1, T2)) {
-        ll c1 = j - 1;
-        ll c2 = t / T2 - 1;
-        ckmin(dp[i], dp[max(0LL, i - P1 * c1 - P2 * c2 - P)] + t);
-      }
-    }
-
-    FOR(j, 1, H) {
-      ll t = T2 * j;
-      if (t >= max(T1, T2)) {
-        ll c1 = t / T1 - 1;
-        ll c2 = j - 1;
-        ckmin(dp[i], dp[max(0LL, i - P1 * c1 - P2 * c2 - P)] + t);
-      }
-    }
-
-    FOR(j, 1, H+1) {
-      ll t = T1 * j;
-      ll c1 = j;
-      ll c2 = t / T2;
-      if (i + P1 * c1 + P2 * c2 >= H) {
-        ckmin(ans, dp[i] + t);
-      }
-    }
-
-    FOR(j, 1, H+1) {
-      ll t = T2 * j;
-      ll c1 = t / T1;
-      ll c2 = j;
-      if (i + P1 * c1 + P2 * c2 >= H) {
-        ckmin(ans, dp[i] + t);
-      }
-    }
-  }
-  ckmin(ans, dp[H]);
-
-  cout << ans << '\n';
+  solve();
 }

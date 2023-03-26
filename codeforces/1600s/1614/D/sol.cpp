@@ -59,64 +59,86 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-const int maxn = 5005;
-ll dp[maxn];
+const int maxx = 2e7+7;
 
-int P1, P2;
-ll T1, T2;
-int H, s;
+int spf[maxx];
 
+void init_spf() {
+  spf[1] = 1;
+  for (int i = 2; i < maxx; i++) if (!spf[i]) {
+      for (int j = i; j < maxx; j += i) {
+        if (!spf[j]) spf[j] = i;
+      }
+    }
+}
+
+int N, A[maxx];
+int cnt[maxx];
+
+ll dp[maxx];
+
+vector<int> primeDivisors(int x) {
+  map<int, int> mp;
+  while (x > 1) {
+    mp[spf[x]]++;
+    x /= spf[x];
+  }
+  vector<int> ps;
+  for (auto [p, c]: mp) ps.push_back(p);
+  return ps;
+}
+
+vector<int> divisors(int x) {
+  map<int, int> mp;
+    while (x > 1) {
+      mp[spf[x]]++;
+    x /= spf[x];
+  }
+  vector<pair<int, int>> v;
+  for (auto p: mp) v.push_back(p);
+
+  vector<int> divisors;
+  auto rec = y_combinator([&](auto rec, int i, int c) -> void {
+    if (i == sz(v)) divisors.push_back(c);
+    else {
+      int mult = 1;
+      for (int j = 0; j <= v[i].second; j++) {
+        rec(i+1, mult * c);
+        mult *= v[i].first;
+      }
+    }
+  });
+  rec(0, 1);
+  return divisors;
+}
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  cin >> P1 >> T1;
-  cin >> P2 >> T2;
-  cin >> H >> s;
-
-  int P = P1 + P2 - s;
-  P1 -= s;
-  P2 -= s;
-
-  ll ans = 1e18;
-  FOR(i, 1, H+1) dp[i] = 1e18;
-  FOR(i, 0, H+1) {
-    FOR(j, 1, H) {
-      ll t = T1 * j;
-      if (t >= max(T1, T2)) {
-        ll c1 = j - 1;
-        ll c2 = t / T2 - 1;
-        ckmin(dp[i], dp[max(0LL, i - P1 * c1 - P2 * c2 - P)] + t);
-      }
-    }
-
-    FOR(j, 1, H) {
-      ll t = T2 * j;
-      if (t >= max(T1, T2)) {
-        ll c1 = t / T1 - 1;
-        ll c2 = j - 1;
-        ckmin(dp[i], dp[max(0LL, i - P1 * c1 - P2 * c2 - P)] + t);
-      }
-    }
-
-    FOR(j, 1, H+1) {
-      ll t = T1 * j;
-      ll c1 = j;
-      ll c2 = t / T2;
-      if (i + P1 * c1 + P2 * c2 >= H) {
-        ckmin(ans, dp[i] + t);
-      }
-    }
-
-    FOR(j, 1, H+1) {
-      ll t = T2 * j;
-      ll c1 = t / T1;
-      ll c2 = j;
-      if (i + P1 * c1 + P2 * c2 >= H) {
-        ckmin(ans, dp[i] + t);
+  init_spf();
+  cin >> N;
+  F0R(i, N) {
+    int x; cin >> x;
+    A[x]++;
+  }
+  for (int i = 1; i < maxx; i++) {
+    if (A[i]) {
+      auto ds = divisors(i);
+      for (auto d: ds) {
+        cnt[d] += A[i];
       }
     }
   }
-  ckmin(ans, dp[H]);
 
+  ll ans = 0;
+  for (int i = maxx-1; i >= 1; i--) {
+    if (cnt[i]) {
+      ckmax(dp[i], 1LL * cnt[i] * i);
+      ckmax(ans, dp[i]);
+      for (int p: primeDivisors(i)) {
+        int d = i / p;
+        ckmax(dp[d], 1LL * (cnt[d] - cnt[i]) * d + dp[i]);
+      }
+    }
+  }
   cout << ans << '\n';
 }

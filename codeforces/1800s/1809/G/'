@@ -59,23 +59,6 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-vector<int> value(vector<int> p) {
-  vector<int> v(sz(p));
-  for (int i = 0; i < sz(p); i++) {
-    for (int j = 0; j < i; j++) {
-      if (p[j] > p[i]) v[i]++;
-    }
-  }
-  return v;
-}
-
-vector<int> iter(vector<int> p) {
-  for (int i = 0; i < sz(p)-1; i++) {
-    if (p[i] > p[i+1]) swap(p[i], p[i+1]);
-  }
-  return p;
-}
-
 namespace ModInt {
   template<int MOD>
   struct mod_int {
@@ -189,39 +172,61 @@ namespace ModInt {
 const int MOD = 998244353;
 using mint = ModInt::mod_int<MOD>;
 
-mint solve() {
-  int N, K; cin >> N >> K;
-  vector<int> A(N+1);
-  FOR(i, 1, N+1) {
-    cin >> A[i];
-  }
-  mint ans = 1;
-  FOR(i, 1, N+1) {
-    if (i <= K) ans *= i;
-    else if (A[i-K] == -1) ans *= i;
-    else if (A[i-K] == 0) ans *= K + 1;
-    if (i >= N - K + 1 && A[i] > 0) {
-      return 0;
+namespace ModCombinatorics { // {{{
+  vector<int> inv, _fac, _ifac;
+  template<size_t N, int MOD>
+  void init() {
+    inv.resize(N);
+    _fac.resize(N);
+    _ifac.resize(N);
+    inv[0] = inv[1] = 1;
+    for (size_t i = 2; i < N; i++) {
+      inv[i] = (MOD - (1LL * (MOD/i) * inv[MOD%i]) % MOD) % MOD;
+    }
+    _fac[0] = _ifac[0] = 1;
+    for (size_t i = 1; i < N; i++) {
+      _fac[i] = (1LL * i * _fac[i-1]) % MOD;
+      _ifac[i] = (1LL * _ifac[i-1] * inv[i]) % MOD;
     }
   }
-  return ans;
-}
+
+  mint choose(int n, int k) {
+    if (n < k || k < 0) return 0;
+    return mint(1) * _fac[n] * _ifac[k] * _ifac[n-k];
+  }
+
+  mint fac(int n) {
+    return mint(_fac[n]);
+  }
+
+  mint ifac(int n) {
+    return mint(_ifac[n]);
+  }
+};
+// }}}
+namespace MC = ModCombinatorics;
+
+const int maxn = 1e6+6;
+int N, K, A[maxn], jmp[maxn];
+mint dp[maxn];
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int T; cin >> T;
-  while (T--) cout << solve() << '\n';
-
-  /*
-  int N; cin >> N;
-  vector<int> p(N); iota(all(p), 0);
-  do {
-    auto np = p;
-    REP(N) {
-      cout << np << ": " << value(np) << endl;
-      np = iter(np);
+  MC::init<maxn, MOD>();
+  cin >> N >> K;
+  F0R(i, N) cin >> A[i];
+  reverse(A, A + N);
+  {
+    int j = 0;
+    for (int i = 0; i < N; i++) {
+      while (j < N && A[i] - A[j] <= K) j++;
+      jmp[i] = j;
     }
-    cout << endl;
-  } while (next_permutation(all(p)));
-  */
+  }
+  dp[0] = 1;
+  for (int i = 0; i < N; i++) {
+    // add to middle
+  }
+
+  cout << dp[N] << '\n';
 }

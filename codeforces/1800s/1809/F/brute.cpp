@@ -59,64 +59,43 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-const int maxn = 5005;
-ll dp[maxn];
+void solve() {
+  int N, K; cin >> N >> K;
+  vector<int> A(2*N), B(2*N);
+  F0R(i, N) {
+    cin >> A[i];
+    A[i+N] = A[i];
+  }
+  F0R(i, N) {
+    cin >> B[i];
+    B[i+N] = B[i];
+  }
 
-int P1, P2;
-ll T1, T2;
-int H, s;
+  F0R(i, N) {
+    int h = 0;
+    ll cost = 0;
+    for (int j = i; j < i + N; j++) {
+      if (B[j] == 1) {
+        cost += K - h;
+        h = K;
+      }
+      else {
+        int add = max(0, A[j] - h);
+        cost += 2 * add;
+        h += add;
+      }
+      assert(h >= A[j]);
+      h -= A[j];
+    }
 
+    cost -= h;
+    cout << cost << ' ';
+  }
+  cout << '\n';
+}
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  cin >> P1 >> T1;
-  cin >> P2 >> T2;
-  cin >> H >> s;
-
-  int P = P1 + P2 - s;
-  P1 -= s;
-  P2 -= s;
-
-  ll ans = 1e18;
-  FOR(i, 1, H+1) dp[i] = 1e18;
-  FOR(i, 0, H+1) {
-    FOR(j, 1, H) {
-      ll t = T1 * j;
-      if (t >= max(T1, T2)) {
-        ll c1 = j - 1;
-        ll c2 = t / T2 - 1;
-        ckmin(dp[i], dp[max(0LL, i - P1 * c1 - P2 * c2 - P)] + t);
-      }
-    }
-
-    FOR(j, 1, H) {
-      ll t = T2 * j;
-      if (t >= max(T1, T2)) {
-        ll c1 = t / T1 - 1;
-        ll c2 = j - 1;
-        ckmin(dp[i], dp[max(0LL, i - P1 * c1 - P2 * c2 - P)] + t);
-      }
-    }
-
-    FOR(j, 1, H+1) {
-      ll t = T1 * j;
-      ll c1 = j;
-      ll c2 = t / T2;
-      if (i + P1 * c1 + P2 * c2 >= H) {
-        ckmin(ans, dp[i] + t);
-      }
-    }
-
-    FOR(j, 1, H+1) {
-      ll t = T2 * j;
-      ll c1 = t / T1;
-      ll c2 = j;
-      if (i + P1 * c1 + P2 * c2 >= H) {
-        ckmin(ans, dp[i] + t);
-      }
-    }
-  }
-  ckmin(ans, dp[H]);
-
-  cout << ans << '\n';
+  int T; cin >> T;
+  while (T--) solve();
 }

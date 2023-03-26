@@ -59,64 +59,44 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-const int maxn = 5005;
-ll dp[maxn];
+vector<int> getDivisors(int x) {
+  vector<int> r;
+  for (int i = 1; i*i <= x; i++) {
+    if (x % i == 0) {
+      r.push_back(i);
+      if (x / i > i) r.push_back(x / i);
+    }
+  }
+  return r;
+}
 
-int P1, P2;
-ll T1, T2;
-int H, s;
+ll lcm(ll a, ll b) {
+  return a * b / __gcd(a, b);
+}
 
+int solve() {
+  int N; cin >> N;
+  vector<int> A(N), B(N);
+  F0R(i, N) {
+    cin >> A[i] >> B[i];
+  }
+  int ans = 1;
+  ll gc = 1LL * A[0] * B[0];
+  ll lc = B[0];
+  F0R(i, N) {
+    gc = __gcd(gc, 1LL * A[i] * B[i]);
+    lc = lcm(lc, B[i]);
+    if (gc % lc != 0) {
+      gc = 1LL * A[i] * B[i];
+      lc = B[i];
+      ans++;
+    }
+  }
+  return ans;
+}
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  cin >> P1 >> T1;
-  cin >> P2 >> T2;
-  cin >> H >> s;
-
-  int P = P1 + P2 - s;
-  P1 -= s;
-  P2 -= s;
-
-  ll ans = 1e18;
-  FOR(i, 1, H+1) dp[i] = 1e18;
-  FOR(i, 0, H+1) {
-    FOR(j, 1, H) {
-      ll t = T1 * j;
-      if (t >= max(T1, T2)) {
-        ll c1 = j - 1;
-        ll c2 = t / T2 - 1;
-        ckmin(dp[i], dp[max(0LL, i - P1 * c1 - P2 * c2 - P)] + t);
-      }
-    }
-
-    FOR(j, 1, H) {
-      ll t = T2 * j;
-      if (t >= max(T1, T2)) {
-        ll c1 = t / T1 - 1;
-        ll c2 = j - 1;
-        ckmin(dp[i], dp[max(0LL, i - P1 * c1 - P2 * c2 - P)] + t);
-      }
-    }
-
-    FOR(j, 1, H+1) {
-      ll t = T1 * j;
-      ll c1 = j;
-      ll c2 = t / T2;
-      if (i + P1 * c1 + P2 * c2 >= H) {
-        ckmin(ans, dp[i] + t);
-      }
-    }
-
-    FOR(j, 1, H+1) {
-      ll t = T2 * j;
-      ll c1 = t / T1;
-      ll c2 = j;
-      if (i + P1 * c1 + P2 * c2 >= H) {
-        ckmin(ans, dp[i] + t);
-      }
-    }
-  }
-  ckmin(ans, dp[H]);
-
-  cout << ans << '\n';
+  int T; cin >> T;
+  while (T--) cout << solve() << '\n';
 }
