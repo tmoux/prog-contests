@@ -42,7 +42,7 @@ int main()
             return (a.first+a.second) > (b.first+b.second);
             });
     for (auto p: v) {
-        if (p.first > r) {
+        if (p.first > r || r + p.second < 0) {
             cout << "NO\n";
             return 0;
         }

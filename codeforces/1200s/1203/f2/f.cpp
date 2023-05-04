@@ -46,14 +46,15 @@ int main()
     }
     while (!v.empty()) {
         sort(v.begin(),v.end(),[](auto a, auto b) {
+            cout << "OK" << endl;
             if (r+a.second < b.first) return false;
             if (r+b.second < a.first) return true;
             return true;});
-        if (r >= v[0].first) {
+        if (r >= v[0].first && r + v[0].second >= 0) {
             r += v[0].second;
+            cout << "adding " << v[0].second << endl;
             ans++;
             v.erase(v.begin());
-            if (r < 0) break;
         }
         else {
             break;

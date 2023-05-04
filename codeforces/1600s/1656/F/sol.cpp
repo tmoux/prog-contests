@@ -52,6 +52,79 @@ ostream& operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
+const ll INF = LLONG_MAX;
+struct Tracker {
+  ll mn, mx, t;
+  vector<ll> v;
+  Tracker(ll x, ll _t) {
+    mn = mx = x;
+    t = _t;
+    v.push_back(x);
+  }
+
+  void add(ll x) {
+    ckmin(mn, x);
+    ckmax(mx, x);
+    v.push_back(x);
+  }
+
+  ll query(ll x) {
+    return min((mn + t) * x + t * mn,
+               (mx + t) * x + t * mx);
+  }
+};
+
+ll solvePos(int N, vector<ll> A) {
+  sort(all(A), greater());
+  ll sum = std::accumulate(all(A), 0LL);
+  sum += A[N-1] * (N - 2);
+  if (sum > 0) return INF;
+  auto calc = [&](ll t) -> ll {
+    Tracker LC(A[0], t);
+
+    ll mst = 0;
+    for (int l = 1, r = N-1; l <= r;) {
+      ll ql = LC.query(A[l]), qr = LC.query(A[r]);
+      if (ql <= qr) {
+        // remove min
+        mst += ql;
+        LC.add(A[l++]);
+      }
+      else {
+        // remove max
+        mst += qr;
+        LC.add(A[r--]);
+      }
+    }
+    return mst;
+  };
+  ll lo = -1, hi = 2e6;
+  while (lo + 1 < hi) {
+    ll mid = (lo + hi) / 2;
+    if (calc(mid) > calc(mid+1)) {
+      hi = mid;
+    }
+    else lo = mid;
+  }
+  return calc(hi);
+}
+
+void solve() {
+  int N; cin >> N;
+  vector<ll> A(N), B(N);
+  F0R(i, N) {
+    cin >> A[i];
+    B[i] = -A[i];
+  }
+  ll ans = max(solvePos(N, A), solvePos(N, B));
+  if (ans < INF) {
+    cout << ans << '\n';
+  }
+  else cout << "INF" << '\n';
+}
+
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
+  int T; cin >> T;
+  while (T--) solve();
 }

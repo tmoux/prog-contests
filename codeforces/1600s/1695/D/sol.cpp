@@ -68,7 +68,23 @@ int solve() {
     adj[x].push_back(y);
     adj[y].push_back(x);
   }
-
+  if (N == 1) return 0;
+  int i = 0;
+  while (i < N && sz(adj[i]) <= 2) i++;
+  if (i == N) return 1;
+  auto dfs = y_combinator([&](auto dfs, int i, int p) -> int {
+    int r = 0;
+    int c = 0;
+    for (int j: adj[i]) {
+      if (j == p) continue;
+      int x = dfs(j, i);
+      r += x;
+      if (x == 0) c++;
+    }
+    if (c > 1) r += c-1;
+    return r;
+  });
+  return dfs(i, i);
 }
 
 int main() {
