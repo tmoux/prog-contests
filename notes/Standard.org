@@ -1,0 +1,41 @@
+#+title: Collection of Standard Problems/Techniques
+
+## Counting Uncovered Spaces
+Problem: We are given intervals in a range [1, n]. We want to support the following queries:
+- Add an interval.
+- Remove an existing interval.
+- Query a range [l, r] and count how many spaces are not covered by any interval.
+See https://codeforces.com/contest/1418/problem/G
+
+Solution: If we are only given insertions, this can be solved by maintaining a disjoint set of intervals along with a segment tree.
+Every time we insert an interval, we merge all the neighboring intervals, so this is O(n log n) amortized. Everytime we add/remove an interval, we update the corresponding interval in the segment tree.
+
+There is a simpler solution, however. Note that if we maintain a segment tree of the frequency that a space is covered, this value is always nonnegative, so we can just maintain (minimum, # of occurrences) with a a lazy segtree, and check if the minimum is indeed 0.
+
+## Counting number of pairs with fixed difference/sum
+Problem:
+See https://codeforces.com/contest/827/problem/E
+
+Solution: Use FFT.
+
+## Comparing M-dimensional vectors
+Problem: Given N M-dimensional vectors, compute the partial order given component-wise ((a_1, a_2, ..., a_m) < (b_1, b_2, ..., b_m) if a_i < b_i for all i).
+
+Solution: Maintain a bitset for each vector, which represents the set of vectors that are smaller than it.
+Initially, all vectors are smaller than it.
+Process each dimension, maintaining a bitset that represents all vectors with the i'th component is less than x.
+Then AND this with each vector at the appropriate time.
+Time Complexity O(M N^2 / 64).
+
+## Determine whether a vector can be written as a linear combination of other vectors.
+
+## Given a multiset with additions/deletions, compute the sum of the smallest K numbers.
+More formally, support the following queries in O(log n):
+- Add x.
+- Delete x.
+- Query the sum of the k smallest numbers.
+
+Solution: This can be solved with a segment tree, where we maintain the sum and count. We walk down the segment tree, recursing on the left/right.
+
+## Find primes in the range [L, R], where R <= 1e14, R-L is small.
+Solution: Use segment sieve.

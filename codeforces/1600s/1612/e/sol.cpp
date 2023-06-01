@@ -1,9 +1,6 @@
 #include <bits/stdc++.h>
- 
 using namespace std;
- 
 using ll = long long;
-using ld = long double;
 
 // Template {{{
 #define FOR(i, a, b) for (int i=a; i<(b); i++)
@@ -76,8 +73,55 @@ ostream& operator<<(ostream& o, const U<T>& v)
 }
 // }}}
 
+struct Frac {
+  ll a, b;
+  bool operator<(const Frac& rhs) const {
+    return a * rhs.b < rhs.a * b;
+  }
+
+  friend ostream& operator<<(ostream& o, const Frac& v)  {
+    return o << v.a << " / " << v.b << endl;
+  }
+};
+
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int n; cin >> n;
+  int N; cin >> N;
+  const int maxn = 200001, maxk = 20;
+  vector<int> s(maxn);
+  vector<vector<int>> v(maxn);
+  F0R(i, N) {
+    int m, k; cin >> m >> k;
+    v[m].push_back(k);
+    s[m] += k;
+  }
 
+  pair<Frac, vector<int>> bestSmall = {{-1, 1}, {}};
+  FOR(t, 1, maxk+1) {
+    vector<pair<int, int>> vs;
+    FOR(j, 1, maxn) {
+      int sum = 0;
+      for (int k: v[j]) {
+        sum += min(t, k);
+      }
+      vs.push_back({sum, j});
+    }
+    sort(all(vs), greater());
+    int num = 0;
+    vector<int> tr;
+    F0R(i, t) {
+      num += vs[i].first;
+      tr.push_back(vs[i].second);
+    }
+    Frac f = {num, t};
+    if (bestSmall.first < f) {
+      bestSmall = {f, tr};
+    }
+  }
+
+  cout << sz(bestSmall.second) << '\n';
+  for (auto i: bestSmall.second) {
+    cout << i << ' ';
+  }
+  cout << '\n';
 }

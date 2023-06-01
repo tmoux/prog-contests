@@ -176,71 +176,49 @@ namespace atcoder {
 using atcoder::segtree;
 
 namespace Seg {
-  int op(int a, int b) { return min(a, b); }
-  int e() { return 1e9; }
+  int op(int a, int b) { return a + b; }
+
+  int e() { return 0; }
 }
-using SEG = segtree<int, Seg::op, Seg::e>;
 
-// Need a better equivalent condition for an array to be decinc.
-// Claim: a subarray is bad if we have a subsequence i < j < k < l
-// such that P_k > P_l > P_i > P_j (or reverse)
+void solve() {
+  string s; cin >> s;
+  map<char, int> mp;
+  for (char c: s) mp[c]++;
+  vector<char> p = {'A', 'N', 'O', 'T'};
+  pair<ll, string> ans;
+  ans = {-1, ""};
 
-const int maxn = 2e5+5;
-int N;
-
-vector<int> solveR(vector<int> P) {
-  vector<vector<int>> A(N), B(N);
-  vector<pair<int, int>> v;
-  F0R(i, N) {
-    while (!v.empty() && v.back().first < P[i]) v.pop_back();
-    if (!v.empty() && v.back().second > 0) B[v.back().second-1].push_back(i);
-    v.push_back({P[i], i});
-  }
-  v.clear();
-  F0Rd(i, N) {
-    while (!v.empty() && v.back().first > P[i]) v.pop_back();
-    if (!v.empty()) A[v.back().second].push_back(i);
-    v.push_back({P[i], i});
-  }
-
-  SEG seg(N);
-  vector<int> R(N, N);
-  F0Rd(idx, N) {
-    for (int l: B[idx]) {
-      seg.set(P[l], l);
+  auto check = [&](string t) -> ll {
+    map<char, int> M;
+    F0R(i, sz(t)) {
+      if (!M.count(t[i])) M[t[i]] = i;
     }
-    for (int i: A[idx]) {
-      R[i] = seg.prod(P[i], N-1);
+    vector<int> v(sz(t));
+    F0R(i, sz(s)) {
+      v[M[s[i]]++] = i;
     }
-  }
-  return R;
+    ll ans = 0;
+    segtree<int, Seg::op, Seg::e> seg(sz(v));
+    F0R(i, sz(v)) {
+      ans += seg.prod(v[i], sz(v)-1);
+      seg.set(v[i], 1);
+    }
+    return ans;
+  };
+
+  do {
+    string t;
+    for (char c: p) {
+      REP(mp[c]) t += c;
+    }
+    ckmax(ans, {check(t), t});
+  } while (next_permutation(all(p)));
+  cout << ans.second << '\n';
 }
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  cin >> N;
-  vector<int> P(N), Q(N);
-  F0R(i, N) {
-    cin >> P[i]; --P[i];
-    Q[i] = N-1-P[i];
-  }
-
-  auto R = solveR(P);
-  auto R2 = solveR(Q);
-  F0R(i, N) ckmin(R[i], R2[i]);
-
-  ll ans = 0;
-  int j = 0;
-  multiset<int> ms; ms.insert(1e9);
-  F0R(i, N) {
-    while (j < N && min(*ms.begin(), R[j]) > j) {
-      ms.insert(R[j]);
-      j++;
-    }
-    ans += j - i;
-    auto it = ms.find(R[i]);
-    assert(it != ms.end());
-    ms.erase(it);
-  }
-  cout << ans << '\n';
+  int T; cin >> T;
+  while (T--) solve();
 }
