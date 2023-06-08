@@ -59,50 +59,44 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-const int maxn = 5e5+5, maxk = 20;
-int N, A[maxn];
-vector<int> adj[maxn];
+const int maxn = 1e5+5;
+int N, M, Q;
+string S, T;
 
-bool seen[maxn];
-int par[maxk][maxn];
-
-void dfs(int i, int p) {
-  par[0][i] = p;
-  FOR(k, 1, maxk) {
-    par[k][i] = par[k-1][par[k-1][i]];
-  }
-  for (int j: adj[i]) {
-    if (j == p) continue;
-    dfs(j, i);
-  }
-}
+int SA[maxn], TA[maxn];
+int SB[maxn], TB[maxn];
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  cin >> N;
-  pair<int, int> mn = {2e9, -1};
-  F0R(i, N) {
-    cin >> A[i];
-    ckmin(mn, {A[i], i});
-  }
-  REP(N-1) {
-    int a, b; cin >> a >> b;
-    a--, b--;
-    adj[a].push_back(b);
-    adj[b].push_back(a);
-  }
-  int rt = mn.second;
-  dfs(rt, rt);
+  cin >> S >> T;
+  N = sz(S), M = sz(T);
+  for (char& c: S) if (c == 'C') c = 'B';
+  for (char& c: T) if (c == 'C') c = 'B';
 
-  auto getmn = [&](int i) -> int {
-    ll mn = 2e9;
-    for (int k = 0; k < maxk; k++) {
-      int j = par[k][i];
-      ckmin(mn, 1LL * A[j] * (1 + k) + A[i]);
+  FOR(i, 1, N+1) {
+    SA[i] = S[i-1] == 'A' ? 1 + SA[i-1] : 0;
+    SB[i] = SB[i-1] + (S[i-1] == 'B');
+  }
+  FOR(i, 1, M+1) {
+    TA[i] = T[i-1] == 'A' ? 1 + TA[i-1] : 0;
+    TB[i] = TB[i-1] + (T[i-1] == 'B');
+  }
+
+  cin >> Q;
+  REP(Q) {
+    int a, b, c, d; cin >> a >> b >> c >> d;
+    int x = SB[b] - SB[a-1];
+    int y = TB[d] - TB[c-1];
+    int k = min(b-a+1, SA[b]);
+    int j = min(d-c+1, TA[d]);
+
+    bool poss = x <= y && ((y-x) % 2 == 0);
+    if (poss) {
+      if (k == j && (x > 0 || x == y)) poss = 1;
+      else if (k > j) poss = x < y || (k - j) % 3 == 0;
+      else poss = 0;
     }
-    return mn;
-  };
-  ll ans = 0;
-  F0R(i, N) if (i != rt) ans += getmn(i);
-  cout << ans << '\n';
+    cout << poss;
+  }
+  cout << '\n';
 }

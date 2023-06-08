@@ -59,50 +59,82 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-const int maxn = 5e5+5, maxk = 20;
-int N, A[maxn];
-vector<int> adj[maxn];
+const int maxn = 2e5+5;
 
-bool seen[maxn];
-int par[maxk][maxn];
+namespace PSeg {
+  const int MV = 40000000;
+  int l[MV], r[MV];
+  int sum[MV];
+  int nv = 0;
+  int rp[maxn];
 
-void dfs(int i, int p) {
-  par[0][i] = p;
-  FOR(k, 1, maxk) {
-    par[k][i] = par[k-1][par[k-1][i]];
+  void reset() {
+    fill(sum, sum+nv, 0);
+    nv = 0;
   }
-  for (int j: adj[i]) {
-    if (j == p) continue;
-    dfs(j, i);
+
+  int build(int tl, int tr) {
+    if (tl == tr) return nv++;
+    int tm = (tl + tr) / 2;
+    int cv = nv;
+    nv++;
+    l[cv] = build(tl, tm);
+    r[cv] = build(tm+1, tr);
+    sum[cv] = sum[l[cv]] ^ sum[r[cv]];
+    return cv;
+  }
+
+  int query(int v, int tl, int tr, int L, int R) {
+    if (L > R) return 0;
+    if (L == tl && R == tr) return sum[v];
+    int tm = (tl+tr)/2;
+    return query(l[v], tl, tm, L, min(R, tm)) ^ query(r[v], tm+1, tr, max(L, tm+1), R);
+  }
+
+  int update(int v, int tl, int tr, int pos, int new_val) {
+    if (tl == tr) {
+      sum[nv] = new_val ^ sum[v];
+      return nv++;
+    }
+    int tm = (tl+tr)/2;
+    if (pos <= tm) {
+      int cv = nv; nv++;
+      l[cv] = update(l[v], tl, tm, pos, new_val);
+      r[cv] = r[v];
+      sum[cv] = sum[l[cv]] ^ sum[r[cv]];
+      return cv;
+    } else {
+      int cv = nv; nv++;
+      l[cv] = l[v];
+      r[cv] = update(r[v], tm+1, tr, pos, new_val);
+      sum[cv] = sum[l[cv]] ^ sum[r[cv]];
+      return cv;
+    }
   }
 }
+using PSeg::rp;
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  cin >> N;
-  pair<int, int> mn = {2e9, -1};
+  int N, M; cin >> N >> M;
+  vector<int> col(M);
   F0R(i, N) {
-    cin >> A[i];
-    ckmin(mn, {A[i], i});
+    int c; cin >> c; c--;
+    col[c] ^= 1;
   }
-  REP(N-1) {
-    int a, b; cin >> a >> b;
-    a--, b--;
-    adj[a].push_back(b);
-    adj[b].push_back(a);
-  }
-  int rt = mn.second;
-  dfs(rt, rt);
 
-  auto getmn = [&](int i) -> int {
-    ll mn = 2e9;
-    for (int k = 0; k < maxk; k++) {
-      int j = par[k][i];
-      ckmin(mn, 1LL * A[j] * (1 + k) + A[i]);
+  int Q; cin >> Q;
+  vector<vector<pair<int, int>>> queries(M);
+  vector<int> ans(Q);
+  F0R(i, Q) {
+    int L, R; cin >> L >> R;
+    L--, R--;
+
+    int ans = 0;
+    for (int j = L; j <= R; j++) {
+      if (col[j]) ans ^= j-L;
     }
-    return mn;
-  };
-  ll ans = 0;
-  F0R(i, N) if (i != rt) ans += getmn(i);
-  cout << ans << '\n';
+    cout << (ans ? 'A' : 'B');
+  }
+  cout << '\n';
 }

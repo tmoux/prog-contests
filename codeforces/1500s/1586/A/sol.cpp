@@ -59,50 +59,49 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-const int maxn = 5e5+5, maxk = 20;
-int N, A[maxn];
-vector<int> adj[maxn];
+const int maxn = 1e5+5;
+int spf[maxn];
 
-bool seen[maxn];
-int par[maxk][maxn];
+void init_spf() {
+  spf[1] = 1;
+  for (int i = 2; i < maxn; i++) if (!spf[i]) {
+      for (int j = i; j < maxn; j += i) {
+        if (!spf[j]) spf[j] = i;
+      }
+    }
+}
 
-void dfs(int i, int p) {
-  par[0][i] = p;
-  FOR(k, 1, maxk) {
-    par[k][i] = par[k-1][par[k-1][i]];
+void solve() {
+  int N; cin >> N;
+  vector<int> A(N);
+  F0R(i, N) {
+    cin >> A[i];
   }
-  for (int j: adj[i]) {
-    if (j == p) continue;
-    dfs(j, i);
+  int sum = std::accumulate(all(A), 0);
+  if (spf[sum] == sum) {
+    // find odd
+    int odd = -1;
+    F0R(i, N) if (A[i] % 2 == 1) {
+      odd = i;
+      break;
+    }
+    cout << N-1 << '\n';
+    F0R(i, N) {
+      if (i == odd) continue;
+      cout << i+1 << ' ';
+    }
+    cout << '\n';
+  }
+  else {
+    cout << N << '\n';
+    FOR(i, 1, N+1) cout << i << ' ';
+    cout << '\n';
   }
 }
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  cin >> N;
-  pair<int, int> mn = {2e9, -1};
-  F0R(i, N) {
-    cin >> A[i];
-    ckmin(mn, {A[i], i});
-  }
-  REP(N-1) {
-    int a, b; cin >> a >> b;
-    a--, b--;
-    adj[a].push_back(b);
-    adj[b].push_back(a);
-  }
-  int rt = mn.second;
-  dfs(rt, rt);
-
-  auto getmn = [&](int i) -> int {
-    ll mn = 2e9;
-    for (int k = 0; k < maxk; k++) {
-      int j = par[k][i];
-      ckmin(mn, 1LL * A[j] * (1 + k) + A[i]);
-    }
-    return mn;
-  };
-  ll ans = 0;
-  F0R(i, N) if (i != rt) ans += getmn(i);
-  cout << ans << '\n';
+  init_spf();
+  int T; cin >> T;
+  while (T--) solve();
 }

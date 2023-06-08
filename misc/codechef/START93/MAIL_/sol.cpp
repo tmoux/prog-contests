@@ -59,50 +59,43 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-const int maxn = 5e5+5, maxk = 20;
-int N, A[maxn];
-vector<int> adj[maxn];
-
-bool seen[maxn];
-int par[maxk][maxn];
-
-void dfs(int i, int p) {
-  par[0][i] = p;
-  FOR(k, 1, maxk) {
-    par[k][i] = par[k-1][par[k-1][i]];
+void solve() {
+  int N, M, K; cin >> N >> M >> K;
+  vector<int> X(K), D(K);
+  F0R(i, K) cin >> X[i];
+  F0R(i, K) cin >> D[i];
+  priority_queue<pair<int, int>> pq;
+  vector<int> p(N+1);
+  F0R(i, K) {
+    pq.push({D[i], X[i]});
+    p[X[i]] = D[i];
   }
-  for (int j: adj[i]) {
-    if (j == p) continue;
-    dfs(j, i);
+  vector<vector<int>> adj(N+1);
+  REP(M) {
+    int a, b; cin >> a >> b;
+    adj[a].push_back(b);
+    adj[b].push_back(a);
   }
+
+  while (!pq.empty()) {
+    auto [d, i] = pq.top(); pq.pop();
+    if (d > 1) {
+      for (int j: adj[i]) {
+        if (p[j] < d-1) {
+          p[j] = d-1;
+          pq.push({p[j], j});
+        }
+      }
+    }
+  }
+
+  bool poss = 1;
+  FOR(i, 1, N+1) if (p[i] == 0) poss = 0;
+  cout << (poss ? "YES" : "NO") << '\n';
 }
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  cin >> N;
-  pair<int, int> mn = {2e9, -1};
-  F0R(i, N) {
-    cin >> A[i];
-    ckmin(mn, {A[i], i});
-  }
-  REP(N-1) {
-    int a, b; cin >> a >> b;
-    a--, b--;
-    adj[a].push_back(b);
-    adj[b].push_back(a);
-  }
-  int rt = mn.second;
-  dfs(rt, rt);
-
-  auto getmn = [&](int i) -> int {
-    ll mn = 2e9;
-    for (int k = 0; k < maxk; k++) {
-      int j = par[k][i];
-      ckmin(mn, 1LL * A[j] * (1 + k) + A[i]);
-    }
-    return mn;
-  };
-  ll ans = 0;
-  F0R(i, N) if (i != rt) ans += getmn(i);
-  cout << ans << '\n';
+  int T; cin >> T;
+  while (T--) solve();
 }

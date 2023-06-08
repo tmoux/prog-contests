@@ -39,3 +39,9 @@ Solution: This can be solved with a segment tree, where we maintain the sum and 
 
 ## Find primes in the range [L, R], where R <= 1e14, R-L is small.
 Solution: Use segment sieve.
+
+## Stirling numbers
+https://en.wikipedia.org/wiki/Stirling_numbers_of_the_second_kind
+There is a O(N) formula, but we need to take powers of N, so we can compute S(n, k) in O(k log n).
+There is a generating function for rows (fixed n): https://codeforces.com/blog/entry/48603
+And a generating function for cols (fixed k) (see Wikipedia)

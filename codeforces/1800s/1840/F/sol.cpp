@@ -59,50 +59,66 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-const int maxn = 5e5+5, maxk = 20;
-int N, A[maxn];
-vector<int> adj[maxn];
-
-bool seen[maxn];
-int par[maxk][maxn];
-
-void dfs(int i, int p) {
-  par[0][i] = p;
-  FOR(k, 1, maxk) {
-    par[k][i] = par[k-1][par[k-1][i]];
+void solve() {
+  int N, M; cin >> N >> M;
+  map<int, vector<pair<int, int>>> shots;
+  int R; cin >> R;
+  REP(R) {
+    int t, d, x; cin >> t >> d >> x;
+    shots[t].push_back({d, x});
   }
-  for (int j: adj[i]) {
-    if (j == p) continue;
-    dfs(j, i);
+
+  int ans = 2e9;
+  vector<vector<vector<int>>> dp(2, vector<vector<int>>(N+1, vector<int>(M+1)));
+  dp[0][0][0] = 1;
+  for (int t = 1; ; t++) {
+    F0R(i, N+1) {
+      F0R(j, M+1) {
+        dp[1][i][j] = dp[0][i][j];
+        if (i > 0) dp[1][i][j] |= dp[0][i-1][j];
+        if (j > 0) dp[1][i][j] |= dp[0][i][j-1];
+      }
+    }
+    auto v = shots[t];
+    for (auto [d, x]: v) {
+      if (d == 1) {
+        for (int j = 0; j <= M; j++) {
+          dp[1][x][j] = 0;
+        }
+      }
+      else {
+        for (int j = 0; j <= N; j++) {
+          dp[1][j][x] = 0;
+        }
+      }
+    }
+    // DEBUG(t);
+    // F0R(i, N+1) {
+    //   F0R(j, M+1) {
+    //     cout << dp[1][i][j] << ' ';
+    //   }
+    //   cout << endl;
+    // }
+
+    if (dp[1][N][M]) {
+      ans = t;
+      break;
+    }
+    swap(dp[0], dp[1]);
+    bool p = 0;
+    F0R(i, N+1) {
+      F0R(j, M+1) {
+        dp[1][i][j] = 0;
+        p |= dp[0][i][j];
+      }
+    }
+    if (!p) break;
   }
+  cout << (ans < 2e9 ? ans : -1) << '\n';
 }
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  cin >> N;
-  pair<int, int> mn = {2e9, -1};
-  F0R(i, N) {
-    cin >> A[i];
-    ckmin(mn, {A[i], i});
-  }
-  REP(N-1) {
-    int a, b; cin >> a >> b;
-    a--, b--;
-    adj[a].push_back(b);
-    adj[b].push_back(a);
-  }
-  int rt = mn.second;
-  dfs(rt, rt);
-
-  auto getmn = [&](int i) -> int {
-    ll mn = 2e9;
-    for (int k = 0; k < maxk; k++) {
-      int j = par[k][i];
-      ckmin(mn, 1LL * A[j] * (1 + k) + A[i]);
-    }
-    return mn;
-  };
-  ll ans = 0;
-  F0R(i, N) if (i != rt) ans += getmn(i);
-  cout << ans << '\n';
+  int T; cin >> T;
+  while (T--) solve();
 }

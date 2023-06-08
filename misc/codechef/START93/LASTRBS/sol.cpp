@@ -59,50 +59,60 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-const int maxn = 5e5+5, maxk = 20;
-int N, A[maxn];
-vector<int> adj[maxn];
+void solve() {
+  int N; cin >> N;
+  string S; cin >> S;
+  vector<vector<vector<int>>> dp(N+2, vector<vector<int>>(N+2, vector<int>(2, -1)));
 
-bool seen[maxn];
-int par[maxk][maxn];
+  auto f = y_combinator([&](auto f, int i, int bal, int p) -> int {
+    if (bal < 0) return 0;
+    if (i == N) return bal == 0;
+    int& res = dp[i][bal][p];
+    if (res != -1) return res;
+    res = 0;
+    if (i > 0 && S[i] == S[i-1]) {
+      res = f(i+1, bal+(p?1:-1), p);
+    }
+    else {
+      res |= f(i+1, bal+1, 1);
+      res |= f(i+1, bal-1, 0);
+    }
+    // cout << i << ' ' << bal << ' ' << p << ": " << res << endl;
+    return res;
+  });
 
-void dfs(int i, int p) {
-  par[0][i] = p;
-  FOR(k, 1, maxk) {
-    par[k][i] = par[k-1][par[k-1][i]];
+  string ans;
+  auto recon = y_combinator([&](auto recon, int i, int bal, int p) -> void {
+    if (i == N) return;
+    if (i > 0 && S[i] == S[i-1]) {
+      ans += p ? '(' : ')';
+      recon(i+1, bal+(p?1:-1), p);
+    }
+    else {
+      if (f(i+1, bal+1, 1)) {
+        ans += '(';
+        recon(i+1, bal+1, 1);
+      }
+      else {
+        ans += ')';
+        recon(i+1, bal-1, 0);
+      }
+    }
+  });
+
+  bool poss = f(0, 0, 0);
+  if (poss) {
+    cout << "YES\n";
+    recon(0, 0, 0);
+    cout << ans << '\n';
   }
-  for (int j: adj[i]) {
-    if (j == p) continue;
-    dfs(j, i);
+  else {
+    cout << "NO\n";
   }
 }
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  cin >> N;
-  pair<int, int> mn = {2e9, -1};
-  F0R(i, N) {
-    cin >> A[i];
-    ckmin(mn, {A[i], i});
-  }
-  REP(N-1) {
-    int a, b; cin >> a >> b;
-    a--, b--;
-    adj[a].push_back(b);
-    adj[b].push_back(a);
-  }
-  int rt = mn.second;
-  dfs(rt, rt);
-
-  auto getmn = [&](int i) -> int {
-    ll mn = 2e9;
-    for (int k = 0; k < maxk; k++) {
-      int j = par[k][i];
-      ckmin(mn, 1LL * A[j] * (1 + k) + A[i]);
-    }
-    return mn;
-  };
-  ll ans = 0;
-  F0R(i, N) if (i != rt) ans += getmn(i);
-  cout << ans << '\n';
+  int T; cin >> T;
+  while (T--) solve();
 }

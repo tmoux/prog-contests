@@ -59,50 +59,55 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-const int maxn = 5e5+5, maxk = 20;
-int N, A[maxn];
-vector<int> adj[maxn];
+int sub(int x) {
+  cout << "- " << x << endl;
+  int i; cin >> i;
+  return i;
+}
+int add(int x) {
+  cout << "+ " << x << endl;
+  int i; cin >> i;
+  return i;
+}
 
-bool seen[maxn];
-int par[maxk][maxn];
-
-void dfs(int i, int p) {
-  par[0][i] = p;
-  FOR(k, 1, maxk) {
-    par[k][i] = par[k-1][par[k-1][i]];
-  }
-  for (int j: adj[i]) {
-    if (j == p) continue;
-    dfs(j, i);
-  }
+void answer(int n) {
+  cout << "! " << n << endl;
+  exit(0);
 }
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  cin >> N;
-  pair<int, int> mn = {2e9, -1};
-  F0R(i, N) {
-    cin >> A[i];
-    ckmin(mn, {A[i], i});
-  }
-  REP(N-1) {
-    int a, b; cin >> a >> b;
-    a--, b--;
-    adj[a].push_back(b);
-    adj[b].push_back(a);
-  }
-  int rt = mn.second;
-  dfs(rt, rt);
-
-  auto getmn = [&](int i) -> int {
-    ll mn = 2e9;
-    for (int k = 0; k < maxk; k++) {
-      int j = par[k][i];
-      ckmin(mn, 1LL * A[j] * (1 + k) + A[i]);
+  const int K = 250;
+  int x; cin >> x;
+  vector<int> v = {x};
+  map<int, int> S; S[x] = 0;
+  F0R(i, K-1) {
+    x = add(1);
+    if (S.count(x)) {
+      answer(sz(S));
     }
-    return mn;
-  };
-  ll ans = 0;
-  F0R(i, N) if (i != rt) ans += getmn(i);
-  cout << ans << '\n';
+    v.push_back(x);
+    S[x] = i+1;
+  }
+  assert(sz(v) == K);
+  int mx = S.rbegin()->first;
+  int sum = K-1;
+  REP(500) {
+    const int M = 1e6;
+    int r = rng() % M + 1;
+    sum += r;
+    x = add(r);
+    ckmax(mx, x);
+  }
+  int n = mx;
+  if (sum > (n-1)) sub(sum - (n-1));
+  else if (sum < (n-1)) add((n-1) - sum);
+  while (1) {
+    x = add(K);
+    n += K;
+    if (S.count(x)) {
+      n -= S[x]+1;
+      answer(n);
+    }
+  }
 }

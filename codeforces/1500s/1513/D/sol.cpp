@@ -59,50 +59,79 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-const int maxn = 5e5+5, maxk = 20;
-int N, A[maxn];
-vector<int> adj[maxn];
-
-bool seen[maxn];
-int par[maxk][maxn];
-
-void dfs(int i, int p) {
-  par[0][i] = p;
-  FOR(k, 1, maxk) {
-    par[k][i] = par[k-1][par[k-1][i]];
+struct DSU {
+  int n;
+  vector<int> par;
+  DSU(int _n) {
+    n = _n;
+    par.resize(n+1, -1);
   }
-  for (int j: adj[i]) {
-    if (j == p) continue;
-    dfs(j, i);
+
+  int Find(int i) {
+    return par[i] < 0 ? i : par[i] = Find(par[i]);
   }
+
+  bool Union(int x, int y) { // return true if x and y were not connected
+    x = Find(x);
+    y = Find(y);
+    if (x == y) return false;
+    if (par[x] > par[y]) swap(x, y);
+    par[x] += par[y];
+    par[y] = x;
+    return true;
+  }
+
+  int getsz(int i) {
+    return -par[Find(i)];
+  }
+};
+
+void solve() {
+  int N, P; cin >> N >> P;
+  vector<int> A(N);
+  vector<int> v;
+  map<int, vector<int>> mp;
+  F0R(i, N) {
+    cin >> A[i];
+    v.push_back(A[i]);
+    mp[A[i]].push_back(i);
+  }
+  sort(all(v)); v.erase(unique(all(v)), v.end());
+
+  DSU dsu(N);
+  ll ans = 0;
+  for (auto x: v) {
+    if (x > P) break;
+    for (auto i: mp[x]) {
+      if (dsu.getsz(i) > 1) continue;
+      for (int j = i+1; j < N; j++) {
+        if (A[j] % A[i] != 0) break;
+        if (dsu.Find(i) != dsu.Find(j)) {
+          dsu.Union(i, j);
+          ans += x;
+        }
+      }
+      for (int j = i-1; j >= 0; j--) {
+        if (A[j] % A[i] != 0) break;
+        if (dsu.Find(i) != dsu.Find(j)) {
+          dsu.Union(i, j);
+          ans += x;
+        }
+      }
+    }
+  }
+
+  F0R(i, N-1) {
+    if (dsu.Find(i) != dsu.Find(i+1)) {
+      dsu.Union(i, i+1);
+      ans += P;
+    }
+  }
+  cout << ans << '\n';
 }
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  cin >> N;
-  pair<int, int> mn = {2e9, -1};
-  F0R(i, N) {
-    cin >> A[i];
-    ckmin(mn, {A[i], i});
-  }
-  REP(N-1) {
-    int a, b; cin >> a >> b;
-    a--, b--;
-    adj[a].push_back(b);
-    adj[b].push_back(a);
-  }
-  int rt = mn.second;
-  dfs(rt, rt);
-
-  auto getmn = [&](int i) -> int {
-    ll mn = 2e9;
-    for (int k = 0; k < maxk; k++) {
-      int j = par[k][i];
-      ckmin(mn, 1LL * A[j] * (1 + k) + A[i]);
-    }
-    return mn;
-  };
-  ll ans = 0;
-  F0R(i, N) if (i != rt) ans += getmn(i);
-  cout << ans << '\n';
+  int T; cin >> T;
+  while (T--) solve();
 }

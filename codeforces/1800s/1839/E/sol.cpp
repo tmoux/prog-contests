@@ -59,50 +59,89 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-const int maxn = 5e5+5, maxk = 20;
-int N, A[maxn];
-vector<int> adj[maxn];
+// If second player can win:
+// If 1st takes MX, then take an odd element
+// else if 1st takes an odd element, take MX
+// else if 1st takes an even element, take another even element
 
-bool seen[maxn];
-int par[maxk][maxn];
+// If first player can win: just always take the MX
 
-void dfs(int i, int p) {
-  par[0][i] = p;
-  FOR(k, 1, maxk) {
-    par[k][i] = par[k-1][par[k-1][i]];
-  }
-  for (int j: adj[i]) {
-    if (j == p) continue;
-    dfs(j, i);
-  }
+const int maxn = 305;
+int N;
+int A[maxn];
+
+int getMove() {
+  int i; cin >> i;
+  if (i == -1) exit(0);
+  return i;
 }
+
+int dp[maxn][maxn*maxn+maxn];
+int ty[maxn];
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
   cin >> N;
-  pair<int, int> mn = {2e9, -1};
-  F0R(i, N) {
-    cin >> A[i];
-    ckmin(mn, {A[i], i});
-  }
-  REP(N-1) {
-    int a, b; cin >> a >> b;
-    a--, b--;
-    adj[a].push_back(b);
-    adj[b].push_back(a);
-  }
-  int rt = mn.second;
-  dfs(rt, rt);
-
-  auto getmn = [&](int i) -> int {
-    ll mn = 2e9;
-    for (int k = 0; k < maxk; k++) {
-      int j = par[k][i];
-      ckmin(mn, 1LL * A[j] * (1 + k) + A[i]);
+  FOR(i, 1, N+1) cin >> A[i];
+  int S = accumulate(A+1, A+N+1, 0);
+  dp[0][0] = 1;
+  FOR(i, 1, N+1) {
+    for (int s = 300*300; s >= 0; s--) {
+      if (dp[i-1][s]) {
+        dp[i][s] = 1;
+        dp[i][s+A[i]] = 1;
+      }
     }
-    return mn;
-  };
-  ll ans = 0;
-  F0R(i, N) if (i != rt) ans += getmn(i);
-  cout << ans << '\n';
+  }
+
+  if (S % 2 == 0 && dp[N][S/2]) {
+    S /= 2;
+    cout << "Second" << endl;
+    for (int i = N; i >= 1; i--) {
+      if (S >= A[i] && dp[i-1][S-A[i]]) {
+        ty[i] = 1;
+        S -= A[i];
+      }
+    }
+    while (1) {
+      // FOR(i, 1, N+1) {
+      //   cout << A[i] << ' ';
+      // }
+      // cout << endl;
+      int i = getMove();
+      if (i == 0) return 0;
+      int idx = -1;
+      FOR(j, 1, N+1) {
+        if (A[j] > 0 && ty[i] != ty[j]) {
+          idx = j;
+          break;
+        }
+      }
+      assert(idx != -1);
+      cout << idx << endl;
+      int x = min(A[i], A[idx]);
+      A[i] -= x;
+      A[idx] -= x;
+    }
+  }
+  else {
+    cout << "First" << endl;
+    while (1) {
+      int idx = -1;
+      FOR(j, 1, N+1) {
+        if (A[j] > 0) {
+          idx = j;
+          break;
+        }
+      }
+      assert(idx != -1);
+      cout << idx << endl;
+
+      int i = getMove();
+      if (i == 0) return 0;
+      int x = min(A[i], A[idx]);
+      A[i] -= x;
+      A[idx] -= x;
+    }
+  }
 }

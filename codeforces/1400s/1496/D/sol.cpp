@@ -59,50 +59,87 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-const int maxn = 5e5+5, maxk = 20;
+const int maxn = 1e5+5;
 int N, A[maxn];
-vector<int> adj[maxn];
+int Left[maxn], Right[maxn];
+int lptr[maxn], rptr[maxn];
 
-bool seen[maxn];
-int par[maxk][maxn];
-
-void dfs(int i, int p) {
-  par[0][i] = p;
-  FOR(k, 1, maxk) {
-    par[k][i] = par[k-1][par[k-1][i]];
-  }
-  for (int j: adj[i]) {
-    if (j == p) continue;
-    dfs(j, i);
-  }
-}
+int LeftV[maxn], RightV[maxn];
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
   cin >> N;
-  pair<int, int> mn = {2e9, -1};
   F0R(i, N) {
     cin >> A[i];
-    ckmin(mn, {A[i], i});
   }
-  REP(N-1) {
-    int a, b; cin >> a >> b;
-    a--, b--;
-    adj[a].push_back(b);
-    adj[b].push_back(a);
-  }
-  int rt = mn.second;
-  dfs(rt, rt);
 
-  auto getmn = [&](int i) -> int {
-    ll mn = 2e9;
-    for (int k = 0; k < maxk; k++) {
-      int j = par[k][i];
-      ckmin(mn, 1LL * A[j] * (1 + k) + A[i]);
+  multiset<int> ms;
+  F0R(i, N) {
+    if (i > 0 && A[i] > A[i-1]) {
+      Left[i] = Left[i-1] + 1;
+      lptr[i] = lptr[i-1];
     }
-    return mn;
-  };
-  ll ans = 0;
-  F0R(i, N) if (i != rt) ans += getmn(i);
+    else {
+      Left[i] = 1;
+      lptr[i] = i;
+    }
+    ms.insert(Left[i]);
+  }
+  F0Rd(i, N) {
+    if (i + 1 < N && A[i] > A[i+1]) {
+      Right[i] = Right[i+1] + 1;
+      rptr[i] = rptr[i+1];
+    }
+    else {
+      Right[i] = 1;
+      rptr[i] = i;
+    }
+    ms.insert(Right[i]);
+  }
+
+  // leftv
+  F0R(i, N) {
+    LeftV[i] = i > 0 && A[i] < A[i-1] ? LeftV[i-1] + 1 : 1;
+  }
+  F0Rd(i, N) {
+    RightV[i] = i + 1 < N && A[i] < A[i+1] ? RightV[i+1] + 1 : 1;
+  }
+
+  int ans = 0;
+  F0R(i, N) {
+    if (Left[i] > 1 && Right[i] > 1) {
+      auto it = ms.find(Left[i]); ms.erase(it);
+      it = ms.find(Right[i]); ms.erase(it);
+      int x = max(Left[i], Right[i]);
+      if (*ms.rbegin() < x) {
+        bool p2 = false;
+        {
+          int a = Left[i]; if (a&1) a--;
+          if (a-1 >= Right[i]-1) p2 = true;
+        }
+        {
+          int a = Right[i]; if (a&1) a--;
+          if (a-1 >= Left[i]-1) p2 = true;
+        }
+        {
+          int j = lptr[i];
+          if (LeftV[j] >= max(Left[i]-1, Right[i])) p2 = true;
+        }
+        {
+          int j = rptr[i];
+          if (RightV[j] >= max(Left[i], Right[i]-1)) p2 = true;
+        }
+        if (!p2) {
+          // DEBUG(i);
+          // cout << lptr[i] << ' ' << rptr[i] << endl;
+          // cout << LeftV[lptr[i]] << endl;
+          ans++;
+        }
+      }
+      ms.insert(Left[i]);
+      ms.insert(Right[i]);
+    }
+  }
+
   cout << ans << '\n';
 }

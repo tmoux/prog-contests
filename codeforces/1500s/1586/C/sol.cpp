@@ -59,50 +59,34 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-const int maxn = 5e5+5, maxk = 20;
-int N, A[maxn];
-vector<int> adj[maxn];
-
-bool seen[maxn];
-int par[maxk][maxn];
-
-void dfs(int i, int p) {
-  par[0][i] = p;
-  FOR(k, 1, maxk) {
-    par[k][i] = par[k-1][par[k-1][i]];
-  }
-  for (int j: adj[i]) {
-    if (j == p) continue;
-    dfs(j, i);
-  }
-}
-
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  cin >> N;
-  pair<int, int> mn = {2e9, -1};
+  int N, M; cin >> N >> M;
+  vector<string> g(N);
   F0R(i, N) {
-    cin >> A[i];
-    ckmin(mn, {A[i], i});
+    cin >> g[i];
   }
-  REP(N-1) {
-    int a, b; cin >> a >> b;
-    a--, b--;
-    adj[a].push_back(b);
-    adj[b].push_back(a);
-  }
-  int rt = mn.second;
-  dfs(rt, rt);
 
-  auto getmn = [&](int i) -> int {
-    ll mn = 2e9;
-    for (int k = 0; k < maxk; k++) {
-      int j = par[k][i];
-      ckmin(mn, 1LL * A[j] * (1 + k) + A[i]);
+  vector<int> has(M);
+  F0R(j, M-1) {
+    FOR(i, 1, N) {
+      if (g[i][j] == 'X' && g[i-1][j+1] == 'X') has[j] = 1;
     }
-    return mn;
-  };
-  ll ans = 0;
-  F0R(i, N) if (i != rt) ans += getmn(i);
-  cout << ans << '\n';
+    if (j > 0) has[j] += has[j-1];
+  }
+  // cout << has << endl;
+
+  int Q; cin >> Q;
+  while (Q--) {
+    int l, r; cin >> l >> r;
+    l--,  r--;
+
+    if (l == r) {
+      cout << "YES\n";
+    }
+    else {
+      int s = has[r-1] - (l == 0 ? 0 : has[l-1]);
+      cout << (s == 0 ? "YES" : "NO") << '\n';
+    }
+  }
 }

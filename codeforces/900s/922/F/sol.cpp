@@ -59,50 +59,71 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-const int maxn = 5e5+5, maxk = 20;
-int N, A[maxn];
-vector<int> adj[maxn];
+const int maxn = 3e5+5;
+int N, K;
 
-bool seen[maxn];
-int par[maxk][maxn];
+int Div[maxn];
+int spf[maxn];
 
-void dfs(int i, int p) {
-  par[0][i] = p;
-  FOR(k, 1, maxk) {
-    par[k][i] = par[k-1][par[k-1][i]];
+vector<int> v;
+int cur;
+void rec(int i) {
+  if (cur == K) {
+    cout << "Yes\n";
+    vector<int> C(N+1);
+    for (auto x: v) C[x] = 1;
+    vector<int> ans;
+    FOR(j, 1, N+1) if (!C[j]) ans.push_back(j);
+    cout << sz(ans) << '\n';
+    for (auto x: ans) cout << x << ' ';
+    cout << endl;
+    exit(0);
   }
-  for (int j: adj[i]) {
-    if (j == p) continue;
-    dfs(j, i);
+
+  if (i >= 1) {
+    int c = Div[i] - Div[i-1] + (N / i - 1);
+    for (int j: v) if (j % i == 0) c--;
+    if (cur - c >= K) {
+      cur -= c;
+      v.push_back(i);
+      rec(i-1);
+      v.pop_back();
+      cur += c;
+    }
+    rec(i-1);
   }
 }
 
+
+void init_spf() {
+  spf[1] = 1;
+  for (int i = 2; i < maxn; i++) if (!spf[i]) {
+      for (int j = i; j < maxn; j += i) {
+        if (!spf[j]) spf[j] = i;
+      }
+    }
+}
+
+
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  cin >> N;
-  pair<int, int> mn = {2e9, -1};
-  F0R(i, N) {
-    cin >> A[i];
-    ckmin(mn, {A[i], i});
-  }
-  REP(N-1) {
-    int a, b; cin >> a >> b;
-    a--, b--;
-    adj[a].push_back(b);
-    adj[b].push_back(a);
-  }
-  int rt = mn.second;
-  dfs(rt, rt);
-
-  auto getmn = [&](int i) -> int {
-    ll mn = 2e9;
-    for (int k = 0; k < maxk; k++) {
-      int j = par[k][i];
-      ckmin(mn, 1LL * A[j] * (1 + k) + A[i]);
+  init_spf();
+  cin >> N >> K;
+  for (int i = 1; i <= N; i++) {
+    for (int j = i+i; j <= N; j += i) {
+      Div[j]++;
     }
-    return mn;
-  };
-  ll ans = 0;
-  F0R(i, N) if (i != rt) ans += getmn(i);
-  cout << ans << '\n';
+  }
+  for (int i = 1; i <= N; i++) {
+    Div[i] += Div[i-1];
+  }
+
+  if (K > Div[N]) {
+    cout << "No\n";
+  }
+  else {
+    while (N-1 >= 1 && Div[N-1] >= K) N--;
+    cur = Div[N];
+    rec(N);
+  }
 }

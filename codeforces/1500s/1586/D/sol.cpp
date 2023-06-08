@@ -59,50 +59,105 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-const int maxn = 5e5+5, maxk = 20;
-int N, A[maxn];
-vector<int> adj[maxn];
+int p[10000], A[10000];
+int N;
 
-bool seen[maxn];
-int par[maxk][maxn];
+// int ask1(int i) {
+//   cout << "? ";
+//   FOR(j, 1, N+1) {
+//     cout << (j == i ? 2 : 1) << ' ';
+//     A[j] = (p[j] + (j == i ? 2 : 1));
+//   }
+//   cout << endl;
+//
+//   FOR(j, 1, N+1) {
+//     FOR(k, j+1, N+1) {
+//       if (A[j] == A[k]) return j;
+//     }
+//   }
+//   return 0;
+// }
+//
+// int ask2(int i) {
+//   cout << "? ";
+//   FOR(j, 1, N+1) {
+//     cout << (j == i ? 1 : 2) << ' ';
+//     A[j] = (p[j] + (j == i ? 1 : 2));
+//   }
+//   cout << endl;
+//   FOR(j, 1, N+1) {
+//     FOR(k, j+1, N+1) {
+//       if (A[j] == A[k]) return j;
+//     }
+//   }
+//   return 0;
+// }
 
-void dfs(int i, int p) {
-  par[0][i] = p;
-  FOR(k, 1, maxk) {
-    par[k][i] = par[k-1][par[k-1][i]];
+
+int ask1(int i) {
+  cout << "? ";
+  FOR(j, 1, N+1) {
+    cout << (j == i ? 2 : 1) << ' ';
   }
-  for (int j: adj[i]) {
-    if (j == p) continue;
-    dfs(j, i);
+  cout << endl;
+  // FOR(j, 1, N+1) {
+  //   cout << (p[j] + (j == i ? 2 : 1)) << ' ';
+  // }
+  // cout << endl;
+  int k; cin >> k;
+  return k;
+}
+
+int ask2(int i) {
+  cout << "? ";
+  FOR(j, 1, N+1) {
+    cout << (j == i ? 1 : 2) << ' ';
   }
+  cout << endl;
+  // FOR(j, 1, N+1) {
+  //   cout << (p[j] + (j == i ? 1 : 2)) << ' ';
+  // }
+  // cout << endl;
+  int k; cin >> k;
+  return k;
 }
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
   cin >> N;
-  pair<int, int> mn = {2e9, -1};
-  F0R(i, N) {
-    cin >> A[i];
-    ckmin(mn, {A[i], i});
-  }
-  REP(N-1) {
-    int a, b; cin >> a >> b;
-    a--, b--;
-    adj[a].push_back(b);
-    adj[b].push_back(a);
-  }
-  int rt = mn.second;
-  dfs(rt, rt);
-
-  auto getmn = [&](int i) -> int {
-    ll mn = 2e9;
-    for (int k = 0; k < maxk; k++) {
-      int j = par[k][i];
-      ckmin(mn, 1LL * A[j] * (1 + k) + A[i]);
+  // FOR(i, 1, N+1) cin >> p[i];
+  vector<int> nxt(N+1), cnt(N+1);
+  FOR(i, 1, N+1) {
+    int k = ask1(i);
+    if (!k) continue;
+    if (k < i) {
+      nxt[i] = k;
+      cnt[k]++;
     }
-    return mn;
-  };
-  ll ans = 0;
-  F0R(i, N) if (i != rt) ans += getmn(i);
-  cout << ans << '\n';
+  }
+  FOR(i, 1, N+1) {
+    int k = ask2(i);
+    if (!k) continue;
+    if (k < i) {
+      nxt[k] = i;
+      cnt[i]++;
+    }
+  }
+  int s = -1;
+  // cout << nxt << ' ' << cnt << endl;
+  FOR(i, 1, N+1) if (!cnt[i]) s = i;
+  assert(s != -1);
+
+  vector<int> ans(N+1);
+  int c = 1;
+  while (1) {
+    ans[s] = c++;
+    if (!nxt[s]) break;
+    s = nxt[s];
+  }
+  cout << "! ";
+  FOR(i, 1, N+1) {
+    cout << ans[i] << ' ';
+  }
+  cout << endl;
 }
