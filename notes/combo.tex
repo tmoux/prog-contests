@@ -1,0 +1,52 @@
+\documentclass[11pt]{scrartcl} 
+\usepackage[sexy]{evan} % Taken from https://github.com/vEnhance/dotfiles/blob/main/texmf/tex/latex/evan/evan.sty
+
+\DeclareMathOperator{\mex}{mex}
+\begin{document}
+
+\title{Combinatorics}
+\author{Timothy Mou}
+\maketitle
+
+\tableofcontents
+
+\begin{abstract}
+  These are some notes about miscellaneous math and combinatorics topics for competitive programming.
+\end{abstract}
+
+\section{Binomial Coefficients}
+Binomial coefficients can be computed in $O(1)$ with $O(N)$ precomputation (need to use trick to compute inverse factorials quickly).
+If $k$ is small, we can also compute ${n \choose k}$ in $O(k)$.
+\begin{itemize}
+    \item
+      \[
+        \sum_{i=0}^N {N \choose i} = 2^N.
+      \]
+      \item
+      \[
+        \sum_{i=0}^N {N \choose i} i = N \cdot 2^{N-1}
+      \]
+      This can be seen combinatorially; this is the number of subsets where we pick a ``leader'' for each subset.
+      \item
+        \[
+          \sum_{i=0}^N {N \choose i} (i+1) = \sum_{i=0}^N {N \choose i} i + \sum_{i=0}^N {N \choose i} = N \cdot 2^{N-1} + 2 \cdot 2^{N-1} = (N + 2) 2^{N-1}.
+        \]
+        Follows from the previous identity.
+
+\end{itemize}
+
+\newpage
+\section{Stirling Numbers}
+Stirling numbers of the second kind, denoted $S(n, k)$ are the number of ways to partition $[n]$ into $k$ indistinguishable nonempty blocks.
+They obey the recurrence
+\[
+  S(n, k) = k \cdot S(n-1, k) + S(n-1, k-1),
+\]
+with the base cases $S(n, n) = 1$, $S(n, 0) = S(0, n) = 0$ for $n > 0$.
+They can also be calculated explicitly in $O(k \log n)$ with the formula
+\[
+  S(n, k) = \frac{1}{k!} \sum_{i=0}^k (-1)^{k-i} {k \choose i} i^n.
+\]
+
+
+\end{document}
