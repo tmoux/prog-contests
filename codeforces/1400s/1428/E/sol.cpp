@@ -61,17 +61,42 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  vector<string> g = {
-  "..#..",
-  ".###.",
-  "#####",
-  ".###.",
-  "..#..",
-  };
-  int N = sz(g);
-  int M = sz(g[0]);
-  cout << N << ' ' << M << '\n';
+  int N, K; cin >> N >> K;
+  vector<int> A(N);
   F0R(i, N) {
-    cout << g[i] << '\n';
+    cin >> A[i];
   }
+  sort(all(A), greater());
+  auto ceil = [](int a, int b) {
+    return (a + b - 1) / b;
+  };
+
+  auto F = [&](int a, int p) -> ll {
+    int x = a / p;
+    int extra = a % p;
+
+    ll ans = 0;
+    ans += 1LL * extra * (x + 1) * (x + 1);
+    ans += 1LL * (p - extra) * x * x;
+    return ans;
+  };
+
+  priority_queue<pair<ll, int>> pq;
+  vector<int> cnt(N, 1);
+  F0R(i, N) {
+    pq.push(make_pair(F(A[i], 1) - F(A[i], 2), i));
+  }
+
+  REP(K-N) {
+    auto [x, i] = pq.top(); pq.pop();
+    cnt[i]++;
+    pq.push(make_pair(F(A[i], cnt[i]) - F(A[i], cnt[i]+1), i));
+  }
+
+  ll ans = 0;
+  F0R(i, N) {
+    ans += F(A[i], cnt[i]);
+  }
+
+  cout << ans << '\n';
 }

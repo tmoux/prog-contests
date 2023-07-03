@@ -61,17 +61,45 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  vector<string> g = {
-  "..#..",
-  ".###.",
-  "#####",
-  ".###.",
-  "..#..",
-  };
-  int N = sz(g);
-  int M = sz(g[0]);
-  cout << N << ' ' << M << '\n';
-  F0R(i, N) {
-    cout << g[i] << '\n';
+  int N, K; cin >> N >> K;
+  vector<ll> A(N+50);
+  F0R(i, N+1) cin >> A[i];
+
+  vector<int> B;
+  ll carry = 0;
+  F0R(i, N+50) {
+    ll x = carry + A[i];
+    int b = x&1;
+    B.push_back(b);
+    carry = (x - b) / 2;
   }
+  if (carry == -1) {
+    // flip
+    F0R(i, N+1) {
+      A[i] *= -1;
+    }
+    B.clear();
+    carry = 0;
+    F0R(i, N+50) {
+      ll x = carry + A[i];
+      int b = x&1;
+      B.push_back(b);
+      carry = (x - b) / 2;
+    }
+  }
+  while (B.back() != 1) B.pop_back();
+
+  int ans = 0;
+  for (int i = 0; i <= N; i++) {
+    if (sz(B)-i <= 40) {
+      ll s = 0;
+      for (int j = i; j < sz(B); j++) {
+        s += (1LL * B[j]) << (j - i);
+      }
+      ll x = A[i] - s;
+      if (abs(x) <= K && (i != N || x != 0)) ans++;
+    }
+    if (B[i] != 0) break;
+  }
+  cout << ans << '\n';
 }

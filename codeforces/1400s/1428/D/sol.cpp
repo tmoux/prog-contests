@@ -61,17 +61,75 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  vector<string> g = {
-  "..#..",
-  ".###.",
-  "#####",
-  ".###.",
-  "..#..",
-  };
-  int N = sz(g);
-  int M = sz(g[0]);
-  cout << N << ' ' << M << '\n';
+  int N; cin >> N;
+  vector<int> A(N);
+  vector<pair<int, int>> ans;
   F0R(i, N) {
-    cout << g[i] << '\n';
+    cin >> A[i];
   }
+
+  set<int> open, taken1;
+  set<pair<int, int>> cols;
+  F0R(i, N) {
+    open.insert(i);
+  }
+  bool poss = true;
+
+  const int INF = 2e9;
+  F0Rd(i, N) {
+    if (A[i] == 0) {
+      continue;
+    }
+    else if (A[i] == 1) {
+      if (!open.empty()) {
+        int r = *open.begin();
+        open.erase(open.begin());
+        ans.push_back({r, i});
+        taken1.insert(r);
+        cols.insert({r, i});
+      }
+      else poss = false;
+    }
+    else if (A[i] == 2) {
+      if (!taken1.empty()) {
+        int r = *taken1.begin();
+        taken1.erase(taken1.begin());
+        ans.push_back({r, i});
+        cols.insert({-INF, i});
+      }
+      else poss = false;
+    }
+    else if (A[i] == 3) {
+      if (!cols.empty() && !open.empty()) {
+        auto [rr, j] = *cols.begin();
+        cols.erase(cols.begin());
+
+        int r = *open.begin();
+        open.erase(open.begin());
+        ans.push_back({r, i});
+        ans.push_back({r, j});
+
+        cols.insert({-INF, i});
+        if (taken1.count(rr)) taken1.erase(rr);
+      }
+      else poss = false;
+    }
+    else assert(false);
+  }
+
+  if (!poss) {
+    cout << -1 << '\n';
+    return 0;
+  }
+
+  // vector<string> G(N, string(N, '.'));
+  cout << sz(ans) << '\n';
+  for (auto [a, b]: ans) {
+    cout << N-a << ' ' << b+1 << '\n';
+    // G[N-1-a][b] = '#';
+  }
+
+  // F0R(i, N) {
+  //   cout << G[i] << endl;
+  // }
 }

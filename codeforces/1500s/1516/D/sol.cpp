@@ -59,19 +59,91 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
+const int maxn = 1e5+5, maxk = 18;
+int N, Q;
+int A[maxn];
+int jmp[maxk][maxn], cnt[maxk][maxn];
+
+int spf[maxn];
+
+void init_spf() {
+  spf[1] = 1;
+  for (int i = 2; i < maxn; i++) if (!spf[i]) {
+      for (int j = i; j < maxn; j += i) {
+        if (!spf[j]) spf[j] = i;
+      }
+    }
+}
+
+vector<int> primes(int x) {
+  vector<int> v;
+  while (x > 1) {
+    int p = spf[x];
+    v.push_back(p);
+    while (x % p == 0) x /= p;
+  }
+  return v;
+}
+
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  vector<string> g = {
-  "..#..",
-  ".###.",
-  "#####",
-  ".###.",
-  "..#..",
-  };
-  int N = sz(g);
-  int M = sz(g[0]);
-  cout << N << ' ' << M << '\n';
+  init_spf();
+  cin >> N >> Q;
   F0R(i, N) {
-    cout << g[i] << '\n';
+    cin >> A[i];
+  }
+
+  map<int, int> last;
+  F0Rd(i, N) {
+    auto ps = primes(A[i]);
+    if (i == N-1) jmp[0][i] = N;
+    else {
+      if (std::gcd(A[i], A[i+1]) > 1) jmp[0][i] = i+1;
+      else {
+        jmp[0][i] = jmp[0][i+1];
+        for (auto p: ps) {
+          if (last.count(p)) {
+            ckmin(jmp[0][i], last[p]);
+          }
+        }
+      }
+    }
+    for (auto p: ps) {
+      last[p] = i;
+    }
+  }
+  F0R(i, N) cnt[0][i] = 1;
+
+  for (int k = 1; k < maxk; k++) {
+    F0R(i, N) {
+      if (jmp[k-1][i] == N) {
+        jmp[k][i] = N;
+        cnt[k][i] = cnt[k-1][i];
+      }
+      else {
+        jmp[k][i] = jmp[k-1][jmp[k-1][i]];
+        cnt[k][i] = cnt[k-1][i] + cnt[k-1][jmp[k-1][i]];
+      }
+    }
+  }
+
+  auto query = [&](int l, int r) {
+    int ans = 0;
+    F0Rd(k, maxk) {
+      int nl = jmp[k][l];
+      if (nl <= r+1) {
+        ans += cnt[k][l];
+        l = nl;
+        if (l == N) break;
+      }
+    }
+    if (l <= r) ans++;
+    return ans;
+  };
+
+  while (Q--) {
+    int l, r; cin >> l >> r;
+    l--, r--;
+    cout << query(l, r) << '\n';
   }
 }

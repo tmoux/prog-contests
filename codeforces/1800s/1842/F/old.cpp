@@ -59,19 +59,51 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
+const int maxn = 5005;
+int N;
+vector<int> adj[maxn];
+
+ll dp[maxn][maxn];
+ll upd[maxn];
+
+int dfs(int i, int p) {
+  int cur_sz = 1;
+  for (int j: adj[i]) {
+    if (j == p) continue;
+    int b_sz = dfs(j, i);
+    F0R(a, N+1) upd[a] = 0;
+    for (int a = 0; a <= cur_sz; a++) {
+      for (int b = 0; b <= b_sz && a + b <= N; b++) {
+        // update dp[i][a+b]
+        ll new_a = dp[i][a] + 1LL * b * (cur_sz-1); // increase edges by b
+        ll new_b = dp[j][b] + 1LL * a * (b_sz-1); // increase edges by a
+        ll new_edge = abs(a - b); // abs(b - ((a + b) - b));
+        // ckmax(upd[a+b], dp[i][a] + dp[j][b] + abs(b - ((a+b) - b)));
+        ckmax(upd[a+b], new_a + new_b + new_edge);
+        // cout << "updating " << a << ' ' << b << ": " << upd[a+b] << ' ' << a+b << endl;
+      }
+    }
+    cur_sz += b_sz;
+    F0R(a, cur_sz+1) ckmax(dp[i][a], upd[a]);
+  }
+  DEBUG(i);
+  FOR(j, 0, cur_sz+1) {
+    cout << dp[i][j] << ' ';
+  }
+  cout << endl;
+  return cur_sz;
+}
+
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  vector<string> g = {
-  "..#..",
-  ".###.",
-  "#####",
-  ".###.",
-  "..#..",
-  };
-  int N = sz(g);
-  int M = sz(g[0]);
-  cout << N << ' ' << M << '\n';
-  F0R(i, N) {
-    cout << g[i] << '\n';
+  cin >> N;
+  REP(N-1) {
+    int a, b; cin >> a >> b;
+    adj[a].push_back(b);
+    adj[b].push_back(a);
+  }
+  dfs(1, 1);
+  FOR(k, 0, N+1) {
+    cout << dp[1][k] << " \n"[k == N];
   }
 }

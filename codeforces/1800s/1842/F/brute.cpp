@@ -59,20 +59,54 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
+const int maxn = 5005;
+int N;
+vector<int> adj[maxn];
+int A[maxn];
+
+int cnt = 0;
+int ans = 0;
+int dfs(int i, int p) {
+    int c = A[i];
+    for (int j: adj[i]) {
+        if (j == p) continue;
+        int k = dfs(j, i);
+        ans += abs(k-(cnt-k));
+        c += k;
+    }
+    return c;
+}
+
 int main() {
     ios_base::sync_with_stdio(false); cin.tie(NULL);
-    int N, K; cin >> N >> K;
-
-    cout << N << ' ' << K << endl;
-    FOR(i, 2, N+1) {
-        int p = rng() % (i-1) + 1;
-        cout << p << ' ' << i << '\n';
+    cin >> N;
+    REP(N-1) {
+        int a, b; cin >> a >> b;
+        adj[a].push_back(b);
+        adj[b].push_back(a);
     }
 
-    int B = 4;
-    F0R(i, N) {
-        int r = rng() % (1 << B);
-        cout << r << ' ';
+    vector<int> dp(N+1, 0);
+    F0R(mask, 1 << N) {
+        cnt = 0;
+        FOR(i, 1, N+1) {
+            if (mask & (1 << (i-1))) {
+                A[i] = 1;
+                cnt++;
+            }
+            else A[i] = 0;
+        }
+        ans = 0;
+        dfs(1, 1);
+        ckmax(dp[cnt], ans);
+
+        int oldans = ans;
+        ans = 0;
+        cnt = cnt + 2;
+        dfs(1, 1);
+        // if (cnt-2 == 3) cout << mask << ' ' << cnt << ": " << oldans << ' ' << ans << endl;
     }
-    cout << '\n';
+    F0R(i, N+1) {
+        cout << dp[i] << " \n"[i == N];
+    }
 }

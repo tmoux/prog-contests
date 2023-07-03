@@ -59,89 +59,86 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-const int maxn = 1e5+5;
-int N, K, A[maxn];
+const int maxn = 1e5+5, maxk = 18;
+int N, Q;
+int A[maxn];
+int jmp[maxk][maxn], cnt[maxk][maxn];
 
-vector<int> adj[maxn];
+int spf[maxn];
 
-struct T {
-  vector<array<int, 2>> v;
-  T() {
-    v.resize(K, {0, 0});
-  }
-
-  T extend() {
-    T r = T();
-    F0R(i, K-1) {
-      r.v[i] = v[i+1];
+void init_spf() {
+  spf[1] = 1;
+  for (int i = 2; i < maxn; i++) if (!spf[i]) {
+      for (int j = i; j < maxn; j += i) {
+        if (!spf[j]) spf[j] = i;
+      }
     }
-    r.v[K-1] = {v[0][1], v[0][0]};
-    return r;
-  }
-
-  int getans() {
-    int res = 0;
-    F0R(i, K) res ^= v[i][1];
-    return res != 0;
-  }
-};
-
-T merge(T a, T b) {
-  F0R(i, K) {
-    F0R(j, 2) {
-      a.v[i][j] ^= b.v[i][j];
-    }
-  }
-  return a;
 }
 
-T F[maxn];
-void dfs(int i, int p) {
-  F[i] = T();
-  F[i].v[0][0] = A[i];
-
-  for (auto j: adj[i]) {
-    if (j == p) continue;
-    dfs(j, i);
-    F[i] = merge(F[i], F[j].extend());
+vector<int> primes(int x) {
+  vector<int> v;
+  while (x > 1) {
+    int p = spf[x];
+    v.push_back(p);
+    while (x % p == 0) x /= p;
   }
-}
-
-int ans[maxn];
-void reroot(int i, int p, T cur) {
-  // cout << "vis " << i << ' ' << p << endl;
-  T r = merge(F[i], cur.extend());
-  // cout << i << ": " << r.v << endl;
-  // cout << cur.extend().v << endl;
-  ans[i] = r.getans();
-
-  for (int j: adj[i]) {
-    if (j == p) continue;
-    T ncur = merge(r, F[j].extend());
-    // cout << i << ' ' << j << ": " << ncur.v << endl;
-    reroot(j, i, ncur);
-  }
+  return v;
 }
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  cin >> N >> K;
-  F0R(i, N-1) {
-    int x, y; cin >> x >> y;
-    adj[x].push_back(y);
-    adj[y].push_back(x);
+  init_spf();
+  cin >> N >> Q;
+  F0R(i, N) {
+    cin >> A[i];
   }
-  FOR(i, 1, N+1) cin >> A[i];
 
-  // dfs(1, 1);
+  map<int, int> last;
+  F0Rd(i, N) {
+    auto ps = primes(A[i]);
+    if (i == N-1) jmp[0][i] = N;
+    else {
+      if (std::gcd(A[i], A[i+1]) > 1) jmp[0][i] = i+1;
+      else {
+        jmp[0][i] = jmp[0][i+1];
+        for (auto p: ps) {
+          if (last.count(p)) {
+            ckmin(jmp[0][i], last[p]);
+          }
+        }
+      }
+    }
+    for (auto p: ps) {
+      last[p] = i;
+    }
+  }
+  F0R(i, N) cnt[0][i] = 1;
 
-  // // FOR(i, 1, N+1) {
-  // //   cout << i << ": " << F[i].v << endl;
-  // // }
-  // reroot(1, 1, T());
+  for (int k = 1; k < maxk; k++) {
+    F0R(i, N) {
+      if (jmp[k-1][i] == N) {
+        jmp[k][i] = N;
+        cnt[k][i] = cnt[k-1][i];
+      }
+      else {
+        jmp[k][i] = jmp[k-1][jmp[k-1][i]];
+        cnt[k][i] = cnt[k-1][i] + cnt[k-1][jmp[k-1][i]];
+      }
+    }
+  }
 
-  FOR(i, 1, N+1) {
-    dfs(i, i);
-    cout << F[i].getans() << " \n"[i == N];
+  auto query = [&](int l, int r) {
+    int ans = 0;
+    while (l <= r) {
+      ans++;
+      l = jmp[0][l];
+    }
+    return ans;
+  };
+
+  while (Q--) {
+    int l, r; cin >> l >> r;
+    l--, r--;
+    cout << query(l, r) << '\n';
   }
 }

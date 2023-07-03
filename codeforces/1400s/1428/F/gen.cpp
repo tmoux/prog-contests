@@ -14,64 +14,57 @@ using ll = long long;
 
 template <class T>
 bool ckmin(T &a, const T &b) {
-  return b < a ? a = b, 1 : 0;
+    return b < a ? a = b, 1 : 0;
 }
 template <class T>
 bool ckmax(T &a, const T &b) {
-  return a < b ? a = b, 1 : 0;
+    return a < b ? a = b, 1 : 0;
 }
 
 namespace std {
-template <class Fun>
-class y_combinator_result {
-  Fun fun_;
+    template <class Fun>
+    class y_combinator_result {
+        Fun fun_;
 
-  public:
-  template <class T>
-  explicit y_combinator_result(T &&fun) : fun_(std::forward<T>(fun)) {}
+        public:
+            template <class T>
+            explicit y_combinator_result(T &&fun) : fun_(std::forward<T>(fun)) {}
 
-  template <class... Args>
-  decltype(auto) operator()(Args &&...args) {
-    return fun_(std::ref(*this), std::forward<Args>(args)...);
-  }
-};
+            template <class... Args>
+            decltype(auto) operator()(Args &&...args) {
+                return fun_(std::ref(*this), std::forward<Args>(args)...);
+            }
+    };
 
-template <class Fun>
-decltype(auto) y_combinator(Fun &&fun) {
-  return y_combinator_result<std::decay_t<Fun>>(std::forward<Fun>(fun));
-}
+    template <class Fun>
+    decltype(auto) y_combinator(Fun &&fun) {
+        return y_combinator_result<std::decay_t<Fun>>(std::forward<Fun>(fun));
+    }
 }  // namespace std
 
 #define DEBUG(x) cerr << #x << ": " << x << '\n'
 template <typename A, typename B>
 ostream &operator<<(ostream &os, const pair<A, B> &p) {
-  return os << '(' << p.first << ", " << p.second << ')';
+    return os << '(' << p.first << ", " << p.second << ')';
 }
 template <typename T_container, typename T = typename enable_if<
                                     !is_same<T_container, string>::value,
                                     typename T_container::value_type>::type>
 ostream &operator<<(ostream &os, const T_container &v) {
-  os << '[';
-  string sep;
-  for (const T &x : v) os << sep << x, sep = ", ";
-  return os << ']';
+    os << '[';
+    string sep;
+    for (const T &x : v) os << sep << x, sep = ", ";
+    return os << ']';
 }
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
 int main() {
-  ios_base::sync_with_stdio(false); cin.tie(NULL);
-  vector<string> g = {
-  "..#..",
-  ".###.",
-  "#####",
-  ".###.",
-  "..#..",
-  };
-  int N = sz(g);
-  int M = sz(g[0]);
-  cout << N << ' ' << M << '\n';
-  F0R(i, N) {
-    cout << g[i] << '\n';
-  }
+    ios_base::sync_with_stdio(false); cin.tie(NULL);
+    int N; cin >> N;
+    cout << N << '\n';
+    F0R(i, N) {
+       cout << (rng()&1);
+    }
+    cout << '\n';
 }

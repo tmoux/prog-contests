@@ -175,54 +175,90 @@ namespace atcoder {
 } // namespace atcoder
 using atcoder::segtree;
 
-namespace Seg {
-  using T = ll;
-  T op(T a, T b) { return min(a, b); }
-  T e() { return 4e18; }
+namespace Max {
+  int op(int a, int b) { return max(a, b); }
+  int e() { return -1; }
+}
+namespace Min {
+  int op(int a, int b) { return min(a, b); }
+  int e() { return 1e9; }
 }
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
   int N; cin >> N;
-  int Q; cin >> Q;
-  vector<int> X(N), W(N);
+  string s; cin >> s;
+
+  vector<int> L(N), R(N);
   F0R(i, N) {
-    cin >> X[i] >> W[i];
+    R[i] = s[i] == '1' ? 1 : 0;
+    if (s[i] == '1' && i > 0 && s[i-1] ==  '1') R[i] += R[i-1];
   }
-  stack<int> st;
-  vector<vector<pair<int, ll>>> I(N);
+  F0Rd(i, N) {
+    L[i] = s[i] == '1' ? 1 : 0;
+    if (s[i] == '1' && i + 1 < N && s[i+1] ==  '1') L[i] += L[i+1];
+  }
 
+  vector<ll> ans(N);
+  vector<array<int, 2>> mult(N);
+  map<int, vector<array<int, 2>>> queries;
   F0R(i, N) {
-    while (!st.empty() && W[st.top()] >= W[i]) {
-      auto j = st.top(); st.pop();
-      assert(X[i] >= X[j]);
-      I[i].push_back({j, 1LL * (X[i] - X[j]) * (W[i] + W[j])});
+    if (s[i] == '1' && (i == 0 || s[i-1] == '0')) {
+      for (int r = 0; r < L[i]-1; r++) {
+        queries[i].push_back({i+r, 0});
+      }
+      queries[i].push_back({i+L[i]-1, 1});
     }
-    if (!st.empty()) {
-      auto j = st.top();
-      I[i].push_back({j, 1LL * (X[i] - X[j]) * (W[i] + W[j])});
-    }
-    st.push(i);
   }
 
-  vector<vector<pair<int, int>>> queries(N);
-  F0R(i, Q) {
-    int l, r; cin >> l >> r;
-    l--, r--;
-    queries[r].push_back({l, i});
+  segtree<int, Max::op, Max::e> seg(N+2);
+  F0R(l, N) {
+    for (auto [r, t]: queries[l]) {
+      int len = r-l+1;
+      if (t == 0) {
+        int i = max(-1, seg.prod(len, N));
+        ans[l] += 1LL * len * (l - i);
+      }
+      else {
+        int i = max(-1, seg.prod(len, N));
+        mult[l][0] = l-i;
+      }
+    }
+    seg.set(L[l], l);
   }
 
-  vector<ll> ans(Q);
-  segtree<Seg::T, Seg::op, Seg::e> seg(N);
-  F0R(r, N) {
-    for (auto [l, x]: I[r]) {
-      seg.set(l, min(seg.get(l), x));
-    }
-    for (auto [l, id]: queries[r]) {
-      ans[id] = seg.prod(l, r);
+  queries.clear();
+  F0R(i, N) {
+    if (s[i] == '1') {
+      if (i == 0 || s[i-1] == '0') {
+        queries[i+L[i]-1].push_back({i, 2});
+      }
+      else {
+        queries[i+L[i]-1].push_back({i, 3});
+      }
     }
   }
-  F0R(i, Q) {
-    cout << ans[i] << '\n';
+
+  segtree<int, Min::op, Min::e> seg2(N+2);
+  F0Rd(r, N) {
+    for (auto [l, t]: queries[r]) {
+      int len = r-l+1;
+      int i = min(N, seg2.prod(len+1, N+1));
+      if (t == 2) {
+        mult[l][1] = i - r;
+      }
+      else if (t == 3) {
+        ans[l] += 1LL * len * (i - r);
+        ans[l] += 1LL * L[l] * (L[l] - 1) / 2;
+      }
+    }
+    seg2.set(R[r], r);
   }
+
+  // cout << ans << endl;
+  F0R(i, N) {
+    ans[i] += 1LL * L[i] * mult[i][0] * mult[i][1];
+    // cout << i << ": " << mult[i][0] << ' ' << mult[i][1] << endl;
+  }
+  cout << std::accumulate(all(ans), 0LL) << '\n';
 }

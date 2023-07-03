@@ -59,19 +59,29 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
+int solve() {
+  int N; cin >> N;
+  const int INF = 2e9;
+  vector<int> A(N+1), dp(N+1, INF);
+  dp[0] = 0;
+  FOR(i, 1, N+1) {
+    cin >> A[i];
+  }
+
+  map<int, int> mindp;
+  FOR(i, 1, N+1) {
+    ckmin(dp[i], dp[i-1] + 1);
+    ckmin(dp[i], mindp.count(A[i]) ? mindp[A[i]] : INF);
+
+    if (!mindp.count(A[i])) mindp[A[i]] = dp[i-1];
+    else ckmin(mindp[A[i]], dp[i-1]);
+  }
+
+  return N - dp[N];
+}
+
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  vector<string> g = {
-  "..#..",
-  ".###.",
-  "#####",
-  ".###.",
-  "..#..",
-  };
-  int N = sz(g);
-  int M = sz(g[0]);
-  cout << N << ' ' << M << '\n';
-  F0R(i, N) {
-    cout << g[i] << '\n';
-  }
+  int T; cin >> T;
+  while (T--) cout << solve() << '\n';
 }

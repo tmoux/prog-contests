@@ -61,17 +61,42 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  vector<string> g = {
-  "..#..",
-  ".###.",
-  "#####",
-  ".###.",
-  "..#..",
-  };
-  int N = sz(g);
-  int M = sz(g[0]);
-  cout << N << ' ' << M << '\n';
+  int N; cin >> N;
+  vector<vector<int>> adj(N);
+  REP(N-1) {
+    int a, b; cin >> a >> b;
+    a--, b--;
+    adj[a].push_back(b);
+    adj[b].push_back(a);
+  }
+
+  const int INF = 2e9;
+  vector<int> ans(N+1, INF);
+  ans[0] = 0;
   F0R(i, N) {
-    cout << g[i] << '\n';
+    vector<int> d(N, INF);
+    d[i] = 0;
+    queue<int> q;
+    q.push(i);
+    vector<int> order;
+    while (!q.empty()) {
+      int f = q.front(); q.pop();
+      order.push_back(d[f]);
+      for (int j: adj[f]) {
+        if (d[j] == INF) {
+          d[j] = d[f] + 1;
+          q.push(j);
+        }
+      }
+    }
+    int sum = 0;
+    for (int k = 0; k < N; k++) {
+      sum += order[k];
+      ckmin(ans[k+1], sum);
+    }
+  }
+
+  for (int k = 0; k <= N; k++) {
+    cout << (N-1) * k - 2 * ans[k] << " \n"[k == N];
   }
 }

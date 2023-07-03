@@ -59,19 +59,31 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
+void solve() {
+  int N; cin >> N;
+  vector<int> A(N);
+  F0R(i, N) cin >> A[i];
+
+  int L = -1;
+  pair<ll, int> mx = {0, 0};
+  ll minSum = 0;
+  ll cur = 0;
+  F0R(i, N) {
+    cur += A[i];
+    if (cur - mx.first < minSum) {
+      minSum = cur - mx.first;
+      L = mx.second;
+    }
+    ckmax(mx, {cur, i+1});
+  }
+
+  ll ans = 0;
+  F0R(i, L) ans += A[i];
+  cout << ans << '\n';
+}
+
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  vector<string> g = {
-  "..#..",
-  ".###.",
-  "#####",
-  ".###.",
-  "..#..",
-  };
-  int N = sz(g);
-  int M = sz(g[0]);
-  cout << N << ' ' << M << '\n';
-  F0R(i, N) {
-    cout << g[i] << '\n';
-  }
+  int T; cin >> T;
+  while (T--) solve();
 }

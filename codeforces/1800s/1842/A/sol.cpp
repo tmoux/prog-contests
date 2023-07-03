@@ -59,19 +59,28 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
+void solve() {
+  int N, M; cin >> N >> M;
+  vector<ll> A(N), B(M);
+  F0R(i, N) cin >> A[i];
+  F0R(i, M) cin >> B[i];
+
+  ll asum = std::accumulate(all(A), 0LL);
+  ll bsum = std::accumulate(all(B), 0LL);
+
+  if (asum > bsum) {
+    cout << "Tsondu" << '\n';
+  }
+  else if (bsum > asum) {
+    cout << "Tenzing" << '\n';
+  }
+  else {
+    cout << "Draw" << '\n';
+  }
+}
+
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  vector<string> g = {
-  "..#..",
-  ".###.",
-  "#####",
-  ".###.",
-  "..#..",
-  };
-  int N = sz(g);
-  int M = sz(g[0]);
-  cout << N << ' ' << M << '\n';
-  F0R(i, N) {
-    cout << g[i] << '\n';
-  }
+  int T; cin >> T;
+  while (T--) solve();
 }

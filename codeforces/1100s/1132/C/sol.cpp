@@ -61,17 +61,38 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  vector<string> g = {
-  "..#..",
-  ".###.",
-  "#####",
-  ".###.",
-  "..#..",
-  };
-  int N = sz(g);
-  int M = sz(g[0]);
-  cout << N << ' ' << M << '\n';
-  F0R(i, N) {
-    cout << g[i] << '\n';
+  int N, Q; cin >> N >> Q;
+  vector<array<int, 2>> v(Q);
+  F0R(i, Q) {
+    cin >> v[i][0] >> v[i][1];
   }
+
+  int ans = 0;
+  F0R(i, Q) {
+    vector<int> pfx(N+2);
+    F0R(j, Q) {
+      if (j != i) {
+        pfx[v[j][0]]++;
+        pfx[v[j][1]+1]--;
+      }
+    }
+
+    int s = 0;
+    vector<int> c(N+1);
+    for (int j = 1; j <= N; j++) {
+      pfx[j] += pfx[j-1];
+      if (pfx[j] > 0) s++;
+      if (pfx[j] == 1) c[j] = 1;
+      c[j] += c[j-1];
+    }
+
+    F0R(j, Q) {
+      if (j != i) {
+        int l = c[v[j][1]] - c[v[j][0]-1];
+        ckmax(ans, s - l);
+      }
+    }
+  }
+
+  cout << ans << '\n';
 }

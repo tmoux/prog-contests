@@ -59,19 +59,28 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
+void solve() {
+  int N, x; cin >> N >> x;
+  vector<vector<int>> A(3, vector<int>(N));
+  F0R(i, 3) {
+    F0R(j, N) {
+      cin >> A[i][j];
+    }
+  }
+  int ans = 0;
+  F0R(i, 3) {
+    F0R(j, N) {
+      int nans = ans | A[i][j];
+      if ((nans | x) == x) ans = nans;
+      else break;
+    }
+  }
+
+  cout << (ans == x ? "Yes" : "No") << '\n';
+}
+
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  vector<string> g = {
-  "..#..",
-  ".###.",
-  "#####",
-  ".###.",
-  "..#..",
-  };
-  int N = sz(g);
-  int M = sz(g[0]);
-  cout << N << ' ' << M << '\n';
-  F0R(i, N) {
-    cout << g[i] << '\n';
-  }
+  int T; cin >> T;
+  while (T--) solve();
 }

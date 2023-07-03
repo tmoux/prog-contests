@@ -59,19 +59,26 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
+void solve() {
+  string s; cin >> s;
+  vector<char> v;
+  for (char c: s) {
+    if (c == 'A') v.push_back(c);
+    else {
+      if (!v.empty() && v.back() == 'A') v.pop_back();
+      else v.push_back(c);
+    }
+  }
+  int acnt = 0, bcnt = 0;
+  for (char c: v) {
+    (c == 'A' ? acnt : bcnt)++;
+  }
+
+  cout << (acnt + (bcnt%2)) << '\n';
+}
+
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  vector<string> g = {
-  "..#..",
-  ".###.",
-  "#####",
-  ".###.",
-  "..#..",
-  };
-  int N = sz(g);
-  int M = sz(g[0]);
-  cout << N << ' ' << M << '\n';
-  F0R(i, N) {
-    cout << g[i] << '\n';
-  }
+  int T; cin >> T;
+  while (T--) solve();
 }

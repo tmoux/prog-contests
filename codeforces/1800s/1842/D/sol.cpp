@@ -2,6 +2,8 @@
 using namespace std;
 using ll = long long;
 
+#define int ll
+
 // Template {{{
 #define REP(n) for (int _ = 0; _ < (n); _++)
 #define FOR(i, a, b) for (int i = a; i < (b); i++)
@@ -59,19 +61,86 @@ ostream &operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-int main() {
+const int maxn = 105;
+int N, M;
+const int INF = 2e9;
+int dist[maxn][maxn];
+
+int32_t main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  vector<string> g = {
-  "..#..",
-  ".###.",
-  "#####",
-  ".###.",
-  "..#..",
-  };
-  int N = sz(g);
-  int M = sz(g[0]);
-  cout << N << ' ' << M << '\n';
-  F0R(i, N) {
-    cout << g[i] << '\n';
+  cin >> N >> M;
+  FOR(i, 1, N+1) {
+    FOR(j, 1, N+1) {
+      if (i != j) dist[i][j] = INF;
+    }
+  }
+  REP(M) {
+    int u, v, y; cin >> u >> v >> y;
+    dist[u][v] = dist[v][u] = y;
+  }
+
+  vector<int> prev(N+1, -1);
+  vector<ll> d(N+1, 1e18);
+  d[1] = 0;
+  vector<int> vis = {1};
+  while (1) {
+    const ll MX = 1e18;
+    array<ll, 3> nxt = {MX, -1, -1};
+    for (int i: vis) {
+      FOR(j, 1, N+1) {
+        if (prev[j] == -1 && dist[i][j] < INF) {
+          ckmin(nxt, {d[i] + dist[i][j], j, i});
+        }
+      }
+    }
+    auto [dd, j, i] = nxt;
+    if (j == -1) break;
+    prev[j] = i;
+    d[j] = dd;
+    vis.push_back(j);
+  }
+
+  if (prev[N] == -1) {
+    cout << "inf" << '\n';
+  }
+  else {
+    if (d[N] == 0) {
+      cout << 0 << ' ' << 0 << '\n';
+      return 0;
+    }
+    vector<int> path;
+    int cur = N;
+    while (1) {
+      path.push_back(cur);
+      if (cur == 1) break;
+      else cur = prev[cur];
+    }
+    reverse(all(path));
+
+    vector<pair<vector<int>, ll>> ret;
+    vector<ll> distances;
+    FOR(i, 1, N+1) distances.push_back(d[i]);
+    sort(all(distances)); distances.erase(unique(all(distances)), distances.end());
+
+    ll prevDist = 0;
+    for (auto di: distances) {
+      if (di == 0) continue;
+      vector<int> v(N+1, 0);
+      FOR(i, 1, N+1) {
+        if (d[i] < di) v[i] = 1;
+      }
+      assert(v[1] == 1 && v[N] == 0);
+      ret.push_back({v, di-prevDist});
+      prevDist = di;
+      if (di == d[N]) break;
+    }
+    cout << d[N] << ' ' << sz(ret) << '\n';
+
+    for (auto [v, di]: ret) {
+      FOR(i, 1, N+1) {
+        cout << v[i];
+      }
+      cout << ' ' << di << '\n';
+    }
   }
 }
