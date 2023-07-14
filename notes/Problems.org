@@ -2,3 +2,5 @@
 
 1. Given a sequence (A_n), define F(A) to be the maximum value of the gcd of any pair of consecutive numbers in A.
 Let P be a random permutation. What is the expected value of F(P(A))?
+
+2.
