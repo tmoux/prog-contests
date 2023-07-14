@@ -1,0 +1,96 @@
+# -*- mode: snippet -*-
+# name: DirectedGraph
+# key: DirectedGraph
+# --
+struct DirectedGraph {
+  #define trav(a, x) for (auto &a : x)
+  using vi = vector<int>;
+  int n;
+  vector<vi> g, gr;
+  vector<bool> used;
+  vi ord, comp;
+
+  vi compOf;
+  int nc;
+
+  vi indegree, source;
+
+  DirectedGraph(int _n) : n(_n) {
+    nc = 0;
+    compOf = vi(n);
+    g = vector<vi>(n);
+    gr = vector<vi>(n);
+    indegree = vi(n);
+    source = vi(n);
+  }
+
+  void add_edge(int i, int j) {
+    g[i].push_back(j);
+    gr[j].push_back(i);
+  }
+
+  void init() {
+    F0R(i, n) {
+      sort(all(g[i])); g[i].erase(unique(all(g[i])), g[i].end());
+      sort(all(gr[i])); gr[i].erase(unique(all(gr[i])), gr[i].end());
+    }
+    F0R(i, n) {
+      for (int j: g[i]) {
+        ++indegree[j];
+      }
+    }
+    F0R(i, n) source[i] = indegree[i] == 0;
+  }
+
+  void dfs1(int v) {
+    used[v] = true;
+    for (auto a: g[v]) {
+      if (!used[a]) dfs1(a);
+    }
+    ord.push_back(v);
+  }
+
+  void dfs2(int v) {
+    used[v] = true;
+    comp.push_back(v);
+    for (auto a: gr[v]) {
+      if (!used[a]) dfs2(a);
+    }
+  }
+
+  void findSCCs() {
+    ord.clear();
+    used.assign(n, false);
+    F0R(i, n) {
+      if (!used[i]) dfs1(i);
+    }
+    used.assign(n, false);
+    F0R(i, n) {
+      int v = ord[n-1-i];
+      if (!used[v]) {
+        dfs2(v);
+        trav(a, comp) {
+          compOf[a] = nc;
+        }
+        nc++;
+        comp.clear();
+      }
+    }
+  }
+
+  pair<DirectedGraph, vi> createCondensationGraph() {
+    findSCCs();
+    DirectedGraph ret(nc);
+    F0R(i, n) {
+      int c = compOf[i];
+      for (int j: g[i]) {
+        int d = compOf[j];
+        if (c != d) {
+          ret.add_edge(c, d);
+        }
+      }
+    }
+    ret.init();
+    return {ret, compOf};
+  }
+};

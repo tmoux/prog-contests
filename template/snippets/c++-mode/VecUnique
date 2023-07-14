@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: VecUnique
+# key: VecUnique
+# --
+
+sort(all(v)); v.erase(unique(all(v)), v.end());

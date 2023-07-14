@@ -1,4 +1,4 @@
 #!/bin/bash
 
 cp ~/.scripts/CppMakefile ./Makefile
-cp ~/.vim/snippets/codeforces.cpp ./sol.cpp
+cp ~/.scripts/codeforces.cpp ./sol.cpp

@@ -1,0 +1,14 @@
+# -*- mode: snippet -*-
+# name: CeilingRanges
+# key: CeilingRanges
+# --
+auto getv = [&](int x) {
+  vector<array<int, 3>> v;
+  for (int k = x, lb; k > 0; k = lb) {
+    int d = (x + k - 1) / k;
+    lb = (x - 1) / d;
+    v.push_back({lb+1, k, d});
+  }
+  reverse(all(v));
+  return v;
+};

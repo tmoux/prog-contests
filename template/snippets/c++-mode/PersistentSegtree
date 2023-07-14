@@ -1,0 +1,78 @@
+# -*- mode: snippet -*-
+# name: PersistentSegtree
+# key: PersistentSegtree
+# --
+
+template <class S, S (*op)(S, S), S (*e)()>
+struct PSeg {
+  const int MV = 5000000;
+  vector<int> l, r;
+  vector<S> sum;
+  int nv = 0;
+  int rp[maxn];
+
+  PSeg() {
+    reset();
+  }
+
+  int extend() {
+    l.push_back(0);
+    r.push_back(0);
+    sum.push_back(e());
+    return nv++;
+  }
+
+  void reset() {
+    l.reserve(MV);
+    r.reserve(MV);
+    sum.reserve(MV);
+    l.resize(1, 0);
+    r.resize(1, 0);
+    sum.resize(1, e());
+    nv = 0;
+  }
+
+  int build(int tl, int tr) {
+    if (tl == tr) return extend();
+    int tm = (tl + tr) / 2;
+    int cv = extend();
+    l[cv] = build(tl, tm);
+    r[cv] = build(tm+1, tr);
+    sum[cv] = op(sum[l[cv]], sum[r[cv]]);
+    return cv;
+  }
+
+  S query(int v, int tl, int tr, int L, int R) {
+    if (L > R) return e();
+    if (L == tl && R == tr) return sum[v];
+    int tm = (tl+tr)/2;
+    return op(query(l[v], tl, tm, L, min(R, tm)), query(r[v], tm+1, tr, max(L, tm+1), R));
+  }
+
+  int update(int v, int tl, int tr, int pos, int new_val) {
+    if (tl == tr) {
+      sum[nv] = op(new_val, sum[v]);
+      return extend();
+    }
+    int tm = (tl+tr)/2;
+    if (pos <= tm) {
+      int cv = extend();
+      l[cv] = update(l[v], tl, tm, pos, new_val);
+      r[cv] = r[v];
+      sum[cv] = op(sum[l[cv]], sum[r[cv]]);
+      return cv;
+    } else {
+      int cv = extend();
+      l[cv] = l[v];
+      r[cv] = update(r[v], tm+1, tr, pos, new_val);
+      sum[cv] = op(sum[l[cv]], sum[r[cv]]);
+      return cv;
+    }
+  }
+};
+
+namespace Seg {
+  using T = int;
+  int op(int a, int b) { return a ^ b; }
+  int e() { return 0; }
+}

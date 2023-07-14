@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: TestCases
+# key: TestCases
+# --
+int T; cin >> T;
+while (T--) solve();

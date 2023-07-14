@@ -1,0 +1,13 @@
+# -*- mode: snippet -*-
+# name: FloorRanges
+# key: FloorRanges
+# --
+
+auto get_floors = [&](int n) {
+  vector<array<int, 3>> v;
+  for (int i = 1, la; i <= n; i = la + 1) {
+    la = n / (n / i);
+    v.push_back({i, la, n/i});
+  }
+  return v;
+};

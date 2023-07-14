@@ -1,0 +1,85 @@
+# -*- mode: snippet -*-
+# name: AhoCorasick
+# key: AhoCorasick
+# --
+const int ALPHA = 26;
+struct AhoCorasick {
+  struct Node {
+    int next[ALPHA], trans[ALPHA];
+    int link;
+    int term;
+    int next_term;
+
+    Node() : link(-1), term(-1), next_term(-1) {
+      F0R(i, ALPHA) next[i] = trans[i] = -1;
+    }
+  };
+
+  vector<Node> nodes;
+
+  int newNode() {
+    nodes.push_back(Node());
+    return sz(nodes) - 1;
+  }
+
+  void insert(int i, const string& s, int idx) {
+    for (char ch: s) {
+      int c = ch - 'a';
+      if (nodes[i].next[c] == -1) nodes[i].next[c] = newNode();
+      i = nodes[i].next[c];
+    }
+    nodes[i].term = idx;
+  }
+
+  AhoCorasick(const vector<string>& vs) {
+    int root = newNode();
+    F0R(i, sz(vs)) {
+      insert(root, vs[i], i);
+    }
+
+    queue<int> q;
+    q.push(root);
+    nodes[root].link = root;
+    F0R(c, ALPHA) {
+      nodes[root].trans[c] = nodes[root].next[c] == -1 ? root : nodes[root].next[c];
+    }
+    while (!q.empty()) {
+      int i = q.front(); q.pop();
+      F0R(ch, ALPHA) {
+        if (nodes[i].next[ch] != -1) {
+          int j = nodes[i].next[ch];
+          if (i == root) {
+            nodes[j].link = root;
+          }
+          else {
+            nodes[j].link = nodes[nodes[i].link].trans[ch];
+          }
+          int suf = nodes[j].link;
+          nodes[j].next_term = nodes[suf].term != -1 ? suf : nodes[suf].next_term;
+          F0R(c, ALPHA) {
+            if (nodes[j].next[c] != -1) {
+              nodes[j].trans[c] = nodes[j].next[c];
+            }
+            else {
+              nodes[j].trans[c] = nodes[suf].trans[c];
+            }
+          }
+          q.push(j);
+        }
+      }
+    }
+  }
+
+  int go(int i, int c) {
+    return nodes[i].trans[c];
+  }
+
+  vector<int> get_matches(int i) {
+    vector<int> r;
+    while (i != -1) {
+      if (nodes[i].term != -1) r.push_back(nodes[i].term);
+      i = nodes[i].next_term;
+    }
+    return r;
+  }
+};
