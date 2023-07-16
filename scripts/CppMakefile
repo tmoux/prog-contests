@@ -1,11 +1,16 @@
 CC = g++
 CFLAGS = -std=c++20 -Wall
-TARGET = sol
 
-all: $(TARGET)
+all: sol
 
-$(TARGET): $(TARGET).cpp
-	$(CC) $(CFLAGS) -o $(TARGET) $(TARGET).cpp
+sol: sol.cpp
+	$(CC) $(CFLAGS) -o sol sol.cpp
+
+gen: gen.cpp
+	$(CC) $(CFLAGS) -o gen gen.cpp
+
+brute: brute.cpp
+	$(CC) $(CFLAGS) -o brute brute.cpp
 
 clean:
-	$(RM) $(TARGET)
+	$(RM) sol gen brute
