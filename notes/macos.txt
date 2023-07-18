@@ -126,3 +126,8 @@ Precompile header using: sudo g++ -std=c++20 stdc++.h
   #include <unordered_map>
   #include <unordered_set>
   #endif
+
+
+##############################################
+Path for g++13 (real gcc): 
+/opt/homebrew/Cellar/gcc/13.1.0/bin/g++-13
