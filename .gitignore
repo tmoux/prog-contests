@@ -30,3 +30,4 @@ CMakeLists.txt
 
 **/*.ccls-cache
 topics.org
+notes/problems.org
