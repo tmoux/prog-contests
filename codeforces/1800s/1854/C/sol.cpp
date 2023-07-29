@@ -162,117 +162,35 @@ namespace ModInt {
     }
   };
 }
-const int mod = 998244353;
-using mint = ModInt::mod_int<mod>;
+const int MOD = 1e9+7;
+using mint = ModInt::mod_int<MOD>;
 
-namespace ModCombinatorics {
-  vector<int> inv, _fac, _ifac;
-  template<size_t N, int MOD>
-  void init() {
-    inv.resize(N);
-    _fac.resize(N);
-    _ifac.resize(N);
-    inv[0] = inv[1] = 1;
-    for (size_t i = 2; i < N; i++) {
-      inv[i] = (MOD - (1LL * (MOD/i) * inv[MOD%i]) % MOD) % MOD;
-    }
-    _fac[0] = _ifac[0] = 1;
-    for (size_t i = 1; i < N; i++) {
-      _fac[i] = (1LL * i * _fac[i-1]) % MOD;
-      _ifac[i] = (1LL * _ifac[i-1] * inv[i]) % MOD;
-    }
-  }
+const int maxn = 505;
+mint dp[maxn][maxn];
 
-  mint choose(int n, int k) {
-    if (n < k || k < 0) return 0;
-    return mint(1) * _fac[n] * _ifac[k] * _ifac[n-k];
-  }
-
-  mint fac(int n) {
-    return mint(_fac[n]);
-  }
-
-  mint ifac(int n) {
-    return mint(_ifac[n]);
-  }
-
-  mint strong_compositions(int n, int k) {
-    if (n == 0) return k == 0 ? mint(1) : mint(0);
-    return choose(n-1, k-1);
-  }
-
-  mint weak_compositions(int n, int k) {
-    if (n == 0) return k == 0 ? mint(1) : mint(0);
-    return choose(n+k-1, k-1);
-  }
-};
-namespace MC = ModCombinatorics;
-
-const int maxn = 2e5+5;
-
-int spf[maxn];
-void init_spf() {
-  spf[1] = 1;
-  for (int i = 2; i < maxn; i++) if (!spf[i]) {
-      for (int j = i; j < maxn; j += i) {
-        if (!spf[j]) spf[j] = i;
-      }
-    }
-}
-
-namespace Mobius {
-  int mu[maxn];
-
-  void mobius_sieve() {
-    mu[1] = 1;
-    for (int i = 1; i < maxn; i++) {
-      for (int j = 2*i; j < maxn; j += i) {
-        mu[j] -= mu[i];
-      }
-    }
-  }
-}
-using namespace Mobius;
-
-mint P[maxn];
-mint F(int n, int k) {
-  vector<mint> q(n+1);
-  for (int i = 1; i <= n; i++) {
-    if (spf[i] == i) {
-      q[i] = mint(i) ^ n;
-    }
-    else {
-      q[i] = q[spf[i]] * q[i/spf[i]];
-    }
-  }
-  mint ans = 0;
-  for (int j = 0; j <= min(n, k); j++) {
-    ans += q[j] * MC::ifac(j) * P[min(n, k) - j];
-  }
-  return ans - 1;
-}
+int S[maxn];
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  init_spf();
-  MC::init<maxn, mod>();
-  mobius_sieve();
-  int n; cin >> n;
-  int K; cin >> K;
-  if (n == 1 || K == 1) {
-    cout << 1 << '\n';
-    return 0;
+  int N; cin >> N;
+  int M; cin >> M;
+  F0R(i, N) {
+    cin >> S[i];
   }
-
-  for (int i = 0; i <= n; i++) {
-    P[i] = (i % 2 == 0 ? 1 : mod-1) * MC::ifac(i);
-    if (i > 0) P[i] += P[i-1];
+  S[N] = M+1;
+  for (int i = 1; i <= M; i++) {
+    dp[i][M+1] = M+1-i;
+  }
+  const mint half = mint(2).inverse();
+  for (int i = M; i >= 1; i--) {
+    for (int j = M; j > i; j--) {
+      dp[i][j] = ((dp[i+1][j] + 1) + dp[i][j+1]) * half;
+    }
   }
 
   mint ans = 0;
-  for (int k = 1; k <= n; k++) {
-    int N = (n + k - 1) / k;
-    ans += mint(mu[k]) * F(N, K);
+  for (int i = 0; i < N; i++) {
+    ans += dp[S[i]][S[i+1]];
   }
   cout << ans << '\n';
 }
