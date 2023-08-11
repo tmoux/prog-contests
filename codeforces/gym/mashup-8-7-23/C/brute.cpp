@@ -162,124 +162,85 @@ namespace ModInt {
     }
   };
 }
-const int mod = 998244353, root = 62;
-using mint = ModInt::mod_int<mod>;
+const int MOD = 1e9+7;
+using mint = ModInt::mod_int<MOD>;
 
-namespace ModCombinatorics {
-  vector<int> inv, _fac, _ifac;
-  template<size_t N, int MOD>
-  void init() {
-    inv.resize(N);
-    _fac.resize(N);
-    _ifac.resize(N);
-    inv[0] = inv[1] = 1;
-    for (size_t i = 2; i < N; i++) {
-      inv[i] = (MOD - (1LL * (MOD/i) * inv[MOD%i]) % MOD) % MOD;
+vector<int> closure(vector<int> v, bool dbg = false) {
+  int N = sz(v);
+  while (1) {
+    int add = 0;
+    F0R(i, N) if (v[i] && !v[i ^ (N-1)]) {
+      add++;
+      if (dbg) cout << bitset<5>(i) << ": " << "adding " << (bitset<5>(i ^ (N-1))) << endl;
+      v[i ^ (N-1)] = 1;
     }
-    _fac[0] = _ifac[0] = 1;
-    for (size_t i = 1; i < N; i++) {
-      _fac[i] = (1LL * i * _fac[i-1]) % MOD;
-      _ifac[i] = (1LL * _ifac[i-1] * inv[i]) % MOD;
-    }
-  }
-
-  mint choose(int n, int k) {
-    if (n < k || k < 0) return 0;
-    return mint(1) * _fac[n] * _ifac[k] * _ifac[n-k];
-  }
-
-  mint fac(int n) {
-    return mint(_fac[n]);
-  }
-
-  mint ifac(int n) {
-    return mint(_ifac[n]);
-  }
-
-  mint strong_compositions(int n, int k) {
-    if (n == 0) return k == 0 ? mint(1) : mint(0);
-    return choose(n-1, k-1);
-  }
-
-  mint weak_compositions(int n, int k) {
-    if (n == 0) return k == 0 ? mint(1) : mint(0);
-    return choose(n+k-1, k-1);
-  }
-};
-namespace MC = ModCombinatorics;
-
-template<typename T, unsigned ROOT>
-struct NTT {
-  void ntt(vector<T> &a) {
-    int n = sz(a), L = 31 - __builtin_clz(n);
-    static vector<T> rt(2, 1);
-    for (static int k = 2, s = 2; k < n; k *= 2, s++) {
-      rt.resize(n);
-      T z[] = {1, T(root) ^ (mod >> s)};
-      FOR(i,k,2*k) rt[i] = rt[i / 2] * z[i & 1];
-    }
-    vector<int> rev(n);
-    FOR(i,0,n) rev[i] = (rev[i / 2] | (i & 1) << L) / 2;
-    FOR(i,0,n) if (i < rev[i]) swap(a[i], a[rev[i]]);
-    for (int k = 1; k < n; k *= 2)
-      for (int i = 0; i < n; i += 2 * k) FOR(j,0,k) {
-          mint z = rt[j + k] * a[i + j + k] % mod, &ai = a[i + j];
-          a[i + j + k] = ai - z;
-          ai += z;
+    F0R(i, N) {
+      FOR(j, i+1, N) {
+        if (v[i] && v[j] && !v[i&j]) {
+          if (dbg) cout << bitset<5>(i) << ' ' << bitset<5>(j) << ": " << "adding " << (bitset<5>(i & j)) << endl;
+          v[i&j] = 1;
+          add++;
         }
+      }
+    }
+    if (add == 0) break;
   }
-  vector<T> conv(const vector<T> &a, const vector<T> &b) {
-    if (a.empty() || b.empty()) return {};
-    int s = sz(a) + sz(b) - 1, B = 32 - __builtin_clz(s), n = 1 << B;
-    mint inv = 1 / mint(n);
-    vector<T> L(a), R(b), out(n);
-    L.resize(n), R.resize(n);
-    ntt(L), ntt(R);
-    FOR(i,0,n) out[-i & (n - 1)] = L[i] * R[i] * inv;
-    ntt(out);
-    return {out.begin(), out.begin() + s};
-  }
-};
+  return v;
+}
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  const int maxn = 3e5+5;
-  MC::init<maxn, mod>();
   int N; cin >> N;
-  vector<vector<int>> adj(N);
-  REP(N-1) {
-    int a, b; cin >> a >> b;
-    a--, b--;
-    adj[a].push_back(b);
-    adj[b].push_back(a);
+  vector<int> v(1 << N);
+  // int r = rng() % (1 << N);
+  // REP(r) {
+  //   int i = rng() % (1 << N);
+  //   v[i] = 1;
+  // }
+  int k; cin >> k;
+  REP(k) {
+    int x; cin >> x;
+    v[x] = 1;
   }
-
-  vector<int> C;
-  y_combinator([&](auto dfs, int i, int p) -> void {
-    int c = 0;
-    for (int j: adj[i]) {
-      if (j == p) continue;
-      c++;
-      dfs(j, i);
+  // cout << closure(v) << endl;
+  auto c = closure(v);
+  int cnt = 0;
+  F0R(i, 1 << N) {
+    if (c[i]) {
+      cnt++;
+      cout << bitset<5>(i) << endl;
     }
-    if (c > 0) C.push_back(c);
-  })(0, 0);
-
-  NTT<mint, root> ntt;
-  auto rec = y_combinator([&](auto rec, int l, int r) -> vector<mint> {
-      if (l == r) return {1, C[l]};
-      int mid = (l + r) >> 1;
-      auto left = rec(l, mid);
-      auto right = rec(mid+1, r);
-      return ntt.conv(left, right);
-  });
-
-  vector<mint> f = rec(0, sz(C) - 1);
-
-  mint ans = 0;
-  for (int k = 0; k <= N-1; k++) {
-    ans += (k % 2 == 0 ? mint(1) : mint(mod-1)) *
-           MC::fac(N - k) * (k < sz(f) ? f[k] : mint(0));
   }
-  cout << ans << '\n';
+  cout << c << endl;
+  DEBUG(cnt);
+
+  // c[9] = 1;
+  // closure(c, true);
+  // return 0;
+
+  F0R(i, 1 << N) {
+    if (!c[i]) {
+      auto nv = c; nv[i] = 1;
+      auto cnv = closure(nv);
+      int num = 0;
+      F0R(j, 1 << N) if (cnv[j]) num++;
+      if (num == 16) {
+        cout << bitset<5>(i) << ": " << cnv << endl;
+      }
+      else {
+        // cout << bitset<5>(i) << ": of size " << num << endl;
+        cout << bitset<5>(i) << ": " << cnv << endl;
+      }
+    }
+    else {
+      // cout << bitset<5>(i) << ": already in" << endl;
+    }
+  }
+  // F0R(mask, 1 << (1 << N)) {
+  //   vector<int> v(1 << N);
+  //   F0R(i, 1 << N) {
+  //     if (mask & (1 << i)) v[i] = 1;
+  //   }
+  //   cout << bitset<5>(mask) << ": " << closure(v) << endl;
+  // }
 }

@@ -84,7 +84,7 @@ namespace ModInt {
       val = (1LL*val*b.val) % MOD;
       return *this;
     }
-    mod_int& operator/=(const mod_int& b) {
+    mod_int& operator/=(const mod_int& b) const {
       val = (1LL*val*b.inverse().val) % MOD;
       return *this;
     }
@@ -162,124 +162,129 @@ namespace ModInt {
     }
   };
 }
-const int mod = 998244353, root = 62;
-using mint = ModInt::mod_int<mod>;
+const int MOD = 1e9+7;
+using mint = ModInt::mod_int<MOD>;
 
-namespace ModCombinatorics {
-  vector<int> inv, _fac, _ifac;
-  template<size_t N, int MOD>
-  void init() {
-    inv.resize(N);
-    _fac.resize(N);
-    _ifac.resize(N);
-    inv[0] = inv[1] = 1;
-    for (size_t i = 2; i < N; i++) {
-      inv[i] = (MOD - (1LL * (MOD/i) * inv[MOD%i]) % MOD) % MOD;
-    }
-    _fac[0] = _ifac[0] = 1;
-    for (size_t i = 1; i < N; i++) {
-      _fac[i] = (1LL * i * _fac[i-1]) % MOD;
-      _ifac[i] = (1LL * _ifac[i-1] * inv[i]) % MOD;
-    }
-  }
+// Find cycles and bridges
+// Then do DP on (i, xor) = # ways to get this xor
 
-  mint choose(int n, int k) {
-    if (n < k || k < 0) return 0;
-    return mint(1) * _fac[n] * _ifac[k] * _ifac[n-k];
-  }
+using vi = vector<int>;
+using pii = pair<int, int>;
 
-  mint fac(int n) {
-    return mint(_fac[n]);
-  }
-
-  mint ifac(int n) {
-    return mint(_ifac[n]);
-  }
-
-  mint strong_compositions(int n, int k) {
-    if (n == 0) return k == 0 ? mint(1) : mint(0);
-    return choose(n-1, k-1);
-  }
-
-  mint weak_compositions(int n, int k) {
-    if (n == 0) return k == 0 ? mint(1) : mint(0);
-    return choose(n+k-1, k-1);
-  }
-};
-namespace MC = ModCombinatorics;
-
-template<typename T, unsigned ROOT>
-struct NTT {
-  void ntt(vector<T> &a) {
-    int n = sz(a), L = 31 - __builtin_clz(n);
-    static vector<T> rt(2, 1);
-    for (static int k = 2, s = 2; k < n; k *= 2, s++) {
-      rt.resize(n);
-      T z[] = {1, T(root) ^ (mod >> s)};
-      FOR(i,k,2*k) rt[i] = rt[i / 2] * z[i & 1];
-    }
-    vector<int> rev(n);
-    FOR(i,0,n) rev[i] = (rev[i / 2] | (i & 1) << L) / 2;
-    FOR(i,0,n) if (i < rev[i]) swap(a[i], a[rev[i]]);
-    for (int k = 1; k < n; k *= 2)
-      for (int i = 0; i < n; i += 2 * k) FOR(j,0,k) {
-          mint z = rt[j + k] * a[i + j + k] % mod, &ai = a[i + j];
-          a[i + j + k] = ai - z;
-          ai += z;
+int S = 0;
+vector<vi> C;
+namespace BC {
+  vi num, st;
+  vi wt;
+  vector<vector<pii>> ed;
+  vector<pii> edges, bridges;
+  int Time;
+  template<class F>
+  int dfs(int at, int par, F& f) {
+    int me = num[at] = ++Time, e, y, top = me;
+    for (auto pa : ed[at]) if (pa.second != par) {
+        tie(y, e) = pa;
+        if (num[y]) {
+          top = min(top, num[y]);
+          if (num[y] < me)
+            st.push_back(e);
+        } else {
+          int si = sz(st);
+          int up = dfs(y, e, f);
+          top = min(top, up);
+          if (up == me) { // BCC (list of edges)
+            st.push_back(e);
+            f(vi(st.begin() + si, st.end()));
+            st.resize(si);
+          }
+          else if (up < me) st.push_back(e);
+          else { // BRIDGE
+            // S ^= wt[e];
+            // auto [a, b] = edges[e];
+            // bridges.emplace_back(a, b);
+          }
         }
+      }
+    return top;
   }
-  vector<T> conv(const vector<T> &a, const vector<T> &b) {
-    if (a.empty() || b.empty()) return {};
-    int s = sz(a) + sz(b) - 1, B = 32 - __builtin_clz(s), n = 1 << B;
-    mint inv = 1 / mint(n);
-    vector<T> L(a), R(b), out(n);
-    L.resize(n), R.resize(n);
-    ntt(L), ntt(R);
-    FOR(i,0,n) out[-i & (n - 1)] = L[i] * R[i] * inv;
-    ntt(out);
-    return {out.begin(), out.begin() + s};
+
+  template<class F>
+  void bicomps(F f) {
+    num.assign(sz(ed), 0);
+    FOR(i,0,sz(ed)) if (!num[i]) dfs(i, -1, f);
   }
-};
+} using namespace BC;
+
+int MX = 1 << 17;
+
+using vmi = vector<mint>;
+
+template<typename T>
+T INV = 1;
+template<> mint INV<mint> = mint(MX).inverse();
+
+template<typename T>
+void FST(vector<T>& a, bool inv, T INV) {
+  for (int n = sz(a), step = 1; step < n; step *= 2) {
+    for (int i = 0; i < n; i += 2 * step) FOR(j,i,i+step) {
+        auto &u = a[j], &v = a[j + step]; tie(u, v) =
+                                           // inv ? pii(v - u, u) : pii(v, u + v); // AND
+        // inv ? pii(v, u - v) : pii(u + v, u); // OR /// include-line
+        pii(u + v, u - v);                   // XOR /// include-line
+      }
+  }
+  if (inv) for (auto& x : a) x *= INV; // XOR only /// include-line
+}
+
+template<typename T>
+vector<T> conv(vector<T> a, vector<T> b) {
+  FST(a, 0, INV<T>); FST(b, 0, INV<T>);
+  FOR(i,0,sz(a)) a[i] *= b[i];
+  FST(a, 1, INV<T>); return a;
+}
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  const int maxn = 3e5+5;
-  MC::init<maxn, mod>();
-  int N; cin >> N;
-  vector<vector<int>> adj(N);
-  REP(N-1) {
-    int a, b; cin >> a >> b;
+  int N, M;
+  cin >> N >> M;
+  ed.resize(N);
+  wt.resize(M);
+  F0R(i, M) {
+    int a, b, w; cin >> a >> b >> w;
     a--, b--;
-    adj[a].push_back(b);
-    adj[b].push_back(a);
+    wt[i] = w;
+    S ^= w;
+    ed[a].emplace_back(b, i);
+    ed[b].emplace_back(a, i);
   }
 
-  vector<int> C;
-  y_combinator([&](auto dfs, int i, int p) -> void {
-    int c = 0;
-    for (int j: adj[i]) {
-      if (j == p) continue;
-      c++;
-      dfs(j, i);
+  bicomps([&](const vi& edgelist) {
+    vi r;
+    for (auto e: edgelist) {
+      r.push_back(wt[e]);
     }
-    if (c > 0) C.push_back(c);
-  })(0, 0);
-
-  NTT<mint, root> ntt;
-  auto rec = y_combinator([&](auto rec, int l, int r) -> vector<mint> {
-      if (l == r) return {1, C[l]};
-      int mid = (l + r) >> 1;
-      auto left = rec(l, mid);
-      auto right = rec(mid+1, r);
-      return ntt.conv(left, right);
+    C.push_back(r);
   });
 
-  vector<mint> f = rec(0, sz(C) - 1);
-
-  mint ans = 0;
-  for (int k = 0; k <= N-1; k++) {
-    ans += (k % 2 == 0 ? mint(1) : mint(mod-1)) *
-           MC::fac(N - k) * (k < sz(f) ? f[k] : mint(0));
+  assert(sz(C) <= 50);
+  vector<mint> dp(MX, 0); dp[S] = 1;
+  vector<mint> dp2(MX, 0); dp2[S] = 1;
+  for (auto c: C) {
+    vector<mint> mult(MX, 0);
+    vector<mint> mult2(MX, 0);
+    for (auto i: c) {
+      mult[i] += 1;
+      mult2[i] = 1;
+    }
+    dp = conv(dp, mult);
+    dp2 = conv(dp2, mult2);
+    F0R(i, MX) dp2[i] = dp2[i] == 0 ? 0 : 1;
   }
-  cout << ans << '\n';
+
+  for (int x = 0; x < MX; x++) {
+    if (dp2[x] != 0) {
+      cout << x << ' ' << dp[x] << '\n';
+      return 0;
+    }
+  }
 }

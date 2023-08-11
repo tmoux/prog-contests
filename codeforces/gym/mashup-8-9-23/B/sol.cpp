@@ -162,124 +162,98 @@ namespace ModInt {
     }
   };
 }
-const int mod = 998244353, root = 62;
-using mint = ModInt::mod_int<mod>;
-
-namespace ModCombinatorics {
-  vector<int> inv, _fac, _ifac;
-  template<size_t N, int MOD>
-  void init() {
-    inv.resize(N);
-    _fac.resize(N);
-    _ifac.resize(N);
-    inv[0] = inv[1] = 1;
-    for (size_t i = 2; i < N; i++) {
-      inv[i] = (MOD - (1LL * (MOD/i) * inv[MOD%i]) % MOD) % MOD;
-    }
-    _fac[0] = _ifac[0] = 1;
-    for (size_t i = 1; i < N; i++) {
-      _fac[i] = (1LL * i * _fac[i-1]) % MOD;
-      _ifac[i] = (1LL * _ifac[i-1] * inv[i]) % MOD;
-    }
-  }
-
-  mint choose(int n, int k) {
-    if (n < k || k < 0) return 0;
-    return mint(1) * _fac[n] * _ifac[k] * _ifac[n-k];
-  }
-
-  mint fac(int n) {
-    return mint(_fac[n]);
-  }
-
-  mint ifac(int n) {
-    return mint(_ifac[n]);
-  }
-
-  mint strong_compositions(int n, int k) {
-    if (n == 0) return k == 0 ? mint(1) : mint(0);
-    return choose(n-1, k-1);
-  }
-
-  mint weak_compositions(int n, int k) {
-    if (n == 0) return k == 0 ? mint(1) : mint(0);
-    return choose(n+k-1, k-1);
-  }
-};
-namespace MC = ModCombinatorics;
-
-template<typename T, unsigned ROOT>
-struct NTT {
-  void ntt(vector<T> &a) {
-    int n = sz(a), L = 31 - __builtin_clz(n);
-    static vector<T> rt(2, 1);
-    for (static int k = 2, s = 2; k < n; k *= 2, s++) {
-      rt.resize(n);
-      T z[] = {1, T(root) ^ (mod >> s)};
-      FOR(i,k,2*k) rt[i] = rt[i / 2] * z[i & 1];
-    }
-    vector<int> rev(n);
-    FOR(i,0,n) rev[i] = (rev[i / 2] | (i & 1) << L) / 2;
-    FOR(i,0,n) if (i < rev[i]) swap(a[i], a[rev[i]]);
-    for (int k = 1; k < n; k *= 2)
-      for (int i = 0; i < n; i += 2 * k) FOR(j,0,k) {
-          mint z = rt[j + k] * a[i + j + k] % mod, &ai = a[i + j];
-          a[i + j + k] = ai - z;
-          ai += z;
-        }
-  }
-  vector<T> conv(const vector<T> &a, const vector<T> &b) {
-    if (a.empty() || b.empty()) return {};
-    int s = sz(a) + sz(b) - 1, B = 32 - __builtin_clz(s), n = 1 << B;
-    mint inv = 1 / mint(n);
-    vector<T> L(a), R(b), out(n);
-    L.resize(n), R.resize(n);
-    ntt(L), ntt(R);
-    FOR(i,0,n) out[-i & (n - 1)] = L[i] * R[i] * inv;
-    ntt(out);
-    return {out.begin(), out.begin() + s};
-  }
-};
+const int MOD = 998244353;
+using mint = ModInt::mod_int<MOD>;
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  const int maxn = 3e5+5;
-  MC::init<maxn, mod>();
-  int N; cin >> N;
-  vector<vector<int>> adj(N);
-  REP(N-1) {
-    int a, b; cin >> a >> b;
-    a--, b--;
-    adj[a].push_back(b);
-    adj[b].push_back(a);
-  }
+  int N, M, K; cin >> N >> M >> K;
 
-  vector<int> C;
-  y_combinator([&](auto dfs, int i, int p) -> void {
-    int c = 0;
-    for (int j: adj[i]) {
-      if (j == p) continue;
-      c++;
-      dfs(j, i);
+  int bad_rows = 0, bad_cols = 0;
+  int invalid_rows = 0, invalid_cols = 0;
+  array<int, 2> checkerboard_cnt = {0, 0};
+  vector<array<int, 2>> cnt_row(N, {0, 0}), cnt_col(M, {0, 0});
+  map<pair<int, int>, int> G;
+
+  auto getans = [&]() -> mint {
+    mint ans = 0;
+    if (invalid_rows == 0) {
+      ans += mint(2) ^ (N - bad_rows);
     }
-    if (c > 0) C.push_back(c);
-  })(0, 0);
+    if (invalid_cols == 0) {
+      ans += mint(2) ^ (M - bad_cols);
+    }
+    F0R(i, 2) if (checkerboard_cnt[i] == 0) ans -= 1;
+    return ans;
+  };
 
-  NTT<mint, root> ntt;
-  auto rec = y_combinator([&](auto rec, int l, int r) -> vector<mint> {
-      if (l == r) return {1, C[l]};
-      int mid = (l + r) >> 1;
-      auto left = rec(l, mid);
-      auto right = rec(mid+1, r);
-      return ntt.conv(left, right);
-  });
+  auto add_checkerboard = [&](int p, int d) {
+    checkerboard_cnt[p] += d;
+  };
 
-  vector<mint> f = rec(0, sz(C) - 1);
+  auto is_invalid = [&](array<int, 2> a) {
+    return a[0] > 0 && a[1] > 0;
+  };
 
-  mint ans = 0;
-  for (int k = 0; k <= N-1; k++) {
-    ans += (k % 2 == 0 ? mint(1) : mint(mod-1)) *
-           MC::fac(N - k) * (k < sz(f) ? f[k] : mint(0));
+  auto add_row = [&](int r, int p, int d) {
+    auto pre = cnt_row[r];
+    cnt_row[r][p] += d;
+    auto cur = cnt_row[r];
+    if (pre[0] == 0 && pre[1] == 0) {
+      bad_rows++;
+    }
+    else if (cur[0] == 0 && cur[1] == 0) {
+      bad_rows--;
+    }
+    if (!is_invalid(pre) && is_invalid(cur)) {
+      invalid_rows++;
+    }
+    else if (is_invalid(pre) && !is_invalid(cur)) {
+      invalid_rows--;
+    }
+  };
+
+  auto add_col = [&](int c, int p, int d) {
+    auto pre = cnt_col[c];
+    cnt_col[c][p] += d;
+    auto cur = cnt_col[c];
+    if (pre[0] == 0 && pre[1] == 0) {
+      bad_cols++;
+    }
+    else if (cur[0] == 0 && cur[1] == 0) {
+      bad_cols--;
+    }
+    if (!is_invalid(pre) && is_invalid(cur)) {
+      invalid_cols++;
+    }
+    else if (is_invalid(pre) && !is_invalid(cur)) {
+      invalid_cols--;
+    }
+  };
+
+  auto update_set = [&](int i, int j, int t) -> void {
+    assert(!G.count({i, j}));
+    G[{i, j}] = t;
+    int p = (i ^ j ^ G[{i, j}]) & 1;
+    add_checkerboard(p, 1);
+    add_row(i, p, 1);
+    add_col(j, p, 1);
+  };
+
+  auto update_unset = [&](int i, int j) -> void {
+    if (!G.count({i, j})) return;
+    int p = (i ^ j ^ G[{i, j}]) & 1;
+    add_checkerboard(p, -1);
+    add_row(i, p, -1);
+    add_col(j, p, -1);
+    G.erase({i, j});
+  };
+
+  while (K--) {
+    int x, y, t; cin >> x >> y >> t;
+    x--, y--;
+    update_unset(x, y);
+    if (t != -1) update_set(x, y, t);
+    cout << getans() << '\n';
   }
-  cout << ans << '\n';
 }

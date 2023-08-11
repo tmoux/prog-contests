@@ -32,3 +32,4 @@ CMakeLists.txt
 topics.org
 notes/problems.org
 notes/personal
+**/*.org
