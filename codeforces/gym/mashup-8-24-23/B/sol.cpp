@@ -52,73 +52,65 @@ ostream& operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-struct DiffTracker {
-  multiset<int> ms;
-  ll sum = 0;
+const int maxn = 2e5+5;
+int N, C[maxn];
+vector<int> adj[maxn];
 
-  void insert(int x) {
-    sum += x;
-    ms.insert(x);
+vector<int> ans;
+ll minCost = 0;
+pair<int, vector<int>*> dfs(int i, int p) {
+  vector<pair<int, vector<int>*>> v;
+  for (int j: adj[i]) {
+    if (j == p) continue;
+    v.push_back(dfs(j, i));
   }
-  void remove(int x) {
-    sum -= x;
-    ms.erase(ms.find(x));
+  sort(all(v));
+  vector<int>* r = new vector<int>;
+  r->push_back(i);
+  if (v.empty()) {
+    return {C[i], r};
   }
-
-  ll getAns() {
-    if (ms.empty()) return 0LL;
-    int biggest = *ms.rbegin();
-    return sum + biggest;
-  }
-};
-
-void solve() {
-  int N; cin >> N;
-  map<int, int> mp;
-  vector<int> A(N);
-  F0R(i, N) {
-    cin >> A[i];
-    mp[A[i]]++;
-  }
-
-  DiffTracker tracker;
-  {
-    vector<int> v = A;
-    sort(all(v)); v.erase(unique(all(v)), v.end());
-    for (int i = 1; i < sz(v); i++) tracker.insert(v[i] - v[i-1]);
-  }
-
-  int Q; cin >> Q;
-  F0R(t, Q) {
-    int i, x; cin >> i >> x;
-    i--;
-    if (--mp[A[i]] == 0) {
-      mp.erase(A[i]);
-      auto it = mp.upper_bound(A[i]);
-      if (it != mp.end()) tracker.remove(it->first - A[i]);
-      if (it != mp.begin()) tracker.remove(A[i] - prev(it)->first);
-
-      if (it != mp.end() && it != mp.begin()) {
-        tracker.insert(it->first - prev(it)->first);
-      }
+  else if (sz(v) == 1 || end(v)[-2].first < end(v)[-1].first) {
+    F0R(k, sz(v)-1) {
+      minCost += v[k].first;
+      for (auto j: *v[k].second) ans.push_back(j);
     }
-    A[i] = x;
-    if (++mp[A[i]] == 1) {
-      auto it = mp.upper_bound(A[i]);
-      auto it2 = mp.lower_bound(A[i]);
-      if (it != mp.end() && it2 != mp.begin()) {
-        tracker.remove(it->first - prev(it2)->first);
-      }
-      if (it != mp.end()) tracker.insert(it->first - A[i]);
-      if (it2 != mp.begin()) tracker.insert(A[i] - prev(it2)->first);
+    if (C[i] < v.back().first) return {C[i], r};
+    else if (v.back().first < C[i]) return v.back();
+    else {
+      v.back().second->push_back(i);
+      return v.back();
     }
-    cout << mp.begin()->first + tracker.getAns() << ' ';
   }
-  cout << '\n';
+  else {
+    F0R(k, sz(v)-1) {
+      minCost += v[k].first;
+    }
+    F0R(k, sz(v)) {
+      for (auto j: *v[k].second) ans.push_back(j);
+    }
+    if (C[i] < v.back().first) return {C[i], r};
+    else if (v.back().first < C[i]) return {v.back().first, new vector<int>};
+    else return {C[i], r};
+  }
 }
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int T; cin >> T;
-  while (T--) solve();
+  cin >> N;
+  F0R(i, N) cin >> C[i];
+  REP(N-1) {
+    int a, b; cin >> a >> b;
+    a--, b--;
+    adj[a].push_back(b);
+    adj[b].push_back(a);
+  }
+  auto [c, v] = dfs(0, 0);
+  for (auto i: *v) ans.push_back(i);
+  minCost += c;
+
+  sort(all(ans));
+  cout << minCost << ' ' << sz(ans) << '\n';
+  for (auto i: ans) cout << i+1 << ' ';
+  cout << '\n';
 }
