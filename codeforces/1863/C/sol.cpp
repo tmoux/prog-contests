@@ -54,34 +54,46 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 void solve() {
   int N, K; cin >> N >> K;
-  vector<int> A(N*K);
-  for (auto& x: A) cin >> x;
-  vector<pair<int, int>> ans(N+1);
-  int cnt = 0;
+  vector<int> A(N);
+  F0R(i, N) {
+    cin >> A[i];
+  }
 
-  vector<int> used(N+1);
-  while (cnt < N) {
-    vector<int> prev(N+1, -1);
-    int last = -1;
-    F0R(i, N*K) {
-      if (used[A[i]]) continue;
-      if (prev[A[i]] > last) {
-        ans[A[i]] = {prev[A[i]], i};
-        used[A[i]] = 1;
-        cnt++;
-        last = i;
-      }
-      else prev[A[i]] = i;
+  auto mex = [&](vector<int> v) {
+    sort(all(v)); v.erase(unique(all(v)), v.end());
+    F0R(i, sz(v)) if (v[i] != i) return i;
+    return sz(v);
+  };
+
+  auto op = [&](vector<int> v) -> vector<int> {
+    F0R(i, sz(v)) {
+      int m = mex(v);
+      v[i] = m;
     }
-  }
+    return v;
+  };
 
-  for (int i = 1; i <= N; i++) {
-    cout << ans[i].first+1 << ' ' << ans[i].second+1 << '\n';
+  int m = mex(A);
+  A.push_back(m);
+
+  auto posmod = [&](int x) {
+    return ((x % (N+1)) + (N+1)) % (N+1);
+  };
+
+  F0R(i, N) {
+    int j = posmod(i - K);
+    cout << A[j] << ' ';
   }
+  cout << '\n';
+
+  // REP(20) {
+  //   cout << A << endl;
+  //   A = op(A);
+  // }
 }
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int T = 1;
+  int T; cin >> T;
   while (T--) solve();
 }

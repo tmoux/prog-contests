@@ -53,35 +53,75 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
 void solve() {
-  int N, K; cin >> N >> K;
-  vector<int> A(N*K);
-  for (auto& x: A) cin >> x;
-  vector<pair<int, int>> ans(N+1);
-  int cnt = 0;
+  int N, M; cin >> N >> M;
+  vector<string> g(N);
+  F0R(i, N) {
+    cin >> g[i];
+  }
 
-  vector<int> used(N+1);
-  while (cnt < N) {
-    vector<int> prev(N+1, -1);
-    int last = -1;
-    F0R(i, N*K) {
-      if (used[A[i]]) continue;
-      if (prev[A[i]] > last) {
-        ans[A[i]] = {prev[A[i]], i};
-        used[A[i]] = 1;
-        cnt++;
-        last = i;
-      }
-      else prev[A[i]] = i;
+  // Check if row/col count is all even: sufficient and necessary
+  F0R(i, N) {
+    int c = 0;
+    F0R(j, M) {
+      if (g[i][j] != '.') c ^= 1;
+    }
+    if (c) {
+      cout << -1 << '\n';
+      return;
+    }
+  }
+  F0R(j, M) {
+    int c = 0;
+    F0R(i, N) {
+      if (g[i][j] != '.') c ^= 1;
+    }
+    if (c) {
+      cout << -1 << '\n';
+      return;
     }
   }
 
-  for (int i = 1; i <= N; i++) {
-    cout << ans[i].first+1 << ' ' << ans[i].second+1 << '\n';
+  // Else possible: pair up blocks
+  vector<string> ans(N, string(M, '.'));
+  F0R(j, M-1) {
+    vector<int> v;
+    F0R(i, N) {
+      if (g[i][j] == 'L' && g[i][j+1] == 'R') {
+        v.push_back(i);
+      }
+    }
+    assert(sz(v) % 2 == 0);
+    for (int idx = 0; idx < sz(v); idx += 2) {
+      ans[v[idx]][j] = 'B';
+      ans[v[idx]][j+1] = 'W';
+      ans[v[idx+1]][j] = 'W';
+      ans[v[idx+1]][j+1] = 'B';
+    }
+  }
+  F0R(i, N-1) {
+    vector<int> v;
+    F0R(j, M) {
+      if (g[i][j] == 'U' && g[i+1][j] == 'D') {
+        v.push_back(j);
+      }
+    }
+    assert(sz(v) % 2 == 0);
+    // cout << i << ": " << v << endl;
+    for (int idx = 0; idx < sz(v); idx += 2) {
+      ans[i][v[idx]] = 'B';
+      ans[i+1][v[idx]] = 'W';
+      ans[i][v[idx+1]] = 'W';
+      ans[i+1][v[idx+1]] = 'B';
+    }
+  }
+
+  F0R(i, N) {
+    cout << ans[i] << '\n';
   }
 }
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int T = 1;
+  int T; cin >> T;
   while (T--) solve();
 }

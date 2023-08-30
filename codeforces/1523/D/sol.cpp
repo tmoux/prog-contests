@@ -52,36 +52,61 @@ ostream& operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-void solve() {
-  int N, K; cin >> N >> K;
-  vector<int> A(N*K);
-  for (auto& x: A) cin >> x;
-  vector<pair<int, int>> ans(N+1);
-  int cnt = 0;
+int main() {
+  ios_base::sync_with_stdio(false); cin.tie(NULL);
+  int N, M, P; cin >> N >> M >> P;
+  vector<int> cnt(M);
+  vector<vector<int>> A(N, vector<int>(M));
+  F0R(i, N) {
+    string s; cin >> s;
+    F0R(j, M) {
+      A[i][j] = s[j] - '0';
+      if (A[i][j]) cnt[j]++;
+    }
+  }
+  int maj = (N + 1) / 2;
 
-  vector<int> used(N+1);
-  while (cnt < N) {
-    vector<int> prev(N+1, -1);
-    int last = -1;
-    F0R(i, N*K) {
-      if (used[A[i]]) continue;
-      if (prev[A[i]] > last) {
-        ans[A[i]] = {prev[A[i]], i};
-        used[A[i]] = 1;
-        cnt++;
-        last = i;
+  pair<int, ll> best = {0, 0};
+  REP(50) {
+    int idx = rng() % N;
+    vector<int> pos;
+    F0R(j, M) if (A[idx][j]) pos.push_back(j);
+
+    vector<int> C(1 << sz(pos));
+    vector<int> F(1 << sz(pos));
+    F0R(i, N) {
+      int mask = 0;
+      F0R(j, sz(pos)) {
+        mask |= (1 ^ A[i][pos[j]]) << j;
       }
-      else prev[A[i]] = i;
+      C[mask]++;
+      F[mask]++;
+    }
+    for (int i = 0; i < sz(pos); i++) {
+      F0R(mask, 1 << sz(pos)) {
+        if (mask & (1 << i)) {
+          F[mask] += F[mask ^ (1 << i)];
+        }
+      }
+    }
+
+    int ALL = (1 << sz(pos)) - 1;
+    F0R(mask, 1 << sz(pos)) {
+      if (F[mask] >= maj) {
+        int x = mask ^ ALL;
+        ll tr = 0;
+        F0R(j, sz(pos)) {
+          if (x & (1 << j)) {
+            tr |= 1LL << pos[j];
+          }
+        }
+        ckmax(best, {__builtin_popcount(x), tr});
+      }
     }
   }
 
-  for (int i = 1; i <= N; i++) {
-    cout << ans[i].first+1 << ' ' << ans[i].second+1 << '\n';
+  F0R(j, M) {
+    cout << ((best.second >> j) & 1);
   }
-}
-
-int main() {
-  ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int T = 1;
-  while (T--) solve();
+  cout << '\n';
 }

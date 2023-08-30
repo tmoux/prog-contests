@@ -53,35 +53,72 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
 void solve() {
-  int N, K; cin >> N >> K;
-  vector<int> A(N*K);
-  for (auto& x: A) cin >> x;
-  vector<pair<int, int>> ans(N+1);
-  int cnt = 0;
+  int N; cin >> N;
+  vector<ll> A(N);
+  F0R(i, N) cin >> A[i];
 
-  vector<int> used(N+1);
-  while (cnt < N) {
-    vector<int> prev(N+1, -1);
-    int last = -1;
-    F0R(i, N*K) {
-      if (used[A[i]]) continue;
-      if (prev[A[i]] > last) {
-        ans[A[i]] = {prev[A[i]], i};
-        used[A[i]] = 1;
-        cnt++;
-        last = i;
+  ll total = 0;
+  for (auto& x: A) total ^= x;
+
+  // BF
+  vector<vector<int>> seen(N, vector<int>(N));
+  vector<vector<int>> dist(N, vector<int>(N));
+  queue<pair<int, int>> q; q.push({0, N-1});
+
+  auto bs = [&](int x) {
+    return bitset<4>(x);
+  };
+
+  vector<int> ans(N);
+  while (!q.empty()) {
+    auto [l, r] = q.front(); q.pop();
+    if (l == r) {
+      ans[l] = 1;
+    }
+    ll x = 0;
+    FOR(i, l, r+1) x ^= A[i];
+    ll a = 0;
+
+    auto upd = [&](int y, int z, int l, int r) {
+      // cout << l << ' ' << r << " -> " << y << ' ' << z << endl;
+      if (!seen[y][z]) {
+        seen[y][z] = 1;
+        q.push({y, z});
+        dist[y][z] = dist[l][r] + 1;
       }
-      else prev[A[i]] = i;
+    };
+    FOR(i, l, r) {
+      a ^= A[i];
+      ll b = x ^ a;
+      if (a == b) {
+        upd(l, i, l, r);
+        upd(i+1, r, l, r);
+      }
+      else if (a > b) {
+        // cout << bs(x) << ' ' << bs(a) << endl;
+        upd(l, i, l, r);
+      }
+      else {
+        // cout << bs(x) << ' ' << bs(b) << endl;
+        upd(i+1, r, l, r);
+      }
     }
   }
-
-  for (int i = 1; i <= N; i++) {
-    cout << ans[i].first+1 << ' ' << ans[i].second+1 << '\n';
+  F0R(i, N) {
+    cout << ans[i];
   }
+  cout << '\n';
+  // cout << ans << endl;
+  // F0R(i, N) {
+  //   if (ans[i]) {
+  //     cout << dist[i][i] << ' ';
+  //   }
+  // }
+  // cout << endl;
 }
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int T = 1;
+  int T; cin >> T;
   while (T--) solve();
 }

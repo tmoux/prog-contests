@@ -53,35 +53,62 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
 void solve() {
-  int N, K; cin >> N >> K;
-  vector<int> A(N*K);
-  for (auto& x: A) cin >> x;
-  vector<pair<int, int>> ans(N+1);
-  int cnt = 0;
+  int N; cin >> N;
+  vector<ll> A(N+1);
+  FOR(i, 1, N+1) cin >> A[i];
 
-  vector<int> used(N+1);
-  while (cnt < N) {
-    vector<int> prev(N+1, -1);
-    int last = -1;
-    F0R(i, N*K) {
-      if (used[A[i]]) continue;
-      if (prev[A[i]] > last) {
-        ans[A[i]] = {prev[A[i]], i};
-        used[A[i]] = 1;
-        cnt++;
-        last = i;
+  vector<ll> pfx(N+1, 0);
+  FOR(i, 1, N+1) pfx[i] = A[i] ^ pfx[i-1];
+
+  auto get = [&](int l, int r) -> ll {
+    return pfx[r] ^ pfx[l-1];
+  };
+
+  auto msb = [](ll x) {
+    return 63 - __builtin_clzll(x);
+  };
+
+  if (N == 1) {
+    cout << 1 << '\n';
+    return;
+  }
+  vector<bool> okL(N+1), okR(N+1);
+  vector<ll> L(N+1), R(N+1);
+
+  vector<int> ans(N+1);
+  auto upd = [&](int l, int r, ll x) {
+    if (x) {
+      int i = msb(x);
+      L[r] |= 1LL << i;
+      R[l] |= 1LL << i;
+    }
+    else {
+      okL[r] = okR[l] = 1;
+    }
+  };
+  for (int r = N; r >= 1; r--) {
+    for (int l = 1; l <= r; l++) {
+      ll x = get(l, r);
+      if (l == 1 && r == N) {
+        upd(1, N, x);
       }
-      else prev[A[i]] = i;
+      else {
+        bool b = (L[r] & x) || okL[r] || (R[l] & x) || okR[l];
+        if (b) {
+          upd(l, r, x);
+          if (l == r) ans[l] = 1;
+        }
+      }
     }
   }
-
-  for (int i = 1; i <= N; i++) {
-    cout << ans[i].first+1 << ' ' << ans[i].second+1 << '\n';
+  FOR(i, 1, N+1) {
+    cout << ans[i];
   }
+  cout << '\n';
 }
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int T = 1;
+  int T; cin >> T;
   while (T--) solve();
 }

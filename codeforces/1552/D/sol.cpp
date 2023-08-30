@@ -52,36 +52,41 @@ ostream& operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-void solve() {
-  int N, K; cin >> N >> K;
-  vector<int> A(N*K);
-  for (auto& x: A) cin >> x;
-  vector<pair<int, int>> ans(N+1);
-  int cnt = 0;
+bool solve() {
+  int N; cin >> N;
+  set<int> s;
+  vector<int> A(N);
+  F0R(i, N) {
+    cin >> A[i];
+    A[i] = abs(A[i]);
+    s.insert(A[i]);
+  }
 
-  vector<int> used(N+1);
-  while (cnt < N) {
-    vector<int> prev(N+1, -1);
-    int last = -1;
-    F0R(i, N*K) {
-      if (used[A[i]]) continue;
-      if (prev[A[i]] > last) {
-        ans[A[i]] = {prev[A[i]], i};
-        used[A[i]] = 1;
-        cnt++;
-        last = i;
+  if (s.count(0) || sz(s) < N) return true;
+
+  F0R(mask, 1 << N) {
+    if (__builtin_popcount(mask) > 1) {
+      vector<int> subset;
+      F0R(i, N) {
+        if (mask & (1 << i)) subset.push_back(A[i]);
       }
-      else prev[A[i]] = i;
+
+      F0R(m, 1 << sz(subset)) {
+        int sum = 0;
+        F0R(j, sz(subset)) {
+          sum += (m & (1 << j)) ? subset[j] : -subset[j];
+        }
+        F0R(i, N) {
+          if (sum == A[i] && !(mask & (1 << i))) return true;
+        }
+      }
     }
   }
-
-  for (int i = 1; i <= N; i++) {
-    cout << ans[i].first+1 << ' ' << ans[i].second+1 << '\n';
-  }
+  return false;
 }
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int T = 1;
-  while (T--) solve();
+  int T; cin >> T;
+  while (T--) cout << (solve() ? "YES" : "NO") << '\n';
 }

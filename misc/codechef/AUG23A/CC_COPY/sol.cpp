@@ -52,36 +52,80 @@ ostream& operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-void solve() {
-  int N, K; cin >> N >> K;
-  vector<int> A(N*K);
-  for (auto& x: A) cin >> x;
-  vector<pair<int, int>> ans(N+1);
-  int cnt = 0;
+using vi = vector<int>;
+bool dfs(int a, int L, vector<vi>& g, vi& btoa, vi& A, vi& B) {
+  if (A[a] != L) return 0;
+  A[a] = -1;
+  for (int b : g[a]) if (B[b] == L + 1) {
+      B[b] = 0;
+      if (btoa[b] == -1 || dfs(btoa[b], L + 1, g, btoa, A, B))
+        return btoa[b] = a, 1;
+    }
+  return 0;
+}
 
-  vector<int> used(N+1);
-  while (cnt < N) {
-    vector<int> prev(N+1, -1);
-    int last = -1;
-    F0R(i, N*K) {
-      if (used[A[i]]) continue;
-      if (prev[A[i]] > last) {
-        ans[A[i]] = {prev[A[i]], i};
-        used[A[i]] = 1;
-        cnt++;
-        last = i;
+int hopcroftKarp(vector<vi>& g, vi& btoa) {
+  int res = 0;
+  vi A(g.size()), B(btoa.size()), cur, next;
+  for (;;) {
+    fill(all(A), 0);
+    fill(all(B), 0);
+    /// Find the starting nodes for BFS (i.e. layer 0).
+    cur.clear();
+    for (int a : btoa) if(a != -1) A[a] = -1;
+    FOR(a,0,sz(g)) if(A[a] == 0) cur.push_back(a);
+    /// Find all layers using bfs.
+    for (int lay = 1;; lay++) {
+      bool islast = 0;
+      next.clear();
+      for (int a : cur) for (int b : g[a]) {
+          if (btoa[b] == -1) {
+            B[b] = lay;
+            islast = 1;
+          }
+          else if (btoa[b] != a && !B[b]) {
+            B[b] = lay;
+            next.push_back(btoa[b]);
+          }
+        }
+      if (islast) break;
+      if (next.empty()) return res;
+      for (int a : next) A[a] = lay;
+      cur.swap(next);
+    }
+    /// Use DFS to scan for augmenting paths.
+    FOR(a,0,sz(g))
+      res += dfs(a, 0, g, btoa, A, B);
+  }
+}
+
+void solve() {
+  string s; cin >> s;
+  const string t = "codechef";
+  vector<vi> g(sz(s));
+  F0R(i, sz(s)) {
+    F0R(j, sz(t)) {
+      if (s[i] != t[j]) {
+        g[i].push_back(j);
       }
-      else prev[A[i]] = i;
     }
   }
-
-  for (int i = 1; i <= N; i++) {
-    cout << ans[i].first+1 << ' ' << ans[i].second+1 << '\n';
+  vi btoa(sz(t), -1);
+  int match = hopcroftKarp(g, btoa);
+  if (match < sz(s)) {
+    cout << -1 << '\n';
+  }
+  else {
+    string ans(sz(s), '#');
+    F0R(i, sz(t)) {
+      ans[i] = s[btoa[i]];
+    }
+    cout << ans << '\n';
   }
 }
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int T = 1;
+  int T; cin >> T;
   while (T--) solve();
 }

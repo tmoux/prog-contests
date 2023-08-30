@@ -53,35 +53,22 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
 void solve() {
-  int N, K; cin >> N >> K;
-  vector<int> A(N*K);
-  for (auto& x: A) cin >> x;
-  vector<pair<int, int>> ans(N+1);
-  int cnt = 0;
-
-  vector<int> used(N+1);
-  while (cnt < N) {
-    vector<int> prev(N+1, -1);
-    int last = -1;
-    F0R(i, N*K) {
-      if (used[A[i]]) continue;
-      if (prev[A[i]] > last) {
-        ans[A[i]] = {prev[A[i]], i};
-        used[A[i]] = 1;
-        cnt++;
-        last = i;
-      }
-      else prev[A[i]] = i;
-    }
+  int N; cin >> N;
+  vector<int> pos(N+1);
+  F0R(i, N) {
+    int x; cin >> x;
+    pos[x] = i;
   }
 
-  for (int i = 1; i <= N; i++) {
-    cout << ans[i].first+1 << ' ' << ans[i].second+1 << '\n';
+  int ans = 0;
+  for (int i = 2; i <= N; i++) {
+    if (pos[i] < pos[i-1]) ans++;
   }
+  cout << ans << '\n';
 }
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int T = 1;
+  int T; cin >> T;
   while (T--) solve();
 }

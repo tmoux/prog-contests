@@ -54,34 +54,43 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 void solve() {
   int N, K; cin >> N >> K;
-  vector<int> A(N*K);
-  for (auto& x: A) cin >> x;
-  vector<pair<int, int>> ans(N+1);
-  int cnt = 0;
 
-  vector<int> used(N+1);
-  while (cnt < N) {
-    vector<int> prev(N+1, -1);
-    int last = -1;
-    F0R(i, N*K) {
-      if (used[A[i]]) continue;
-      if (prev[A[i]] > last) {
-        ans[A[i]] = {prev[A[i]], i};
-        used[A[i]] = 1;
-        cnt++;
-        last = i;
-      }
-      else prev[A[i]] = i;
+  vector<int> used(2*N);
+  vector<pair<int, int>> edges;
+  REP(K) {
+    int x, y; cin >> x >> y;
+    x--, y--;
+    used[x] = used[y] = 1;
+    edges.emplace_back(x, y);
+  }
+
+  vector<int> v;
+  F0R(i, 2*N) {
+    if (!used[i]) v.push_back(i);
+  }
+  for (int i = 0; i < sz(v)/2; i++) {
+    edges.emplace_back(v[i], v[i+sz(v)/2]);
+  }
+
+  auto isec = [&](pair<int, int> A, pair<int, int> B) -> bool {
+    auto [a, b] = A;
+    auto [c, d] = B;
+    if (a > b) swap(a, b);
+    if (c > d) swap(c, d);
+    return a < c && c < b && b < d;
+  };
+
+  int ans = 0;
+  F0R(i, sz(edges)) {
+    FOR(j, i+1, sz(edges)) {
+      if (isec(edges[i], edges[j]) || isec(edges[j], edges[i])) ans++;
     }
   }
-
-  for (int i = 1; i <= N; i++) {
-    cout << ans[i].first+1 << ' ' << ans[i].second+1 << '\n';
-  }
+  cout << ans << '\n';
 }
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int T = 1;
+  int T; cin >> T;
   while (T--) solve();
 }

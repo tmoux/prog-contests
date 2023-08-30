@@ -53,35 +53,70 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
 void solve() {
-  int N, K; cin >> N >> K;
-  vector<int> A(N*K);
-  for (auto& x: A) cin >> x;
-  vector<pair<int, int>> ans(N+1);
-  int cnt = 0;
+  int N, M, K; cin >> N >> M >> K;
+  vector<int> T(N);
+  F0R(i, N) cin >> T[i];
 
-  vector<int> used(N+1);
-  while (cnt < N) {
-    vector<int> prev(N+1, -1);
-    int last = -1;
-    F0R(i, N*K) {
-      if (used[A[i]]) continue;
-      if (prev[A[i]] > last) {
-        ans[A[i]] = {prev[A[i]], i};
-        used[A[i]] = 1;
-        cnt++;
-        last = i;
-      }
-      else prev[A[i]] = i;
+
+  vector<vector<int>> adj(N);
+  vector<int> indegree(N);
+  REP(M) {
+    int a, b; cin >> a >> b;
+    a--, b--;
+    // add reverse edge
+    adj[b].push_back(a);
+    indegree[a]++;
+  }
+
+  queue<int> q;
+  F0R(i, N) if (indegree[i] == 0) q.push(i);
+
+  vector<ll> mxT(N, 0);
+  while (!q.empty()) {
+    int i = q.front(); q.pop();
+    for (int j: adj[i]) {
+      int add = T[j] <= T[i] ? T[i]-T[j] : (T[i]+K)-T[j];
+      ckmax(mxT[j], mxT[i] + add);
+      if (--indegree[j] == 0) q.push(j);
     }
   }
 
-  for (int i = 1; i <= N; i++) {
-    cout << ans[i].first+1 << ' ' << ans[i].second+1 << '\n';
+  vector<pair<int, int>> sources;
+  F0R(i, N) if (adj[i].empty()) sources.emplace_back(T[i], i);
+  sort(all(sources));
+
+  vector<ll> sfx(sz(sources));
+  for (int i = sz(sources)-1; i >= 0; i--) {
+    int j = sources[i].second;
+    sfx[i] = mxT[j] + T[j];
+    if (i + 1 < sz(sources)) ckmax(sfx[i], sfx[i+1]);
   }
+
+  ll ans = 1e18;
+  ll mxPrefix = 0;
+  F0R(i, sz(sources)) {
+    int j = sources[i].second;
+    ll startTime = sources[i].first;
+    ll endTime = sfx[i];
+    if (i > 0) ckmax(endTime, mxPrefix + K);
+    ckmin(ans, endTime - startTime);
+
+    // update mxPrefix
+    ckmax(mxPrefix, mxT[j] + T[j]);
+  }
+  // vector<int> result(sz(T));
+  // std::partial_sum(all(T), result.begin(), [&](int x, int y) {
+  //   return max(x, y);
+  // });
+  // cout << T << endl;
+  // cout << result << endl;
+  // return;
+
+  cout << ans << '\n';
 }
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int T = 1;
+  int T; cin >> T;
   while (T--) solve();
 }
