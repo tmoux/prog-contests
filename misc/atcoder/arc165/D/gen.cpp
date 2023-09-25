@@ -61,38 +61,15 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 int main() {
     ios_base::sync_with_stdio(false); cin.tie(NULL);
-    int T; cin >> T;
-    cout << T << '\n';
-    int N, M, Q; cin >> N >> M >> Q;
-    REP(T) {
-        cout << N << ' ' << M << ' ' << Q << '\n';
-        REP(M) {
-            int i = rng() % N + 1;
-            cout << i << ' ';
-        }
-        cout << '\n';
-        for (int i = 2; i <= N; i++) {
-            int p = rng() % (i - 1) + 1;
-            int w = rng() % 1000000000;
-            cout << p << ' ' << i << ' ' << w << '\n';
-        }
-        REP(Q) {
-            int n = rng() % N + 1;
-            vector<int> v;
-            REP(n) {
-                int i = rng() % N + 1;
-                v.push_back(i);
-            }
-            sort(all(v)); v.erase(unique(all(v)), v.end());
-            cout << sz(v) << '\n';
-            for (auto i: v) cout << i << ' ';
-            cout << '\n';
-            // cout << i << ' ' << j << '\n';
-            // cout << N << ' ';
-            // for (int i = 1; i <= N; i++) {
-            //     cout << i << ' ';
-            // }
-            // cout << '\n';
-        }
+    int N, M; cin >> N >> M;
+    cout << N << ' ' << M << '\n';
+    REP(M) {
+        int a = rng() % N + 1;
+        int b = rng() % N + 1;
+        int c = rng() % N + 1;
+        int d = rng() % N + 1;
+        if (a > b) swap(a, b);
+        if (c > d) swap(c, d);
+        cout << a << ' ' << b << ' ' << c << ' ' << d << '\n';
     }
 }

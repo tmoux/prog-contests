@@ -1,6 +1,3 @@
-#pragma GCC optimize("O3,unroll-loops")
-#pragma GCC target("avx2,bmi,bmi2,lzcnt,popcnt")
-
 #include <bits/stdc++.h>
 using namespace std;
 using ll = long long;
@@ -100,6 +97,37 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
 // Data structure for handling LCA queries and preorder traversals.
+pair<int, int> mincomp(pair<int, int> x, pair<int, int> y) {
+  return min(x, y);
+}
+
+// combine should be associative and idempotent (e.g., min, max, gcd)
+template<typename T, T (*combine)(T, T)>
+struct SparseTable
+{
+  int n, maxk;
+  vector<vector<T>> tb;
+  static inline int lg(int x) { return 32 - __builtin_clz(x) - 1; }
+  SparseTable() {}
+  SparseTable(const vector<T>& a) : n(sz(a)) {
+    maxk = 0;
+    while (n >= (1<<maxk)) maxk++;
+    tb.resize(maxk, vector<T>(n));
+    for (int i = 0; i < n; i++) tb[0][i] = a[i];
+    for (int k = 1; k <= lg(n); k++) {
+      for (int i = 0; i < n; i++) {
+        int nx = i + (1<<(k-1));
+        if (nx < n) tb[k][i] = combine(tb[k-1][i], tb[k-1][nx]);
+        else tb[k][i] = tb[k-1][i];
+      }
+    }
+  }
+  T prod(int l, int r) {
+    int g = lg(r-l+1);
+    return combine(tb[g][l], tb[g][r-(1<<g)+1]);
+  }
+};
+
 struct Tree {
   int n, maxk;
   bool is_0_index;
@@ -107,18 +135,20 @@ struct Tree {
   vector<vector<pair<int, ll>>> adj;
   vector<int> udepth;
   vector<ll> depth, depthFromRed;
-  vector<vector<int>> par;
+  vector<pair<int, int>> E;
+  vector<int> Eindex;
+  int e_idx = 0;
+  SparseTable<pair<int, int>, mincomp> table;
 
   void dfs(int i, int p, int& t, ll nearestRedDepth) {
+    Eindex[i] = e_idx;
+    E[e_idx++] = {udepth[i], i};
     depthFromRed[i] = depth[i] - nearestRedDepth;
-    par[0][i] = p;
-    for (int k = 1; k < maxk; k++) {
-      par[k][i] = par[k-1][i] == -1 ? -1 : par[k-1][par[k-1][i]];
-    }
     for (auto [j, w]: adj[i]) if (j != p) {
         udepth[j] = udepth[i] + 1;
         depth[j] = depth[i] + w;
         dfs(j, i, t, isRed[i] ? depth[i] : nearestRedDepth);
+        E[e_idx++] = {udepth[i], i};
       }
   }
 
@@ -131,7 +161,9 @@ struct Tree {
     udepth.resize(sz, 0);
     depth.resize(sz, 0);
     depthFromRed.resize(sz, 0);
-    par = vector<vector<int>>(maxk, vector<int>(sz, -1));
+    E.resize(2*sz-1);
+    Eindex.resize(sz, -1);
+    e_idx = 0;
   }
   void add_edge(int u, int v, ll w) {
     adj[u].emplace_back(v, w);
@@ -142,24 +174,13 @@ struct Tree {
     int root = is_0_index ? 0 : 1;
     int t = 0;
     dfs(root, -1, t, 0);
+    table = SparseTable<pair<int, int>, mincomp>(E);
   }
 
   int lca(int a, int b) {
-    if (udepth[a] > udepth[b]) swap(a, b);
-    for (int k = maxk-1; k >= 0; k--) {
-      int bb = par[k][b];
-      if (bb != -1 && udepth[bb] >= udepth[a]) b = bb;
-    }
-    if (a == b) return a;
-    for (int k = maxk-1; k >= 0; k--) {
-      int aa = par[k][a];
-      int bb = par[k][b];
-      if (aa != bb) {
-        a = aa;
-        b = bb;
-      }
-    }
-    return par[0][a];
+    int i = Eindex[a], j = Eindex[b];
+    if (i > j) swap(i, j);
+    return table.prod(i, j).second;
   }
 };
 
@@ -198,7 +219,6 @@ void solve() {
     return ans;
   };
 
-  // cout << tree.depthFromRed << endl;
   REP(Q) {
     int k = getInt();
     // int k; cin >> k;
