@@ -52,50 +52,75 @@ ostream& operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-const int D = 60; //length of masks
+template<typename T = uint32_t, int LOG_A = 30>
+struct XorBasis {
+  T basis[LOG_A];
+  int basis_size = 0;
+  int num_vectors = 0;
+  XorBasis() {
+    fill(basis, basis+LOG_A, 0);
+  }
 
-ll basis[D]; // basis[i] keeps the mask of the vector whose f value is i
+  T getBit(T x, int i) {
+    return x & (1LL << i);
+  }
 
-int bs = 0; //basis size
+  void insertVector(T mask) {
+    if (!mask) return;
+    num_vectors++;
+    for (int i = LOG_A - 1; i >= 0; i--) {
+      if (!getBit(mask, i)) continue;
+      if (!basis[i]) {
+        basis[i] = mask;
+        basis_size++;
+        return;
+      }
+      mask ^= basis[i];
+    }
+  }
 
-void insertVector(ll mask) {
-  if (!mask) return;
-	for (int i = 0; i < D; i++) {
-		if ((mask & 1ll << i) == 0) continue;
+  bool inSpan(T x) { // check if x is in the span of the basis
+    for (int i = LOG_A - 1; i >= 0; i--) {
+      if (basis[i] && getBit(x, i)) x ^= basis[i];
+    }
+    return x == 0;
+  }
 
-		if (!basis[i]) {
-			basis[i] = mask;
-			++bs;
-			return;
-		}
+  T maxXor(T x) { // maximum z s.t. x ^ y = z, where y in span
+    T ans = x;
+    for (int i = LOG_A - 1; i >= 0; i--) {
+      if (basis[i] && !getBit(ans, i)) ans ^= basis[i];
+    }
+    return ans;
+  }
 
-		mask ^= basis[i];
-	}
-}
-
-int basis_size = 0;
-bool inSpan(ll mask) {
-	for (int i = 0; i < D; i++) {
-		if ((mask & 1ll << i) == 0) continue;
-		mask ^= basis[i];
-	}
-  return mask == 0;
-}
+  T minXor(T x) { // maximum z s.t. x ^ y = z, where y in span
+    T ans = x;
+    for (int i = LOG_A - 1; i >= 0; i--) {
+      if (basis[i] && !getBit(ans, i)) ans ^= basis[i];
+    }
+    return ans;
+  }
+};
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
+  XorBasis<uint64_t, 60> xb;
   int N; cin >> N;
   uint64_t x = 0;
   F0R(i, N) {
     uint64_t a, b; cin >> a >> b;
     x ^= a;
-    insertVector(a ^ b);
+    xb.insertVector(a ^ b);
+    cout << "inserting " << (a^b) << endl;
   }
-  if (!inSpan(x)) {
+  cout << "checking " << x << endl;
+  if (!xb.inSpan(x)) {
     cout << "1/1" << '\n';
   }
   else {
-    int D = bs;
+    int D = xb.basis_size;
+    DEBUG(D);
     cout << ((1LL << D) - 1) << "/" << (1LL << D) << '\n';
   }
 }
