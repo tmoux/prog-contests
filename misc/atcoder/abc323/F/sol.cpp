@@ -52,45 +52,66 @@ ostream& operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-ll SZ = 1 << 19; //set this to power of two
-ll* seg = new ll[2*SZ]; //segtree implementation by bqi343's Github
+using P = pair<ll, ll>;
 
-ll combine(ll a, ll b) { return a + b; }
-
-void update(int p, ll value) {
-  for (seg[p += SZ] = value; p > 1; p >>= 1)
-    seg[p>>1] = combine(seg[(p|1)^1], seg[p|1]);
+P dist(P A, P B) {
+  return {B.first - A.first, B.second - A.second};
 }
 
-ll query(int l, int r) {  // sum on interval [l, r]
-  ll resL = 0, resR = 0; r++;
-  for (l += SZ, r += SZ; l < r; l >>= 1, r >>= 1) {
-    if (l&1) resL = combine(resL,seg[l++]);
-    if (r&1) resR = combine(seg[--r],resR);
+ll manhat(P A, P B) {
+  return abs(B.first - A.first) + abs(B.second - A.second);
+}
+
+ll movedist(P A, P B, P T) {
+  if (A.first == B.first && B.first == T.first &&
+      ((A.second < B.second && B.second < T.second) ||
+       (A.second > B.second && B.second > T.second))) {
+    return manhat(A, T) + 2;
   }
-  return combine(resL,resR);
+  else if (A.second == B.second && B.second == T.second &&
+           ((A.first < B.first && B.first < T.first) ||
+            (A.first > B.first && B.first > T.first))) {
+    return manhat(A, T) + 2;
+  }
+  else return manhat(A, T);
 }
-
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int N, Q; cin >> N >> Q;
-  F0R(i, N) {
-    int x; cin >> x;
-    update(i, x);
-  }
+  P A, B, C;
+  cin >> A.first >> A.second;
+  cin >> B.first >> B.second;
+  cin >> C.first >> C.second;
 
-  REP(Q) {
-    int t; cin >> t;
-    if (t == 0) {
-      int p, x; cin >> p >> x;
-      ll v = query(p, p) + x;
-      update(p, v);
-    }
-    else {
-      int l, r; cin >> l >> r;
-      r--;
-      cout << query(l, r) << '\n';
-    }
+  P delta = dist(B, C);
+  ll ans = 0;
+  if (delta.first == 0) {
+    P T = {B.first, delta.second > 0 ? B.second - 1 : B.second + 1};
+    ans += movedist(A, B, T);
+    ans += manhat(B, C);
   }
+  else if (delta.second == 0) {
+    P T = {delta.first > 0 ? B.first - 1 : B.first + 1, B.second};
+    ans += movedist(A, B, T);
+    //DEBUG(delta);
+    //DEBUG(T);
+    //DEBUG(ans);
+    ans += manhat(B, C);
+  }
+  else {
+    P T1 = {B.first, delta.second > 0 ? B.second - 1 : B.second + 1};
+    P T2 = {delta.first > 0 ? B.first - 1 : B.first + 1, B.second};
+
+    ll minans = 1e18;
+    for (auto v: vector<vector<P>>{{T1, T2}, {T2, T1}}) {
+      ll tr = 0;
+
+      tr += movedist(A, B, v[0]);
+      tr += 2;
+      tr += manhat(B, C);
+      ckmin(minans, tr);
+    }
+    ans = minans;
+  }
+  cout << ans << '\n';
 }

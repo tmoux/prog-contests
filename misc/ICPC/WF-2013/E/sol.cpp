@@ -36,173 +36,143 @@ template<class T> bool ckmax(T& a, const T& b) { return a < b ? a = b, 1 : 0; }
  
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
-const int maxn = 2005;
-int Index[maxn];
-pair<char, int> what[maxn];
-int nxt[maxn], jmp[maxn];
-int B, S, id = 0;
+// Re-implementation time: 25:34
 
+int B, S;
+const int maxn = 1005;
+pair<char, int> D[maxn];
+int End[maxn];
 const int MX = 13;
-ll C[MX][MX], total = 0;
-using T = pair<pair<array<array<ll, MX>, MX>, ll>, int>;
 
-T G(int i, int r, int mask);
-T F(int i, int r, int mask);
+using T = pair<array<array<ll, MX>, MX>, ll>;
 
-T G(int i, int r, int mask) {
-    assert(what[i].first == 'R');
-    int end = jmp[i];
-    i++;
+pair<T, int> F(int i, int r, int mask);
+pair<T, int> G(int i, int r, int mask);
 
-    array<array<ll, MX>, MX> c;
-    F0R(a, MX) F0R(b, MX) c[a][b] = 0;
-    ll t = 0;
-    while (i < end) {
-        assert(i != -1);
-        if (what[i].first == 'V') {
-            t++;
-            int x = Index[i];
+pair<T, int> F(int i, int r, int mask) {
+    assert(D[i].first == 'R');
+    int n = D[i].second;
+    if (n == 1) return G(i, r, mask);
+    else {
+        auto [dat, nr] = G(i, r, mask);
+        auto& [C1, total1] = dat;
+        auto [dat2, nnr] = G(i, nr, mask);
+        auto& [C2, total2] = dat2;
+
+        ll total = total1 + (n-1) * total2;
+        F0R(a, MX) F0R(b, MX) {
+            C1[a][b] += (n-1) * C2[a][b];
+        }
+        return {{C1, total}, nnr};
+    }
+}
+
+pair<T, int> G(int i, int r, int mask) {
+    assert(D[i].first == 'R');
+    int E = End[i];
+
+    array<array<ll, MX>, MX> C;
+    F0R(a, MX) F0R(b, MX) C[a][b] = 0;
+    ll total = 0;
+    for (i++; i < E; i++) {
+        if (D[i].first == 'V') {
+            int x = D[i].second;
+            total++;
             if (!(mask & (1 << x))) {
-                if (r != -1) c[r][x]++;
+                if (r == -1) total++;
+                else if (r != x) C[r][x]++;
                 r = x;
             }
-            i++;
         }
-        else if (what[i].first == 'R') {
-            auto [cost2, nr] = F(i, r, mask);
-            F0R(a, MX) F0R(b, MX) c[a][b] += cost2.first[a][b];
-            t += cost2.second;
+        else if (D[i].first == 'R') {
+            auto [dat, nr] = F(i, r, mask);
+            auto& [C2, total2] = dat;
+            F0R(a, MX) F0R(b, MX) C[a][b] += C2[a][b];
+            total += total2;
             r = nr;
-            i = jmp[i] + 1;
+            i = End[i];
         }
-        else {
-            assert(false);
-        }
+        else assert(0);
     }
-    return {{c, t}, r};
-}
-
-T F(int i, int r, int mask) {
-    assert(what[i].first == 'R');
-    int n = what[i].second;
-    if (n == 1) {
-        return G(i, r, mask);
-    }
-    else {
-        auto [c, nr] = G(i, r, mask);
-        auto [cost2, nnr] = G(i, nr, mask);
-        cost2.second = (cost2.second * (n-1)) + c.second;
-        F0R(a, MX) {
-            F0R(b, MX) {
-                cost2.first[a][b] = cost2.first[a][b] * (n-1) + c.first[a][b];
-            }
-        }
-        return {cost2, nnr};
-    }
-}
-
-ll cnt = 0;
-ll solve(const vector<int>& assign) {
-    ll ans = total;
-    bool has_gt0 = false;
-    F0R(i, sz(assign)) if (assign[i] > 0) has_gt0 = true;
-    if (has_gt0) ans++;
-    F0R(i, sz(assign)) {
-        F0R(j, sz(assign)) {
-            ans += C[i][j] * (assign[i] != assign[j]);
-        }
-    }
-    return ans;
+    return {{C, total}, r};
 }
 
 int main() {
     ios_base::sync_with_stdio(0); cin.tie(0);
-    memset(nxt, -1, sizeof nxt);
-    memset(jmp, -1, sizeof jmp);
     cin >> B >> S;
 
     vector<string> vs = {"R1"};
     string s;
     while (cin >> s) vs.push_back(s);
     vs.push_back("E");
-
     stack<int> st;
-    vector<int> V;
-    for (auto s: vs) {
-        if (s[0] == 'E') {
-            what[id] = {'E', 0};
+    int mx = 0;
+    F0R(i, sz(vs)) {
+        char c = vs[i][0];
+        if (c == 'R') {
+            int n = stoi(vs[i].substr(1));
+            D[i] = {'R', n};
+            st.push(i);
+        }
+        else if (c == 'V') {
+            int x = stoi(vs[i].substr(1)) - 1;
+            D[i] = {'V', x};
+            ckmax(mx, x+1);
+        }
+        else if (c == 'E') {
             assert(!st.empty());
-            jmp[st.top()] = id;
+            End[st.top()] = i;
             st.pop();
         }
-        else if (s[0] == 'V') {
-            int i = stoi(s.substr(1)) - 1;
-            Index[id] = i;
-            V.push_back(i);
-            what[id] = {'V', i};
-        }
-        else if (s[0] == 'R') {
-            int n = stoi(s.substr(1));
-            what[id] = {'R', n};
-            st.push(id);
-        }
-        id++;
+        else assert(0);
     }
-    sort(all(V)); V.erase(unique(all(V)), V.end());
-    map<int, int> compress;
-    F0R(i, sz(V)) compress[V[i]] = i;
-    F0R(i, id) Index[i] = compress[Index[i]];
-    int mx = sz(V);
+    assert(st.empty());
 
     ll ans = 1e18;
-
-    int target = min(S, mx);
-    for (int mask = 0; mask < (1 << mx); mask++) {
-        if (__builtin_popcount(mask) == target) {
-            memset(C, 0, sizeof C);
-            total = 0;
-            auto p = F(0, -1, mask);
-            F0R(a, MX) {
-                F0R(b, MX) {
-                    C[a][b] = p.first.first[a][b];
+    F0R(mask, 1 << mx) {
+        if (__builtin_popcount(mask) == min(mx, S)) {
+            auto [dat, _] = F(0, -1, mask);
+            const auto& [C, total] = dat;
+            auto compute = [&](const vector<int>& assign) -> ll {
+                ll ans = total;
+                F0R(i, sz(assign)) {
+                    F0R(j, sz(assign)) {
+                        ans += (assign[i] != assign[j]) * C[i][j];
+                    }
                 }
-            }
-            total = p.first.second;
+                return ans;
+            };
 
-            vector<int> assign(mx);
-            vector<int> cnt(B);
-            for (int i = 0; i < mx; i++) {
-                if (mask & (1 << i)) assign[i] = 0;
-            }
-
+            vector<int> assign(mx, 0);
+            vector<int> cnt(B, 0);
             function<void(int, int)> rec;
-            rec = [&](int i, int num) {
+            rec = [&](int i, int num) -> void {
                 if (i == mx) {
-                    ckmin(ans, solve(assign));
+                    ckmin(ans, compute(assign));
                     return;
                 }
-                if (mask & (1 << i)) rec(i+1, num);
                 else {
-                    for (int j = 1; j < num; j++) {
-                        if (cnt[j] < S) {
-                            cnt[j]++;
-                            assign[i] = j;
-                            rec(i+1, num);
-                            cnt[j]--;
+                    if (mask & (1 << i)) rec(i+1, num);
+                    else {
+                        for (int j = 1; j < num; j++) {
+                            if (cnt[j] < S) {
+                                cnt[j]++;
+                                assign[i] = j;
+                                rec(i+1, num);
+                                cnt[j]--;
+                            }
                         }
-                    }
-                    if (num < B) {
-                        cnt[num]++;
-                        assign[i] = num;
-                        rec(i+1, num+1);
-                        cnt[num]--;
+                        if (num < B) {
+                            cnt[num]++;
+                            assign[i] = num;
+                            rec(i+1, num+1);
+                            cnt[num]--;
+                        }
                     }
                 }
             };
-
             rec(0, 1);
         }
-
     }
     cout << ans << '\n';
     return 0;

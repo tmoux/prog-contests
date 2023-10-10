@@ -52,45 +52,37 @@ ostream& operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-ll SZ = 1 << 19; //set this to power of two
-ll* seg = new ll[2*SZ]; //segtree implementation by bqi343's Github
+double solve() {
+  pair<int, int> P; cin >> P.first >> P.second;
+  pair<int, int> A; cin >> A.first >> A.second;
+  pair<int, int> B; cin >> B.first >> B.second;
+  pair<int, int> O = {0, 0};
 
-ll combine(ll a, ll b) { return a + b; }
+  auto in = [&](pair<int, int> a, pair<int, int> b, double r) -> bool {
+    return hypot(a.first - b.first, a.second - b.second) <= r;
+  };
 
-void update(int p, ll value) {
-  for (seg[p += SZ] = value; p > 1; p >>= 1)
-    seg[p>>1] = combine(seg[(p|1)^1], seg[p|1]);
-}
 
-ll query(int l, int r) {  // sum on interval [l, r]
-  ll resL = 0, resR = 0; r++;
-  for (l += SZ, r += SZ; l < r; l >>= 1, r >>= 1) {
-    if (l&1) resL = combine(resL,seg[l++]);
-    if (r&1) resR = combine(seg[--r],resR);
+  double lo = 0, hi = 1e4+4;
+  REP(200) {
+    double mid = (lo + hi) / 2;
+    bool poss = false;
+    poss |= in(O, A, mid) && in(A, P, mid);
+    poss |= in(O, A, mid) && in(A, B, 2*mid) && in(B, P, mid);
+
+    poss |= in(O, B, mid) && in(B, P, mid);
+    poss |= in(O, B, mid) && in(B, A, 2*mid) && in(A, P, mid);
+
+    if (poss) hi = mid;
+    else lo = mid;
   }
-  return combine(resL,resR);
-}
 
+  return hi;
+}
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int N, Q; cin >> N >> Q;
-  F0R(i, N) {
-    int x; cin >> x;
-    update(i, x);
-  }
-
-  REP(Q) {
-    int t; cin >> t;
-    if (t == 0) {
-      int p, x; cin >> p >> x;
-      ll v = query(p, p) + x;
-      update(p, v);
-    }
-    else {
-      int l, r; cin >> l >> r;
-      r--;
-      cout << query(l, r) << '\n';
-    }
-  }
+  int T; cin >> T;
+  cout << fixed << setprecision(10);
+  while (T--) cout << solve() << '\n';
 }

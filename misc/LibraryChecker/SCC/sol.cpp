@@ -52,45 +52,83 @@ ostream& operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-ll SZ = 1 << 19; //set this to power of two
-ll* seg = new ll[2*SZ]; //segtree implementation by bqi343's Github
+int n, m;
+vector < vector<int> > g, gr; //g stores graph, gr stores graph transposed
+vector<bool> used;
+vector<int> order, component;
 
-ll combine(ll a, ll b) { return a + b; }
-
-void update(int p, ll value) {
-  for (seg[p += SZ] = value; p > 1; p >>= 1)
-    seg[p>>1] = combine(seg[(p|1)^1], seg[p|1]);
+void dfs1 (int v) {
+    used[v] = true;
+    for (size_t i=0; i<g[v].size(); ++i)
+        if (!used[ g[v][i] ])
+            dfs1 (g[v][i]);
+    order.push_back (v);
 }
 
-ll query(int l, int r) {  // sum on interval [l, r]
-  ll resL = 0, resR = 0; r++;
-  for (l += SZ, r += SZ; l < r; l >>= 1, r >>= 1) {
-    if (l&1) resL = combine(resL,seg[l++]);
-    if (r&1) resR = combine(seg[--r],resR);
+void dfs2 (int v) {
+    used[v] = true;
+    component.push_back (v);
+    for (size_t i=0; i<gr[v].size(); ++i)
+        if (!used[ gr[v][i] ])
+            dfs2 (gr[v][i]);
+}
+
+vector<vector<int>> sccs;
+void findSCCs() {
+    order.clear();
+    used.assign (n, false);
+    for (int i=0; i<n; ++i)
+        if (!used[i])
+            dfs1 (i);
+    used.assign (n, false);
+    for (int i=0; i<n; ++i) {
+        int v = order[n-1-i];
+        if (!used[v]) {
+            dfs2 (v);
+            sccs.push_back(component);
+            //SCC FOUND, DO SOMETHING
+            component.clear();
+        }
+    }
+
+}
+
+void addEdge(int a, int b) {
+  g[a].push_back(b);
+  gr[b].push_back(a);
+}
+
+
+template<typename T>
+void output_vector(const vector<T>& v) {
+  for (auto it = v.begin(); it != v.end(); ++it) {
+    cout << *it << (next(it) == v.end() ? '\n' : ' ');
   }
-  return combine(resL,resR);
 }
 
+template<typename T>
+void output_vector(const vector<T>& v, int offset) {
+  for (auto it = v.begin(); it != v.end(); ++it) {
+    cout << (*it + offset) << (next(it) == v.end() ? '\n' : ' ');
+  }
+}
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int N, Q; cin >> N >> Q;
-  F0R(i, N) {
-    int x; cin >> x;
-    update(i, x);
+  cin >> n >> m;
+  g.resize(n);
+  gr.resize(n);
+  REP(m) {
+    int a, b; cin >> a >> b;
+    addEdge(a, b);
   }
 
-  REP(Q) {
-    int t; cin >> t;
-    if (t == 0) {
-      int p, x; cin >> p >> x;
-      ll v = query(p, p) + x;
-      update(p, v);
-    }
-    else {
-      int l, r; cin >> l >> r;
-      r--;
-      cout << query(l, r) << '\n';
-    }
+
+  findSCCs();
+
+  cout << sz(sccs) << '\n';
+  for (auto c: sccs) {
+    cout << sz(c) << ' ';
+    output_vector(c);
   }
 }

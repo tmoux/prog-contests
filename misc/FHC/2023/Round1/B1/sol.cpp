@@ -52,45 +52,61 @@ ostream& operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-ll SZ = 1 << 19; //set this to power of two
-ll* seg = new ll[2*SZ]; //segtree implementation by bqi343's Github
-
-ll combine(ll a, ll b) { return a + b; }
-
-void update(int p, ll value) {
-  for (seg[p += SZ] = value; p > 1; p >>= 1)
-    seg[p>>1] = combine(seg[(p|1)^1], seg[p|1]);
-}
-
-ll query(int l, int r) {  // sum on interval [l, r]
-  ll resL = 0, resR = 0; r++;
-  for (l += SZ, r += SZ; l < r; l >>= 1, r >>= 1) {
-    if (l&1) resL = combine(resL,seg[l++]);
-    if (r&1) resR = combine(seg[--r],resR);
+template<typename T>
+void output_vector(const vector<T>& v) {
+  for (auto it = v.begin(); it != v.end(); ++it) {
+    cout << *it << (next(it) == v.end() ? '\n' : ' ');
   }
-  return combine(resL,resR);
 }
 
+template<typename T>
+void output_vector(const vector<T>& v, int offset) {
+  for (auto it = v.begin(); it != v.end(); ++it) {
+    cout << (*it + offset) << (next(it) == v.end() ? '\n' : ' ');
+  }
+}
+
+vector<int> solve() {
+  int P; cin >> P;
+  int orig = P;
+  vector<int> primes;
+  for (int i = 2; i*i <= orig; i++) {
+    while (P % i == 0) {
+      P /= i;
+      primes.push_back(i);
+    }
+  }
+  if (P > 1) primes.push_back(P);
+  ll sum = std::accumulate(all(primes), 0LL);
+  const int SUM = 41;
+  if (sum > SUM) {
+    // cout << "FAILED AT " << orig << endl;
+    // DEBUG(primes);
+    return {};
+  }
+  else {
+    REP(SUM - sum) primes.push_back(1);
+    assert(sz(primes) <= 100);
+    assert(std::accumulate(all(primes), 0LL) == SUM);
+    ll prod = 1;
+    for (auto x: primes) prod *= x;
+    assert(prod == orig);
+    return primes;
+  }
+}
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int N, Q; cin >> N >> Q;
-  F0R(i, N) {
-    int x; cin >> x;
-    update(i, x);
-  }
-
-  REP(Q) {
-    int t; cin >> t;
-    if (t == 0) {
-      int p, x; cin >> p >> x;
-      ll v = query(p, p) + x;
-      update(p, v);
+  int T; cin >> T;
+  FOR(tc, 1, T+1) {
+    cout << "Case #" << tc << ": ";
+    auto ans = solve();
+    if (ans.empty()) {
+      cout << -1 << '\n';
     }
     else {
-      int l, r; cin >> l >> r;
-      r--;
-      cout << query(l, r) << '\n';
+      cout << sz(ans) << ' ';
+      output_vector(ans);
     }
   }
 }

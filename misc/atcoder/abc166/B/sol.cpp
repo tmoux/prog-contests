@@ -52,45 +52,66 @@ ostream& operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-ll SZ = 1 << 19; //set this to power of two
-ll* seg = new ll[2*SZ]; //segtree implementation by bqi343's Github
-
-ll combine(ll a, ll b) { return a + b; }
-
-void update(int p, ll value) {
-  for (seg[p += SZ] = value; p > 1; p >>= 1)
-    seg[p>>1] = combine(seg[(p|1)^1], seg[p|1]);
-}
-
-ll query(int l, int r) {  // sum on interval [l, r]
-  ll resL = 0, resR = 0; r++;
-  for (l += SZ, r += SZ; l < r; l >>= 1, r >>= 1) {
-    if (l&1) resL = combine(resL,seg[l++]);
-    if (r&1) resR = combine(seg[--r],resR);
-  }
-  return combine(resL,resR);
-}
-
+/*
+** ABC
+** AB C
+** AC B
+** BC A
+** A B C
+ */
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int N, Q; cin >> N >> Q;
+  int N; cin >> N;
+  ll A, B, C; cin >> A >> B >> C;
+  vector<ll> X(N);
+  F0R(i, N) cin >> X[i];
+
+  auto calc = [&](ll x, ll m) -> ll {
+    return x % m == 0 ? 0 : m - (x % m);
+  };
+
+  ll ans = -1;
+  // ABC
   F0R(i, N) {
-    int x; cin >> x;
-    update(i, x);
+    if (i == 0) ans = calc(X[i], lcm(lcm(A, B), C));
+    else ckmin(ans, calc(X[i], lcm(lcm(A, B), C)));
   }
 
-  REP(Q) {
-    int t; cin >> t;
-    if (t == 0) {
-      int p, x; cin >> p >> x;
-      ll v = query(p, p) + x;
-      update(p, v);
+  vector<pair<ll, int>> AS, BS;
+  auto prep = [&](ll a, ll b) {
+    AS.clear(); BS.clear();
+    F0R(i, N) {
+      AS.emplace_back(calc(X[i], a), i);
+      BS.emplace_back(calc(X[i], b), i);
     }
-    else {
-      int l, r; cin >> l >> r;
-      r--;
-      cout << query(l, r) << '\n';
+    sort(all(AS));
+    sort(all(BS));
+  };
+  auto solve2 = [&](int exclude, ll a, ll b) -> ll {
+    const ll INF = 1e18 + 5;
+    ll ans = 2 * INF;
+    F0R(i, min(5, sz(AS))) {
+      F0R(j, min(5, sz(BS))) {
+        if (AS[i].second != BS[j].second && AS[i].second != exclude && BS[j].second != exclude) {
+          ckmin(ans, AS[i].first + BS[j].first);
+        }
+      }
     }
+    return ans;
+  };
+
+  prep(lcm(A, B), C);
+  ckmin(ans, solve2(-1, lcm(A, B), C));
+  prep(lcm(A, C), B);
+  ckmin(ans, solve2(-1, lcm(A, C), B));
+  prep(lcm(B, C), A);
+  ckmin(ans, solve2(-1, lcm(B, C), A));
+
+  prep(B, C);
+  F0R(i, N) {
+    ckmin(ans, calc(X[i], A) + solve2(i, B, C));
   }
+
+  cout << ans << '\n';
 }

@@ -52,45 +52,44 @@ ostream& operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
-ll SZ = 1 << 19; //set this to power of two
-ll* seg = new ll[2*SZ]; //segtree implementation by bqi343's Github
+int solve() {
+  int N; cin >> N;
+  string s; cin >> s;
+  vector<int> press(N+1, 0), on(N+1, 0);
+  for (int i = 1; i <= N; i++) on[i] = s[i-1] - '0';
 
-ll combine(ll a, ll b) { return a + b; }
-
-void update(int p, ll value) {
-  for (seg[p += SZ] = value; p > 1; p >>= 1)
-    seg[p>>1] = combine(seg[(p|1)^1], seg[p|1]);
-}
-
-ll query(int l, int r) {  // sum on interval [l, r]
-  ll resL = 0, resR = 0; r++;
-  for (l += SZ, r += SZ; l < r; l >>= 1, r >>= 1) {
-    if (l&1) resL = combine(resL,seg[l++]);
-    if (r&1) resR = combine(seg[--r],resR);
+  int Q; cin >> Q;
+  REP(Q) {
+    int b; cin >> b;
+    press[b] ^= 1;
   }
-  return combine(resL,resR);
-}
+  for (int i = 1; i <= N; i++) {
+    if (press[i]) {
+      for (int j = i; j <= N; j += i) {
+        on[j] ^= 1;
+      }
+    }
+  }
 
+  int ans = 0;
+  for (int i = 1; i <= N; i++) {
+    if (on[i]) {
+      ans++;
+      for (int j = i; j <= N; j += i) {
+        on[j] ^= 1;
+      }
+    }
+  }
+  for (int i = 1; i <= N; i++) {
+    assert(!on[i]);
+  }
+  return ans;
+}
 
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int N, Q; cin >> N >> Q;
-  F0R(i, N) {
-    int x; cin >> x;
-    update(i, x);
-  }
-
-  REP(Q) {
-    int t; cin >> t;
-    if (t == 0) {
-      int p, x; cin >> p >> x;
-      ll v = query(p, p) + x;
-      update(p, v);
-    }
-    else {
-      int l, r; cin >> l >> r;
-      r--;
-      cout << query(l, r) << '\n';
-    }
+  int T; cin >> T;
+  FOR(tc, 1, T+1) {
+    cout << "Case #" << tc << ": " << solve() << '\n';
   }
 }

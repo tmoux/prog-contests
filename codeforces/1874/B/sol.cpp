@@ -15,6 +15,7 @@ using ll = long long;
 template<class T> bool ckmin(T& a, const T& b) { return b < a ? a = b, 1 : 0; }
 template<class T> bool ckmax(T& a, const T& b) { return a < b ? a = b, 1 : 0; }
 
+
 namespace std {
   template<class Fun>
   class y_combinator_result {
@@ -52,55 +53,110 @@ ostream& operator<<(ostream &os, const T_container &v) {
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 // }}}
 
+// (a, b, m) -> 8 options, map to 5 states
+// do BFS from valid ending states
+
+const int MX = 4e5+5;
+bool good[MX];
+vector<int> adj[MX];
+int dist[MX];
+
+array<int, 8> unpack(int x) {
+  array<int, 8> a;
+  for (int i = 8-1; i >= 0; i--) {
+    a[i] = x % 5;
+    x /= 5;
+  }
+  return a;
+}
+
+int pack(array<int, 8> a) {
+  int x = 0;
+  F0R(i, 8) {
+    x = (x * 5) + a[i];
+  }
+  return x;
+}
+
+array<int, 3> unpackBit(int x) {
+  return {(x >> 2) & 1, (x >> 1) & 1, x & 1};
+};
+int packBit(array<int, 3> a) {
+  return 4 * a[0] + 2 * a[1] + a[2];
+}
+
+array<int, 3> trans(int a, int b, int m, int t) {
+  if (t == 0) {
+    return {a & b, b, m};
+  }
+  else if (t == 1) {
+    return {a | b, b, m};
+  }
+  else if (t == 2) {
+    return {a, a ^ b, m};
+  }
+  else if (t == 3) {
+    return {a, b ^ m, m};
+  }
+  else assert(0);
+}
+
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  const int MX = 1 << 5;
-  vector<bool> good(MX, 0);
-  auto pack = [&](int a, int b, int c, int d, int m) -> int {
-    return 2 * (2 * (2 * (2 * a + b) + c) + d) + m;
-  };
-  auto unpack = [&](int x) -> array<int, 5> {
-    return {(x >> 4) & 1, (x >> 3) & 1, (x >> 2) & 1, (x >> 1) & 1, x & 1 };
-  };
-  F0R(a, 2) F0R(b, 2) F0R(m, 2) {
-    int x = pack(a, b, a, b, m);
-    good[x] = 1;
-  }
-  auto mask_is_good = [&](int mask) -> bool {
-    F0R(i, MX) {
-      if ((mask & (1 << i)) && !good[i]) return false;
+  int mx = 1;
+  REP(8) mx *= 5;
+  F0R(x, mx) {
+    auto A = unpack(x);
+
+    good[x] = true;
+    F0R(i, 8) {
+      if (A[i] == 4) continue;
+      auto [a, b, m] = unpackBit(i);
+      int c = (A[i] >> 1) & 1, d = A[i] & 1;
+      if (a != c || b != d) good[x] = false;
     }
-    return true;
-  };
 
-  auto trans = [&](int mask, int t) -> int {
-    int ret = 0;
-    F0R(i, MX) {
-      if (mask & (1 << i)) {
-        auto [a, b, c, d, m] = unpack(i);
-        if (t == 0) a &= b;
-        else if (t == 1) a |= b;
-        else if (t == 2) b ^= a;
-        else b ^= m;
+    F0R(t, 4) {
+      bool poss = true;
+      array<int, 8> B = {4, 4, 4, 4, 4, 4, 4, 4};
+      F0R(i, 8) {
+        if (A[i] == 4) continue;
+        auto [a, b, m] = unpackBit(i);
 
-        ret |= 1 << pack(a, b, c, d, m);
+        int j = packBit(trans(a, b, m, t));
+        if (B[j] != 4 && B[j] != A[i]) {
+          poss = false;
+          break;
+        }
+        else B[j] = A[i];
+      }
+
+      if (poss) {
+        adj[pack(B)].push_back(x);
       }
     }
-    return ret;
-  };
+  }
+  memset(dist, -1, sizeof dist);
+  queue<int> q;
+  F0R(x, mx) if (good[x]) {
+    dist[x] = 0;
+    q.push(x);
+  }
+  while (!q.empty()) {
+    auto x = q.front(); q.pop();
+    for (auto y: adj[x]) {
+      if (dist[y] == -1) {
+        dist[y] = dist[x] + 1;
+        q.push(y);
+      }
+    }
+  }
+
   int T; cin >> T;
-
-  int mx = 0;
-  while (T--) {
-    int A, B, C, D, M;
-    cin >> A >> B >> C >> D >> M;
-    // A = rng() % (1 << 10);
-    // B = rng() % (1 << 10);
-    // C = rng() % (1 << 10);
-    // D = rng() % (1 << 10);
-    // M = rng() % (1 << 10);
-
-    int mask = 0;
+  REP(T) {
+    int A, B, C, D, M; cin >> A >> B >> C >> D >> M;
+    array<int, 8> arr = {4, 4, 4, 4, 4, 4, 4, 4};
+    bool poss = true;
     F0R(i, 30) {
       int a = (A >> i) & 1;
       int b = (B >> i) & 1;
@@ -108,64 +164,20 @@ int main() {
       int d = (D >> i) & 1;
       int m = (M >> i) & 1;
 
-      int x = pack(a, b, c, d, m);
-      // DEBUG(x);
-      mask |= 1 << x;
-    }
-    map<int, int> dist;
-    queue<int> q;
-    q.push(mask);
-    dist[mask] = 0;
-
-    int ans = -1;
-
-    auto update = [&](int x, int y) -> void {
-      if (!dist.count(y)) {
-        dist[y] = dist[x] + 1;
-        q.push(y);
+      int x = packBit({a, b, m});
+      int y = (2 * c) + d;
+      if (arr[x] != 4 && arr[x] != y) {
+        poss = false;
       }
-    };
-    while (!q.empty()) {
-      int x = q.front(); q.pop();
-      // cout << x << ": " << dist[x] << ' ' << good[x] << endl;
-      if (mask_is_good(x)) {
-        ans = dist[x];
-        break;
-      }
-      if (dist.count(x))
-      // auto [a, b, c, d, m] = unpack(x);
-      F0R(i, 4) {
-        update(x, trans(x, i));
-        // cout << "trans " << x << ' ' << trans(x, i) << endl;
+      else {
+        arr[x] = y;
       }
     }
-    cout << ans << '\n';
-    ckmax(mx, ans);
+    if (!poss) {
+      cout << -1 << '\n';
+    }
+    else {
+      cout << dist[pack(arr)] << '\n';
+    }
   }
-
-  // for (int a: {0, 1}) {
-  //   for (int b: {0, 1}) {
-  //     for (int m: {0, 1}) {
-  //       cout << a << ' ' << b << ' ' << m << ":::::\n";
-  //       map<pair<int, int>, int> dist;
-  //       queue<pair<int, int>> q;
-  //       q.push({a, b});
-  //       dist[{a, b}] = 0;
-  //       while (!q.empty()) {
-  //         auto [x, y] = q.front(); q.pop();
-  //         cout << "found " << x << ' ' << y << ' ' << dist[{x, y}] << endl;
-  //         auto upd = [&](int nx, int ny) -> void {
-  //           if (!dist.count({nx, ny})) {
-  //             dist[{nx, ny}] = dist[{x, y}] + 1;
-  //             q.push({nx, ny});
-  //           }
-  //         };
-  //         upd(x & y, y);
-  //         upd(x | y, y);
-  //         upd(x, x ^ y);
-  //         upd(x, y ^ m);
-  //       }
-  //     }
-  //   }
-  // }
 }
