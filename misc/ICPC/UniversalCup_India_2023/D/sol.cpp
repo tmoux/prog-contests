@@ -333,48 +333,6 @@ void solve() {
   F0R(i, sz(ans)) {
     cout << ans[i]+1 << " \n"[i == sz(ans)-1];
   }
-  // priority_queue<pair<int, int>> pq;
-  // F0R(i, N) {
-  //   int c = 0;
-  //   for (int j: tree.adj[i]) {
-  //     if (j == tree.par[0][i]) continue;
-  //     c++;
-  //   }
-  //   if (c == 0) {
-  //     int j = tree.walkUp(i, K);
-  //     int d = tree.depth[j];
-  //     pq.push({d, j});
-  //   }
-  // }
-
-  // segtree<int, Seg::op, Seg::e> seg(N+1);
-  // auto isc = [&](int i) {
-  //   return seg.prod(0, tree.tin[i]) == 0;
-  // };
-  // auto add = [&](int i) {
-  //   seg.set(tree.tin[i], seg.get(tree.tin[i]) + 1);
-  //   seg.set(tree.tout[i]+1, seg.get(tree.tout[i]+1) - 1);
-  // };
-
-  // vector<int> ans;
-  // while (!pq.empty()) {
-  //   auto [d, i] = pq.top(); pq.pop();
-  //   // cout << "pushiing " << d << ' ' << i << endl;
-  //   if (isc(i)) {
-  //     ans.push_back(i);
-  //     add(i);
-  //     if (i != 0) {
-  //       int j = tree.walkUp(tree.par[0][i], K);
-  //       int d = tree.depth[j];
-  //       pq.push({d, j});
-  //     }
-  //   }
-  // }
-
-  // cout << sz(ans) << '\n';
-  // F0R(i, sz(ans)) {
-  //   cout << ans[i]+1 << " \n"[i == sz(ans)-1];
-  // }
 }
 
 int main() {
