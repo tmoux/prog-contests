@@ -99,6 +99,28 @@ int hopcroftKarp(vector<vi>& g, vi& btoa) {
   }
 }
 
+const int maxn = 2 * 3005;
+//Storing the graph
+vector<int> g[maxn];
+//Storing whether we have visited a node
+bool vis[maxn];
+//Storing the vertex matched to
+int match[maxn];
+
+bool hungarian(int u){
+  for (int i = 0;i < g[u].size();++i){
+    int v = g[u][i];
+    if (!vis[v]){
+			vis[v] = true;
+			if (match[v] == -1 || hungarian(match[v])){
+				match[u] = v; match[v] = u; return true;
+			}
+		}
+	}
+	return false;
+}
+
+
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
   int N; cin >> N;
@@ -134,17 +156,24 @@ int main() {
     }
   }
 
-  vector<vi> g(ca);
-  F0R(i, N) g[compA[i]].push_back(compB[i]);
-  vector<int> btoa(cb, -1);
+  F0R(i, N) {
+    g[compA[i]].push_back(compB[i] + N);
+    g[compB[i] + N].push_back(compA[i]);
+  }
 
-  hopcroftKarp(g, btoa);
+  //in main: call hungarian for each vertex on one side
+  memset(match, -1, sizeof match);
+  for (int i = 0;i < N;++i){
+    memset(vis,false,sizeof vis);
+    hungarian(i);
+  }
+
   set<pair<int, int>> matching;
-  F0R(i, cb) if (btoa[i] != -1) matching.insert({btoa[i], i});
+  F0R(i, ca) if (match[i] != -1) matching.insert({i, match[i]});
 
   vector<int> ans;
   F0R(i, N) {
-    int a = compA[i], b = compB[i];
+    int a = compA[i], b = compB[i] + N;
     if (matching.count({a, b})) {
       matching.erase({a, b});
     }

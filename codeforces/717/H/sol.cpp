@@ -66,53 +66,67 @@ void output_vector(const vector<T>& v, int offset) {
   }
 }
 
-void solve() {
-  int N; cin >> N;
-  vector<int> A(N);
-  F0R(i, N) {
-    cin >> A[i];
-  }
-  vector<int> B(N);
-  F0Rd(i, N) {
-    if (i == N-1) B[i] = A[i];
-    else B[i] = max(B[i], B[i+1] + 1);
-  }
-
-  auto check = [&](vector<int> v, int i) -> bool {
-    for (int j = i-1; j >= 0; j--) {
-      if (!(A[j] < A[j+1])) return false;
-    }
-    for (int j = i+1; j < N; j++) {
-      if (!(A[j] < A[j-1])) return false;
-    }
-    return true;
-  };
-  F0R(i, N) {
-    if (i == N-1 || B[i+1] < 0) {
-      vector<int> ans(N);
-      ans[i] = 0;
-      for (int j = i-1; j >= 0; j--) {
-        ans[j] = max(A[j], ans[j+1]-1);
-      }
-      for (int j = i+1; j < N; j++) {
-        ans[j] = max(A[j], ans[j-1]-1);
-      }
-      if (check(ans, i)) {
-        cout << "YES\n";
-        output_vector(ans);
-        return;
-      }
-      else {
-        cout << "No\n";
-        return;
-      }
-    }
-  }
-  cout << "No\n";
-}
-
 int main() {
   ios_base::sync_with_stdio(false); cin.tie(NULL);
-  int T; cin >> T;
-  while (T--) solve();
+  int N; cin >> N;
+  int M; cin >> M;
+  vector<vector<int>> adj(N);
+  REP(M) {
+    int a, b; cin >> a >> b;
+    a--, b--;
+    adj[a].push_back(b);
+    adj[b].push_back(a);
+  }
+
+  vector<vector<int>> wish(N);
+  int mxT = 0;
+  F0R(i, N) {
+    int k; cin >> k;
+    REP(k) {
+      int t; cin >> t;
+      ckmax(mxT, t);
+      wish[i].push_back(t-1);
+    }
+  }
+
+  vector<int> conf(N);
+  F0R(i, N) {
+    vector<int> c(2, 0);
+    for (int j: adj[i]) {
+      if (j < i) {
+        c[conf[j]]++;
+      }
+    }
+    if (c[0] > c[1]) conf[i] = 1;
+    else conf[i] = 0;
+  }
+
+  while (1) {
+    vector<int> assign(mxT);
+    for (int t = 0; t < mxT; t++) {
+      assign[t] = rng() & 1;
+    }
+    vector<int> team(N);
+    bool poss = true;
+    F0R(i, N) {
+      bool ok = false;
+      for (int t: wish[i]) {
+        if (assign[t] == conf[i]) {
+          team[i] = t + 1;
+          ok = true;
+          break;
+        }
+      }
+      if (!ok) {
+        poss = false;
+        break;
+      }
+    }
+
+    if (poss) {
+      output_vector(team);
+      output_vector(assign, +1);
+      return 0;
+    }
+  }
 }
