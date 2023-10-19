@@ -29,6 +29,9 @@ Time Complexity O(M N^2 / 64).
 
 ## Determine whether a vector can be written as a linear combination of other vectors.
 
+Solution: Check if vector is in span of the basis.
+See https://codeforces.com/blog/entry/68953.
+
 ## Given a multiset with additions/deletions, compute the sum of the smallest K numbers.
 More formally, support the following queries in O(log n):
 - Add x.
