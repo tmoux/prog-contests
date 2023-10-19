@@ -12,6 +12,7 @@ CMakeLists.txt
 **/out
 **/my
 **/sys
+**/Stress
 
 **/*.aux
 **/*.lof
