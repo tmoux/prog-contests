@@ -1,5 +1,5 @@
-CC = g++
-CFLAGS = -std=c++20 -Wall
+CC = g++-13
+CFLAGS = -O2 -std=c++20 -Wall
 
 all: sol
 
